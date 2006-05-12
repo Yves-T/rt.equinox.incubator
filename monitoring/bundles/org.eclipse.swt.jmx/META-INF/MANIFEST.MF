@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SWT JMX Plug-in
+Bundle-SymbolicName: org.eclipse.swt.jmx;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.equinox.jmx.server
+Eclipse-LazyStart: false
+Import-Package: javax.management,
+ javax.management.remote,
+ org.eclipse.core.runtime,
+ org.eclipse.equinox.jmx.common,
+ org.eclipse.osgi.util,
+ org.eclipse.swt.graphics,
+ org.eclipse.swt.widgets,
+ org.osgi.framework
+Bundle-RequiredExecutionEnvironment: J2SE-1.5,
+ CDC-1.0/Foundation-1.0,
+ J2SE-1.3
