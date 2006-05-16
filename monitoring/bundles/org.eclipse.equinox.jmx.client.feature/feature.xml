@@ -32,7 +32,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.equinox.jmx.provider.jdk5rmi"
+         id="org.eclipse.equinox.jmx.rmi"
          download-size="0"
          install-size="0"
          version="0.0.0"
