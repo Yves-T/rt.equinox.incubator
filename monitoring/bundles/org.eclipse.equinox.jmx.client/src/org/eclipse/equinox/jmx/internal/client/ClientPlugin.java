@@ -107,7 +107,10 @@ public class ClientPlugin extends AbstractUIPlugin {
 	 * @param exception The thrown exception.
 	 */
 	public static void logError(Throwable exception) {
-		log(exception.getMessage(), exception, IStatus.ERROR);
+		String message = exception.getMessage();
+		if (message == null)
+			message = "Exception occurred.";
+		log(message, exception, IStatus.ERROR);
 	}
 
 	/**
