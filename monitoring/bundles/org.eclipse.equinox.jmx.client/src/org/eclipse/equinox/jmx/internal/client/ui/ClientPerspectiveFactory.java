@@ -18,6 +18,9 @@ import org.eclipse.ui.IPerspectiveFactory;
  */
 public class ClientPerspectiveFactory implements IPerspectiveFactory {
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
+	 */
 	public void createInitialLayout(IPageLayout layout) {
 		layout.setEditorAreaVisible(false);
 

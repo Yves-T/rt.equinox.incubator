@@ -17,7 +17,7 @@ import javax.management.remote.JMXConnector;
 import org.eclipse.core.runtime.*;
 import org.eclipse.equinox.jmx.client.IJMXConnectorProvider;
 import org.eclipse.equinox.jmx.common.JMXConstants;
-import org.eclipse.equinox.jmx.internal.client.ClientPlugin;
+import org.eclipse.equinox.jmx.internal.client.Activator;
 import org.eclipse.equinox.jmx.internal.client.MBeanServerProxy;
 import org.eclipse.equinox.jmx.internal.client.ui.ClientUI;
 import org.eclipse.equinox.jmx.internal.client.ui.contributionsview.ContributionsViewPart;
@@ -101,7 +101,7 @@ public class NewConnectionAction implements IWorkbenchWindowActionDelegate {
 					isConnecting = false;
 					serverProxy = new MBeanServerProxy(connector.getMBeanServerConnection());
 				} catch (Exception e) {
-					ClientPlugin.logError(e.getMessage(), e);
+					Activator.logError(e.getMessage(), e);
 					MessageDialog.openError(window.getShell(), ActionMessages.error_message, e.getMessage());
 				}
 			}
@@ -118,7 +118,7 @@ public class NewConnectionAction implements IWorkbenchWindowActionDelegate {
 					connector = null;
 				} catch (IOException e) {
 					MessageDialog.openError(window.getShell(), ActionMessages.error_message, e.getMessage());
-					ClientPlugin.log(e);
+					Activator.log(e);
 				}
 			}
 			connected = false;
@@ -162,7 +162,7 @@ public class NewConnectionAction implements IWorkbenchWindowActionDelegate {
 				contributionsView.setMBeanServerProxy(serverProxy);
 			}
 		} catch (PartInitException e) {
-			ClientPlugin.log(e);
+			Activator.log(e);
 		}
 	}
 
@@ -170,7 +170,7 @@ public class NewConnectionAction implements IWorkbenchWindowActionDelegate {
 		if (transports == null) {
 			transports = new HashMap();
 		}
-		IExtensionPoint point = RegistryFactory.getRegistry().getExtensionPoint(ClientPlugin.PI_NAMESPACE, ClientPlugin.PT_TRANSPORT);
+		IExtensionPoint point = RegistryFactory.getRegistry().getExtensionPoint(Activator.PI_NAMESPACE, Activator.PT_TRANSPORT);
 		IExtension[] types = point.getExtensions();
 		for (int i = 0; i < types.length; i++) {
 			loadTransportConfigurationElements(types[i].getConfigurationElements());
@@ -182,7 +182,7 @@ public class NewConnectionAction implements IWorkbenchWindowActionDelegate {
 			IConfigurationElement element = configElems[j];
 			final String elementName = element.getName();
 			String transport;
-			if (elementName.equals(ClientPlugin.PT_TRANSPORT) && null != element.getAttribute("class") //$NON-NLS-1$
+			if (elementName.equals(Activator.PT_TRANSPORT) && null != element.getAttribute("class") //$NON-NLS-1$
 					&& null != (transport = element.getAttribute("protocol"))) //$NON-NLS-1$
 			{
 				try {
@@ -191,7 +191,7 @@ public class NewConnectionAction implements IWorkbenchWindowActionDelegate {
 						transports.put(transport, obj);
 					}
 				} catch (CoreException e) {
-					ClientPlugin.log(e);
+					Activator.log(e);
 				}
 			}
 		}

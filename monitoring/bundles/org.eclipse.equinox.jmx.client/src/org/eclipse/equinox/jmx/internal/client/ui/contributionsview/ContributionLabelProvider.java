@@ -18,7 +18,7 @@ import javax.management.MBeanOperationInfo;
 import org.eclipse.equinox.jmx.common.ContributionProxy;
 import org.eclipse.equinox.jmx.common.ContributionProxyMBean;
 import org.eclipse.equinox.jmx.common.util.ByteArrayHolder;
-import org.eclipse.equinox.jmx.internal.client.ClientPlugin;
+import org.eclipse.equinox.jmx.internal.client.Activator;
 import org.eclipse.equinox.jmx.internal.client.ui.util.ByteImageRegistry;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.graphics.Image;
@@ -57,7 +57,7 @@ public class ContributionLabelProvider implements ILabelProvider {
 				try {
 					return decorateImage(imageRegistry.getImage(imageData), element);
 				} catch (IOException e) {
-					ClientPlugin.log(e);
+					Activator.log(e);
 				}
 			}
 		}

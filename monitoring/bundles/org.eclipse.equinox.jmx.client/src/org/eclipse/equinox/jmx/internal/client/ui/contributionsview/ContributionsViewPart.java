@@ -12,7 +12,7 @@ package org.eclipse.equinox.jmx.internal.client.ui.contributionsview;
 
 import java.io.IOException;
 import javax.management.*;
-import org.eclipse.equinox.jmx.internal.client.ClientPlugin;
+import org.eclipse.equinox.jmx.internal.client.Activator;
 import org.eclipse.equinox.jmx.internal.client.MBeanServerProxy;
 import org.eclipse.equinox.jmx.internal.client.ui.actions.ActionMessages;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -32,6 +32,9 @@ public class ContributionsViewPart extends ViewPart {
 	protected ContributionLabelProvider labelProvider;
 	protected MBeanServerProxy serverProxy;
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.SINGLE | SWT.V_SCROLL | SWT.H_SCROLL);
 		viewer.setUseHashlookup(true);
@@ -55,6 +58,9 @@ public class ContributionsViewPart extends ViewPart {
 		viewer.setLabelProvider(labelProvider);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
 	public void setFocus() {
 		viewer.getTree().setFocus();
 	}
@@ -65,7 +71,7 @@ public class ContributionsViewPart extends ViewPart {
 			contentProvider.setServerContributionProxy(proxy);
 			updateViewer();
 		} catch (Exception e) {
-			ClientPlugin.logError(e);
+			Activator.logError(e);
 		}
 	}
 
@@ -73,6 +79,9 @@ public class ContributionsViewPart extends ViewPart {
 		return serverProxy;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
 	public void dispose() {
 		super.dispose();
 	}

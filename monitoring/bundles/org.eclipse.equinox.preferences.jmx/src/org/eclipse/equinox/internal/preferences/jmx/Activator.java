@@ -13,6 +13,7 @@ package org.eclipse.equinox.internal.preferences.jmx;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -62,17 +63,18 @@ public class Activator implements BundleActivator {
 	/*
 	 * Log the given error.
 	 */
-	public static void log(String message, Exception e) {
-		// TODO we need to log
-		//		if (logService == null) {
-		//			logService = new ServiceTracker(context, ILog.class.getName(), null);
-		//			logService.open();
-		//		}
-		//		ILog log = (ILog) logService.getService();
-		//		if (log == null)
-		//			return;
-		//		IStatus status = new Status(IStatus.ERROR, BUNDLE_NAME, 0, message, e);
-		//		log.log(status);
+	public static void log(String message, Exception exception) {
+		if (logService == null) {
+			logService = new ServiceTracker(context, LogService.class.getName(), null);
+			logService.open();
+		}
+		LogService log = (LogService) logService.getService();
+		if (log == null) {
+			System.out.println(message);
+			if (exception != null)
+				exception.printStackTrace(System.out);
+		} else
+			log.log(LogService.LOG_ERROR, message, exception);
 	}
 
 	public static BundleContext getContext() {

@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.equinox.jmx.common.util;
+package org.eclipse.osgi.jmx.internal;
 
 import java.io.*;
 import java.net.URL;
@@ -17,7 +17,6 @@ import java.util.jar.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.eclipse.core.runtime.*;
-import org.eclipse.equinox.jmx.internal.common.CommonPlugin;
 import org.eclipse.osgi.service.pluginconversion.PluginConversionException;
 import org.eclipse.osgi.service.pluginconversion.PluginConverter;
 import org.eclipse.osgi.service.resolver.*;
@@ -107,7 +106,7 @@ public class BundleUtils {
 	}
 
 	public static BundleDescription getBundleDescription(Dictionary manifest, File bundleLocation, long bundleId) throws BundleException {
-		BundleContext context = CommonPlugin.getDefault().getBundleContext();
+		BundleContext context = Activator.getBundleContext();
 		ServiceReference platformAdminReference = context.getServiceReference(PlatformAdmin.class.getName());
 		if (platformAdminReference == null)
 			return null;

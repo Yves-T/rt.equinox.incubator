@@ -56,46 +56,73 @@ public class SleakContributionProvider extends ContributionProvider {
 		refreshInterval = interval.intValue();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.jmx.server.ContributionProvider#contributesType(java.lang.Object)
+	 */
 	protected boolean contributesType(Object obj) {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.jmx.server.ContributionProvider#providesType(java.lang.Object)
+	 */
 	protected boolean providesType(Object obj) {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.jmx.server.ContributionProvider#createProvider(java.lang.Object)
+	 */
 	protected ContributionProvider createProvider(Object obj) {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.jmx.server.ContributionProvider#createContribution(java.lang.Object)
+	 */
 	protected Contribution createContribution(Object obj) throws MalformedObjectNameException {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.jmx.server.Contribution#getName()
+	 */
 	protected String getName() {
 		return SleakMessages.name;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.jmx.server.Contribution#getChildren()
+	 */
 	protected Object[] getChildren() {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.jmx.server.Contribution#getProperties()
+	 */
 	protected Set getProperties() {
 		Set result = new TreeSet();
-		result.add(SleakMessages.colors + " " + colors);
-		result.add(SleakMessages.cursors + " " + cursors);
-		result.add(SleakMessages.fonts + " " + fonts);
-		result.add(SleakMessages.gcs + " " + gcs);
-		result.add(SleakMessages.images + " " + images);
-		result.add(SleakMessages.regions + " " + regions);
+		result.add(SleakMessages.colors + " " + colors); //$NON-NLS-1$
+		result.add(SleakMessages.cursors + " " + cursors); //$NON-NLS-1$
+		result.add(SleakMessages.fonts + " " + fonts); //$NON-NLS-1$
+		result.add(SleakMessages.gcs + " " + gcs); //$NON-NLS-1$
+		result.add(SleakMessages.images + " " + images); //$NON-NLS-1$
+		result.add(SleakMessages.regions + " " + regions); //$NON-NLS-1$
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.jmx.server.Contribution#getImageLocation()
+	 */
 	protected URL getImageLocation() {
 		return null;
 	}
 
-	protected MBeanInfo getMBeanInfo(Object contributionDelegate) {
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.jmx.server.Contribution#getMBeanInfo(java.lang.Object)
+	 */
+	protected MBeanInfo getMBeanInfo(Object delegate) {
 		MBeanOperationInfo[] ops = new MBeanOperationInfo[3];
 		ops[0] = createStartOperation();
 		ops[1] = createStopOperation();
@@ -103,6 +130,9 @@ public class SleakContributionProvider extends ContributionProvider {
 		return new MBeanInfo(SleakContributionProvider.class.getName(), SleakMessages.description, null, null, ops, null);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.jmx.server.Contribution#invokeOperation(java.lang.String, java.lang.Object[], java.lang.String[])
+	 */
 	protected Object invokeOperation(String operationName, Object[] args, String[] argTypes) {
 		if (operationName.equals("start")) {
 			start();
@@ -117,17 +147,29 @@ public class SleakContributionProvider extends ContributionProvider {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.management.DynamicMBean#getAttribute(java.lang.String)
+	 */
 	public Object getAttribute(String attribute) throws AttributeNotFoundException, MBeanException, ReflectionException {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.management.DynamicMBean#setAttribute(javax.management.Attribute)
+	 */
 	public void setAttribute(Attribute attribute) throws AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException {
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.management.DynamicMBean#getAttributes(java.lang.String[])
+	 */
 	public AttributeList getAttributes(String[] attributes) {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.management.DynamicMBean#setAttributes(javax.management.AttributeList)
+	 */
 	public AttributeList setAttributes(AttributeList attributes) {
 		return null;
 	}

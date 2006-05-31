@@ -14,9 +14,12 @@ import java.net.URL;
 import org.eclipse.core.runtime.*;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
+ * The activator class for this bundle.
+ * 
  * @since 1.0
  */
 public class Activator implements BundleActivator {
@@ -44,18 +47,21 @@ public class Activator implements BundleActivator {
 	}
 
 	/*
-	 * Log the given error.
+	 * Log the given message and error to the log file.
 	 */
-	public static void log(String message, Exception e) {
+	public static void log(String message, Exception exception) {
 		if (logService == null) {
-			logService = new ServiceTracker(context, ILog.class.getName(), null);
+			logService = new ServiceTracker(context, LogService.class.getName(), null);
 			logService.open();
 		}
-		ILog log = (ILog) logService.getService();
-		if (log == null)
-			return;
-		IStatus status = new Status(IStatus.ERROR, BUNDLE_NAME, 0, message, e);
-		log.log(status);
+		LogService log = (LogService) logService.getService();
+		if (log == null) {
+			System.out.println(BUNDLE_NAME);
+			System.out.println(message);
+			if (exception != null)
+				exception.printStackTrace(System.out);
+		} else
+			log.log(IStatus.ERROR, message, exception);
 	}
 
 	static URL getImageLocation(String path) {

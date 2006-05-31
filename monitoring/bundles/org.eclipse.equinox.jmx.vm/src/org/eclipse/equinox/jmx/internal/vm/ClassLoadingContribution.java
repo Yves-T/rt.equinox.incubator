@@ -48,9 +48,9 @@ public class ClassLoadingContribution extends Contribution {
 	protected Set getProperties() {
 		Set result = new HashSet();
 		ClassLoadingMXBean mbean = (ClassLoadingMXBean) contributionDelegate;
-		result.add(VMStatsMessages.cl_loadedclscnt + ": " + mbean.getLoadedClassCount());
-		result.add(VMStatsMessages.cl_totloadedclscnt + ": " + mbean.getTotalLoadedClassCount());
-		result.add(VMStatsMessages.cl_totunloadedclscnt + ": " + mbean.getUnloadedClassCount());
+		result.add(VMStatsMessages.cl_loadedclscnt + ": " + mbean.getLoadedClassCount()); //$NON-NLS-1$
+		result.add(VMStatsMessages.cl_totloadedclscnt + ": " + mbean.getTotalLoadedClassCount()); //$NON-NLS-1$
+		result.add(VMStatsMessages.cl_totunloadedclscnt + ": " + mbean.getUnloadedClassCount()); //$NON-NLS-1$
 		return result;
 	}
 

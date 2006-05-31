@@ -14,7 +14,6 @@ import java.net.URL;
 import java.util.Set;
 import javax.management.*;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.equinox.jmx.common.util.BundleUtils;
 import org.eclipse.equinox.jmx.server.Contribution;
 import org.eclipse.equinox.jmx.server.ContributionProvider;
 import org.eclipse.osgi.service.resolver.BundleDescription;
@@ -103,7 +102,7 @@ public class BundleRequiresProvider extends ContributionProvider {
 	/* (non-Javadoc)
 	 * @see org.eclipse.equinox.jmx.server.Contribution#getMBeanInfo(java.lang.Object)
 	 */
-	protected MBeanInfo getMBeanInfo(Object contributionDelegate) {
+	protected MBeanInfo getMBeanInfo(Object delegate) {
 		return null;
 	}
 

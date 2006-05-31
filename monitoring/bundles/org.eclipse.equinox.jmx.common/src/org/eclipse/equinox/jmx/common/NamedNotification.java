@@ -35,6 +35,9 @@ public class NamedNotification extends Notification implements Comparable {
 		return notificationId;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(T)
+	 */
 	public int compareTo(Object obj) {
 		if (!(obj instanceof NamedNotification)) {
 			if (obj instanceof Comparable) {

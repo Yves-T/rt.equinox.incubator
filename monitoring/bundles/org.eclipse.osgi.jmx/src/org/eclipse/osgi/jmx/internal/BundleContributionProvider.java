@@ -15,7 +15,6 @@ import java.util.*;
 import javax.management.*;
 import org.eclipse.core.runtime.*;
 import org.eclipse.equinox.jmx.common.ContributionNotificationEvent;
-import org.eclipse.equinox.jmx.common.util.BundleUtils;
 import org.eclipse.equinox.jmx.server.Contribution;
 import org.eclipse.equinox.jmx.server.ContributionProvider;
 import org.eclipse.osgi.util.NLS;
@@ -167,7 +166,7 @@ public class BundleContributionProvider extends ContributionProvider implements 
 	/* (non-Javadoc)
 	 * @see com.jmx.server.contrib.ContributionProvider#getMBeanInfo(java.lang.Object)
 	 */
-	public MBeanInfo getMBeanInfo(Object contributionDelegate) {
+	public MBeanInfo getMBeanInfo(Object delegate) {
 		return new MBeanInfo(getClass().getName(), null, null, null, new MBeanOperationInfo[] {createInstallOperation()}, null);
 	}
 

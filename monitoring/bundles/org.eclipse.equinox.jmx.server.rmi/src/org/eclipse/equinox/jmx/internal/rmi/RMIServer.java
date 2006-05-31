@@ -31,13 +31,16 @@ public class RMIServer implements IJMXConnectorServerProvider {
 		return new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + port + "/" + domain);
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.management.remote.JMXConnectorServerProvider#newJMXConnectorServer(javax.management.remote.JMXServiceURL, java.util.Map, javax.management.MBeanServer)
+	 */
 	public JMXConnectorServer newJMXConnectorServer(JMXServiceURL arg0, Map arg1, MBeanServer arg2) throws IOException {
 		initialize();
 		return JMXConnectorServerFactory.newJMXConnectorServer(arg0, arg1, arg2);
 	}
 
 	private void initialize() throws IOException {
-		// load the security policy from the plugin install location
+		// load the security policy from the bundle install location
 		IPath serverPolicyFileName = new Path("server.policy"); //$NON-NLS-1$
 		URL serverPolicyBundleURL = FileLocator.find(Activator.getBundleContext().getBundle(), serverPolicyFileName, null);
 		if (serverPolicyBundleURL == null)

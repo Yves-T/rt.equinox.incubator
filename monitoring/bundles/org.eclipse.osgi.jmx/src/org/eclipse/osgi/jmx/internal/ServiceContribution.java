@@ -190,7 +190,7 @@ public class ServiceContribution extends Contribution implements ServiceListener
 	/* (non-Javadoc)
 	 * @see com.jmx.server.contrib.Contribution#getMBeanInfo(java.lang.Object)
 	 */
-	public MBeanInfo getMBeanInfo(Object serviceDelegate) {
+	public MBeanInfo getMBeanInfo(Object delegate) {
 		return mbeanInfo;
 	}
 

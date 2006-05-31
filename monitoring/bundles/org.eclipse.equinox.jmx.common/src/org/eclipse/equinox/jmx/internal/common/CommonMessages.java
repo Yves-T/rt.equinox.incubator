@@ -16,6 +16,7 @@ public class CommonMessages extends NLS {
 
 	public static String invalid_server_type;
 	public static String contribution_instance_not_found;
+	public static String exception_occurred;
 
 	private CommonMessages() {
 		// disallow instantiations

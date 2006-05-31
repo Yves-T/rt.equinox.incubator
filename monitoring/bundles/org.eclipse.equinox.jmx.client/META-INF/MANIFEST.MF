@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: JMX Client Plug-in
 Bundle-SymbolicName: org.eclipse.equinox.jmx.client;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: org.eclipse.equinox.jmx.internal.client.ClientPlugin
+Bundle-Activator: org.eclipse.equinox.jmx.internal.client.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

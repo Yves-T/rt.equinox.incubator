@@ -43,6 +43,9 @@ public class ByteImageRegistry extends ImageRegistry {
 		return cache;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.jmx.internal.client.ui.viewsupport.ImageRegistry#dispose()
+	 */
 	public void dispose() {
 		getCache().clear();
 		super.dispose();

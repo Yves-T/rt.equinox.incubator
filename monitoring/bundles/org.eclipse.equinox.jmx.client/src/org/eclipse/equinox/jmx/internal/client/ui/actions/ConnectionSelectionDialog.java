@@ -47,15 +47,15 @@ public class ConnectionSelectionDialog extends SelectionDialog {
 		this.transports = transports;
 	}
 
-	/**
-	 * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.dialogs.SelectionDialog#configureShell(org.eclipse.swt.widgets.Shell)
 	 */
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(ActionMessages.connection_selection_dialog_title);
 	}
 
-	/**
+	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
 	 */
 	protected Control createDialogArea(final Composite parent) {
@@ -101,6 +101,9 @@ public class ConnectionSelectionDialog extends SelectionDialog {
 		return composite;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+	 */
 	protected void okPressed() {
 		if (hostText.getText().equals("")) { //$NON-NLS-1$
 			MessageDialog.openError(parent.getShell(), ActionMessages.error_message, ActionMessages.invalid_host);

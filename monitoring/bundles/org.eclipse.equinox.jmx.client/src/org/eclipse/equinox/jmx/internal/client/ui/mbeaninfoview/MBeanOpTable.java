@@ -28,26 +28,41 @@ public class MBeanOpTable {
 	protected class MBeanOpContentProvider implements IStructuredContentProvider {
 		private MBeanOperationInfo[] fOps;
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
 		public Object[] getElements(Object inputElement) {
 			if (fOps == null)
 				return new Object[0];
 			return fOps;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
 		public void dispose() {
 			// nothing needs to be disposed
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+		 */
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			fOps = (MBeanOperationInfo[]) newInput;
 		}
 	}
 
 	protected class MBeanOpLabelProvider extends LabelProvider implements ITableLabelProvider {
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
+		 */
 		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
+		 */
 		public String getColumnText(Object element, int columnIndex) {
 			if (!(element instanceof MBeanOperationInfo))
 				return super.getText(element);
@@ -79,6 +94,9 @@ public class MBeanOpTable {
 	}
 
 	protected class MBeanOpViewerFilter extends ViewerFilter {
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+		 */
 		public boolean select(Viewer viewer, Object parentElement, Object element) {
 			if (element instanceof MBeanOperationInfo) {
 				MBeanOperationInfo info = (MBeanOperationInfo) element;
@@ -96,6 +114,9 @@ public class MBeanOpTable {
 			fIndex = index;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+		 */
 		public int compare(Viewer viewer, Object e1, Object e2) {
 			if (e1 instanceof MBeanOperationInfo && e2 instanceof MBeanOperationInfo) {
 				MBeanOperationInfo op1 = (MBeanOperationInfo) e1;

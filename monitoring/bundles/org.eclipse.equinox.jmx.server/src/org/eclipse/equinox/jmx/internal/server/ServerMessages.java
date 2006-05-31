@@ -23,6 +23,7 @@ public final class ServerMessages extends NLS {
 	public static String invalid_jmx_server;
 	public static String expected_non_null_jmxconnector;
 	public static String duplicate_protocol_provider;
+	public static String exception_occurred;
 
 	private ServerMessages() {
 		// disallow instantiations

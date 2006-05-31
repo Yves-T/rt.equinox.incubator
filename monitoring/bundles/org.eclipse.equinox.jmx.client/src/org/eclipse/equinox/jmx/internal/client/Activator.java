@@ -20,11 +20,9 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
- * The main plugin class to be used in the desktop.
- * 
- * @since 1.0
+ * The activator for this bundle.
  */
-public class ClientPlugin extends AbstractUIPlugin {
+public class Activator extends AbstractUIPlugin {
 
 	public static final String PI_NAMESPACE = "org.eclipse.equinox.jmx.client"; //$NON-NLS-1$
 	public static final String PT_TRANSPORT = "transport"; //$NON-NLS-1$
@@ -34,28 +32,28 @@ public class ClientPlugin extends AbstractUIPlugin {
 	static final String DELIM = ":"; //$NON-NLS-1$
 
 	//The shared instance.
-	private static ClientPlugin plugin;
+	private static Activator singleton;
 
 	/**
 	 * The constructor.
 	 */
-	public ClientPlugin() {
-		plugin = this;
+	public Activator() {
+		singleton = this;
 	}
 
-	/**
-	 * This method is called upon plug-in activation
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 	}
 
-	/**
-	 * This method is called when the plug-in is stopped
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
-		plugin = null;
+		singleton = null;
 	}
 
 	/**
@@ -63,13 +61,13 @@ public class ClientPlugin extends AbstractUIPlugin {
 	 *
 	 * @return the shared instance.
 	 */
-	public static ClientPlugin getDefault() {
-		return plugin;
+	public static Activator getDefault() {
+		return singleton;
 	}
 
 	/**
 	 * Returns an image descriptor for the image file at the given
-	 * plug-in relative path.
+	 * bundle relative path.
 	 *
 	 * @param path the path
 	 * @return the image descriptor
@@ -79,7 +77,7 @@ public class ClientPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Log to the <code>ServerPlugin</code>s log.
+	 * Log to this bundle's log file.
 	 * 
 	 * @param message The message to log.
 	 * @param exception The exception to log.
@@ -90,7 +88,7 @@ public class ClientPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Logs the message to the <code>ServerPlugin</code>s log with
+	 * Logs the message to this bundle's log file with
 	 * status <code>IStatus.ERROR</code>.
 	 * 
 	 * @param message The message to log.
@@ -101,7 +99,7 @@ public class ClientPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Logs the message to the <code>ServerPlugin</code>s log with
+	 * Logs the message to this bundle's log file with
 	 * status <code>IStatus.ERROR</code>.
 	 * 
 	 * @param exception The thrown exception.
@@ -114,7 +112,7 @@ public class ClientPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Logs the message to the <code>ServerPlugin</code>s log with
+	 * Logs the message to this bundle's log file with
 	 * status <code>IStatus.INFO</code>.
 	 * 
 	 * @param message The message to log.
@@ -124,7 +122,7 @@ public class ClientPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Logs the throwable to the <code>ServerPlugin</code>s log with
+	 * Logs the throwable to this bundle's log file with
 	 * status <code>IStatus.INFO</code>.
 	 * 
 	 * @param exception The thrown exception.
@@ -158,6 +156,9 @@ public class ClientPlugin extends AbstractUIPlugin {
 		getPreferenceStore().setValue(CONNECTION_PREFERENCE_NAME, sbuf.toString());
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#initializeDefaultPreferences(org.eclipse.jface.preference.IPreferenceStore)
+	 */
 	protected void initializeDefaultPreferences(IPreferenceStore store) {
 		store.setDefault(CONNECTION_PREFERENCE_NAME, "service:jmx:rmi:///jndi/rmi://127.0.0.1:8118/" + JMXConstants.DEFAULT_DOMAIN);
 	}

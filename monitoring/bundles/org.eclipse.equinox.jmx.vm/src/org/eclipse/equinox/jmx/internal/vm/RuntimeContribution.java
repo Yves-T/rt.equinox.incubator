@@ -47,16 +47,16 @@ public class RuntimeContribution extends Contribution {
 	protected Set getProperties() {
 		Set result = new HashSet();
 		RuntimeMXBean mbean = (RuntimeMXBean) contributionDelegate;
-		result.add(VMStatsMessages.rt_vmname + ": " + mbean.getVmName());
-		result.add(VMStatsMessages.rt_vmvendor + ": " + mbean.getVmVendor());
-		result.add(VMStatsMessages.rt_vmversion + ": " + mbean.getVmVersion());
-		result.add(VMStatsMessages.rt_starttime + ": " + new Date(mbean.getStartTime()));
-		result.add(VMStatsMessages.rt_uptime + ": " + new Date(mbean.getUptime()));
-		result.add(VMStatsMessages.rt_bootclasspath + ": " + mbean.getBootClassPath());
-		result.add(VMStatsMessages.rt_systemclasspath + ": " + mbean.getClassPath());
-		result.add(VMStatsMessages.rt_inputargs + ": " + Arrays.toString(mbean.getInputArguments().toArray()));
-		result.add(VMStatsMessages.rt_ldpath + ": " + mbean.getLibraryPath());
-		result.add(VMStatsMessages.rt_mgmtspecver + ": " + mbean.getManagementSpecVersion());
+		result.add(VMStatsMessages.rt_vmname + ": " + mbean.getVmName()); //$NON-NLS-1$
+		result.add(VMStatsMessages.rt_vmvendor + ": " + mbean.getVmVendor()); //$NON-NLS-1$
+		result.add(VMStatsMessages.rt_vmversion + ": " + mbean.getVmVersion()); //$NON-NLS-1$
+		result.add(VMStatsMessages.rt_starttime + ": " + new Date(mbean.getStartTime())); //$NON-NLS-1$
+		result.add(VMStatsMessages.rt_uptime + ": " + new Date(mbean.getUptime())); //$NON-NLS-1$
+		result.add(VMStatsMessages.rt_bootclasspath + ": " + mbean.getBootClassPath()); //$NON-NLS-1$
+		result.add(VMStatsMessages.rt_systemclasspath + ": " + mbean.getClassPath()); //$NON-NLS-1$
+		result.add(VMStatsMessages.rt_inputargs + ": " + Arrays.toString(mbean.getInputArguments().toArray())); //$NON-NLS-1$
+		result.add(VMStatsMessages.rt_ldpath + ": " + mbean.getLibraryPath()); //$NON-NLS-1$
+		result.add(VMStatsMessages.rt_mgmtspecver + ": " + mbean.getManagementSpecVersion()); //$NON-NLS-1$
 		return result;
 	}
 

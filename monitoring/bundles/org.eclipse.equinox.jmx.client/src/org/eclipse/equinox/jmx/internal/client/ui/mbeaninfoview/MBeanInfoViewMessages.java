@@ -37,7 +37,7 @@ public class MBeanInfoViewMessages extends NLS {
 	private MBeanInfoViewMessages() {
 		// disallow instantiations
 	}
-	
+
 	static {
 		NLS.initializeMessages(MBeanInfoViewMessages.class.getName(), MBeanInfoViewMessages.class);
 	}

@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.eclipse.equinox.jmx.common
 Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin
 Eclipse-LazyStart: true
-Bundle-Activator: org.eclipse.equinox.jmx.internal.common.CommonPlugin
+Bundle-Activator: org.eclipse.equinox.jmx.internal.common.Activator
 Bundle-Vendor: Eclipse.org
 Export-Package: org.eclipse.equinox.jmx.common,
  org.eclipse.equinox.jmx.common.util
@@ -18,10 +18,9 @@ Import-Package: javax.management,
  javax.management.remote,
  javax.management.remote.rmi,
  javax.management.timer,
- org.eclipse.osgi.service.pluginconversion,
- org.eclipse.osgi.service.resolver,
  org.eclipse.osgi.util,
- org.osgi.framework;version="1.3.0",
+ org.osgi.framework,
+ org.osgi.service.log,
  org.osgi.util.tracker
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
  CDC-1.0/Foundation-1.0,

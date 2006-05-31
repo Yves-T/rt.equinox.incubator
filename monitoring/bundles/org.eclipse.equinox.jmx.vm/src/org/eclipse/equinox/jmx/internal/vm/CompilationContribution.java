@@ -48,8 +48,8 @@ public class CompilationContribution extends Contribution {
 	protected Set getProperties() {
 		Set result = new HashSet();
 		CompilationMXBean mbean = (CompilationMXBean) contributionDelegate;
-		result.add(VMStatsMessages.cmp_jitname + ": " + mbean.getName());
-		result.add(VMStatsMessages.cmp_tottime + ": " + mbean.getTotalCompilationTime());
+		result.add(VMStatsMessages.cmp_jitname + ": " + mbean.getName()); //$NON-NLS-1$
+		result.add(VMStatsMessages.cmp_tottime + ": " + mbean.getTotalCompilationTime()); //$NON-NLS-1$
 		return result;
 	}
 

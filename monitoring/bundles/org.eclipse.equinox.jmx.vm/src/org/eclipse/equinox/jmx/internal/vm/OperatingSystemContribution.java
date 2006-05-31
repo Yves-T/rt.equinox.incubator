@@ -48,10 +48,10 @@ public class OperatingSystemContribution extends Contribution {
 	protected Set getProperties() {
 		Set result = new HashSet();
 		OperatingSystemMXBean mbean = (OperatingSystemMXBean) contributionDelegate;
-		result.add(VMStatsMessages.os_name + ": " + mbean.getName());
-		result.add(VMStatsMessages.os_version + ": " + mbean.getVersion());
-		result.add(VMStatsMessages.os_arch + ": " + mbean.getArch());
-		result.add(VMStatsMessages.os_ncpus + ": " + mbean.getAvailableProcessors());
+		result.add(VMStatsMessages.os_name + ": " + mbean.getName()); //$NON-NLS-1$
+		result.add(VMStatsMessages.os_version + ": " + mbean.getVersion()); //$NON-NLS-1$
+		result.add(VMStatsMessages.os_arch + ": " + mbean.getArch()); //$NON-NLS-1$
+		result.add(VMStatsMessages.os_ncpus + ": " + mbean.getAvailableProcessors()); //$NON-NLS-1$
 		return result;
 	}
 

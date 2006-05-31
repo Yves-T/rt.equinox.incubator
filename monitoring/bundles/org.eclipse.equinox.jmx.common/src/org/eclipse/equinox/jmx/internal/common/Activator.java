@@ -13,8 +13,10 @@ package org.eclipse.equinox.jmx.internal.common;
 import org.eclipse.core.runtime.IStatus;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.log.LogService;
+import org.osgi.util.tracker.ServiceTracker;
 
-public class CommonPlugin implements BundleActivator {
+public class Activator implements BundleActivator {
 
 	// default server settings
 	public static final String DEFAULT_DOMAIN = "jmxserver"; //$NON-NLS-1$
@@ -28,32 +30,39 @@ public class CommonPlugin implements BundleActivator {
 	public static final String PT_CONTRIBUTIONUI = "contributionui"; //$NON-NLS-1$
 
 	//The shared instance.
-	private static CommonPlugin plugin;
+	private static Activator instance;
 	private static BundleContext bundleContext;
+	private static ServiceTracker logService;
 
 	/**
 	 * The constructor.
 	 */
-	public CommonPlugin() {
-		plugin = this;
+	public Activator() {
+		instance = this;
 	}
 
-	/**
-	 * This method is called upon plug-in activation
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
 		bundleContext = context;
 	}
 
-	/**
-	 * This method is called when the plug-in is stopped
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
+		instance = null;
+		if (logService != null) {
+			logService.close();
+			logService = null;
+		}
 	}
 
 	/**
-	 * @return The bundle context.
+	 * Return this bundle's context.
+	 * 
+	 * @return the bundle context
 	 */
 	public BundleContext getBundleContext() {
 		return bundleContext;
@@ -62,24 +71,54 @@ public class CommonPlugin implements BundleActivator {
 	/**
 	 * Returns the shared instance.
 	 */
-	public static CommonPlugin getDefault() {
-		return plugin;
+	public static Activator getDefault() {
+		return instance;
 	}
 
 	/**
-	 * Log to the <code>ServerPlugin</code>s log.
+	 * Log the given message and exception to the log file.
 	 * 
 	 * @param message The message to log.
 	 * @param exception The exception to log.
 	 * @param iStatusSeverity The <code>IStatus</code> severity level.
 	 */
 	public static void log(String message, Throwable exception, int iStatusSeverity) {
-		//		getDefault().getLog().log(new Status(iStatusSeverity, PLUGIN_ID, 0, message, exception));
+		if (message == null) {
+			message = exception.getMessage();
+			if (message == null)
+				message = CommonMessages.exception_occurred;
+		}
+		if (logService == null) {
+			logService = new ServiceTracker(bundleContext, LogService.class.getName(), null);
+			logService.open();
+		}
+		LogService log = (LogService) logService.getService();
+		int severity = LogService.LOG_INFO;
+		switch (iStatusSeverity) {
+			case IStatus.ERROR :
+				severity = LogService.LOG_ERROR;
+				break;
+			case IStatus.WARNING :
+				severity = LogService.LOG_WARNING;
+				break;
+			case IStatus.INFO :
+			default :
+				severity = LogService.LOG_INFO;
+				break;
+		}
+		if (log == null) {
+			System.out.println(PLUGIN_ID);
+			System.out.println(severity);
+			System.out.println(message);
+			if (exception != null)
+				exception.printStackTrace(System.out);
+		} else
+			log.log(severity, message, exception);
 	}
 
 	/**
-	 * Logs the message to the <code>ServerPlugin</code>s log with
-	 * status <code>IStatus.ERROR</code>.
+	 * Log the given message and exception to the log file with a
+	 * status code of <code>IStatus.ERROR</code>.
 	 * 
 	 * @param message The message to log.
 	 * @param exception The thrown exception.
@@ -89,8 +128,8 @@ public class CommonPlugin implements BundleActivator {
 	}
 
 	/**
-	 * Logs the message to the <code>ServerPlugin</code>s log with
-	 * status <code>IStatus.ERROR</code>.
+	 * Log the given exception to the log file with a
+	 * status code of <code>IStatus.ERROR</code>.
 	 *
 	 * @param exception The thrown exception.
 	 */
@@ -99,8 +138,8 @@ public class CommonPlugin implements BundleActivator {
 	}
 
 	/**
-	 * Logs the message to the <code>ServerPlugin</code>s log with
-	 * status <code>IStatus.INFO</code>.
+	 * Log the given message to the log file with a
+	 * status code of <code>IStatus.INFO</code>.
 	 * 
 	 * @param message The message to log.
 	 */
@@ -109,13 +148,13 @@ public class CommonPlugin implements BundleActivator {
 	}
 
 	/**
-	 * Logs the throwable to the <code>ServerPlugin</code>s log with
-	 * status <code>IStatus.INFO</code>.
+	 * Log the given exception to the log file with a
+	 * status code of <code>IStatus.INFO</code>.
 	 * 
 	 * @param exception The thrown exception.
 	 */
 	public static void log(Throwable exception) {
-		logError(exception.getMessage(), exception);
+		log(exception.getMessage(), exception, IStatus.INFO);
 	}
 
 }

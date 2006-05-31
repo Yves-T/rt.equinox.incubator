@@ -13,7 +13,7 @@ package org.eclipse.equinox.jmx.client.remote;
 import java.util.*;
 import javax.management.*;
 import org.eclipse.equinox.jmx.common.NamedNotification;
-import org.eclipse.equinox.jmx.internal.client.ClientPlugin;
+import org.eclipse.equinox.jmx.internal.client.Activator;
 
 public class RemoteNotificationHandler {
 
@@ -89,7 +89,7 @@ public class RemoteNotificationHandler {
 						}
 					}
 				} catch (Exception e) {
-					ClientPlugin.log(e);
+					Activator.log(e);
 					break;
 				}
 			}
@@ -126,7 +126,7 @@ public class RemoteNotificationHandler {
 						try {
 							notificationQueue.wait();
 						} catch (InterruptedException e) {
-							ClientPlugin.log(e);
+							Activator.log(e);
 							Thread.currentThread().interrupt();
 							continue outer;
 						}

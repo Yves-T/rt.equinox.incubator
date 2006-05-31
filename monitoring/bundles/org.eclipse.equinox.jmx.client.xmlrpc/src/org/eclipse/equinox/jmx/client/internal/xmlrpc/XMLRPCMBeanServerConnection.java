@@ -26,6 +26,7 @@ import org.eclipse.equinox.jmx.common.NamedNotification;
  */
 public class XMLRPCMBeanServerConnection implements MBeanServerConnection, RemoteMBeanConnection {
 
+	private static final String CREATE_MBEAN = "createMBean"; //$NON-NLS-1$
 	private XmlRpcClient clientConnection;
 	private RemoteNotificationHandler notificationHandler;
 
@@ -39,7 +40,7 @@ public class XMLRPCMBeanServerConnection implements MBeanServerConnection, Remot
 	 */
 	public ObjectInstance createMBean(String className, ObjectName name) throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, IOException {
 		try {
-			return (ObjectInstance) clientConnection.execute("createMBean", new Object[] {className, name});
+			return (ObjectInstance) clientConnection.execute(CREATE_MBEAN, new Object[] {className, name});
 		} catch (XmlRpcException e) {
 			throw new MBeanException(e);
 		}
@@ -50,7 +51,7 @@ public class XMLRPCMBeanServerConnection implements MBeanServerConnection, Remot
 	 */
 	public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName) throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, InstanceNotFoundException, IOException {
 		try {
-			return (ObjectInstance) clientConnection.execute("createMBean", new Object[] {className, name, loaderName});
+			return (ObjectInstance) clientConnection.execute(CREATE_MBEAN, new Object[] {className, name, loaderName});
 		} catch (XmlRpcException e) {
 			throw new MBeanException(e);
 		}
@@ -61,7 +62,7 @@ public class XMLRPCMBeanServerConnection implements MBeanServerConnection, Remot
 	 */
 	public ObjectInstance createMBean(String className, ObjectName name, Object[] params, String[] signature) throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, IOException {
 		try {
-			return (ObjectInstance) clientConnection.execute("createMBean", new Object[] {className, name, params, signature});
+			return (ObjectInstance) clientConnection.execute(CREATE_MBEAN, new Object[] {className, name, params, signature});
 		} catch (XmlRpcException e) {
 			throw new MBeanException(e);
 		}
@@ -72,7 +73,7 @@ public class XMLRPCMBeanServerConnection implements MBeanServerConnection, Remot
 	 */
 	public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName, Object[] params, String[] signature) throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, InstanceNotFoundException, IOException {
 		try {
-			return (ObjectInstance) clientConnection.execute("createMBean", new Object[] {className, name, loaderName, params, signature});
+			return (ObjectInstance) clientConnection.execute(CREATE_MBEAN, new Object[] {className, name, loaderName, params, signature});
 		} catch (XmlRpcException e) {
 			throw new MBeanException(e);
 		}

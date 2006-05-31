@@ -18,6 +18,11 @@ public class ServerExtensionManager extends Observable implements IRegistryChang
 
 	public static class ContributionExtensionDefinition {
 
+		private static final String ATTRIBUTE_CLASS = "class"; //$NON-NLS-1$
+		private static final String ATTRIBUTE_IS_ROOT = "isroot"; //$NON-NLS-1$
+		private static final String ELEMENT_CONTRIBUTION = "contribution"; //$NON-NLS-1$
+		private static final String ELEMENT_EXTENDS_CLASS = "extendsClass"; //$NON-NLS-1$
+
 		private String providerClassName;
 		private boolean isRootProvider;
 		private Set extendsClasses;
@@ -26,28 +31,26 @@ public class ServerExtensionManager extends Observable implements IRegistryChang
 		ContributionExtensionDefinition(final IConfigurationElement contribElem) {
 			final String elementName = contribElem.getName();
 			// check for require mbean element and associated class attribute
-			if (elementName.equalsIgnoreCase("contribution") //$NON-NLS-1$
-					&& (providerClassName = contribElem.getAttribute("class")) != null) //$NON-NLS-1$
-			{
+			if (elementName.equalsIgnoreCase(ELEMENT_CONTRIBUTION) && (providerClassName = contribElem.getAttribute(ATTRIBUTE_CLASS)) != null) {
 				try {
-					Object obj = contribElem.createExecutableExtension("class"); //$NON-NLS-1$
+					Object obj = contribElem.createExecutableExtension(ATTRIBUTE_CLASS);
 					if (obj instanceof ContributionProvider) {
 						provider = (ContributionProvider) obj;
 						// check if provider is a root provider and set flag appropriately
 						String attrIsRoot = null;
-						if ((attrIsRoot = contribElem.getAttribute("isroot")) != null) { //$NON-NLS-1$ 
+						if ((attrIsRoot = contribElem.getAttribute(ATTRIBUTE_IS_ROOT)) != null) {
 							isRootProvider = attrIsRoot.equals("true"); //$NON-NLS-1$
 						}
 						// cache any types which this provider extends
-						IConfigurationElement[] extendsElems = contribElem.getChildren("extendsClass");
+						IConfigurationElement[] extendsElems = contribElem.getChildren(ELEMENT_EXTENDS_CLASS);
 						extendsClasses = new TreeSet();
 						for (int j = 0; j < extendsElems.length; j++) {
 							IConfigurationElement extendsElem = extendsElems[j];
-							extendsClasses.add(extendsElem.getAttribute("class"));
+							extendsClasses.add(extendsElem.getAttribute(ATTRIBUTE_CLASS));
 						}
 					}
 				} catch (CoreException e) {
-					ServerPlugin.logError(e);
+					Activator.logError(e);
 				}
 			} else {
 				throw new IllegalArgumentException();
@@ -100,7 +103,7 @@ public class ServerExtensionManager extends Observable implements IRegistryChang
 	}
 
 	private void registerContributions() {
-		IExtensionPoint point = RegistryFactory.getRegistry().getExtensionPoint(ServerPlugin.PI_NAMESPACE, ServerPlugin.PT_CONTRIBUTION);
+		IExtensionPoint point = RegistryFactory.getRegistry().getExtensionPoint(Activator.PI_NAMESPACE, Activator.PT_CONTRIBUTION);
 		IExtension[] types = point.getExtensions();
 		for (int i = 0; i < types.length; i++) {
 			registerContribution(types[i]);
@@ -112,7 +115,7 @@ public class ServerExtensionManager extends Observable implements IRegistryChang
 		for (int j = 0; j < configElems.length; j++) {
 			ContributionExtensionDefinition defn = new ContributionExtensionDefinition(configElems[j]);
 			if (defn.getContributionProvider() == null) {
-				// extension was removed or an error loading the class occured
+				// extension was removed or an error loading the class occurred
 				// remove from map if exists
 				defn = (ContributionExtensionDefinition) providers.remove(defn.getProviderClassName());
 			} else {
@@ -127,7 +130,7 @@ public class ServerExtensionManager extends Observable implements IRegistryChang
 	 * @see org.eclipse.core.runtime.IRegistryChangeListener#registryChanged(org.eclipse.core.runtime.IRegistryChangeEvent)
 	 */
 	public void registryChanged(IRegistryChangeEvent event) {
-		IExtensionDelta[] deltas = event.getExtensionDeltas(ServerPlugin.PI_NAMESPACE, ServerPlugin.PT_CONTRIBUTION);
+		IExtensionDelta[] deltas = event.getExtensionDeltas(Activator.PI_NAMESPACE, Activator.PT_CONTRIBUTION);
 		for (int i = 0; i < deltas.length; i++) {
 			IExtensionDelta delta = deltas[i];
 			registerContribution(delta.getExtension());

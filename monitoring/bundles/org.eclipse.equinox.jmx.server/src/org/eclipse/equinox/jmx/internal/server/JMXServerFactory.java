@@ -23,6 +23,9 @@ import org.eclipse.osgi.util.NLS;
 
 public class JMXServerFactory {
 
+	private static final String ATTRIBUTE_CLASS = "class"; //$NON-NLS-1$
+	private static final String ATTRIBUTE_INITIALIZER_CLASS = "initializerClass"; //$NON-NLS-1$
+
 	private static Map jmxProviderCache;
 
 	private JMXServerFactory() {
@@ -49,14 +52,14 @@ public class JMXServerFactory {
 			try {
 				return (IJMXConnectorServerProvider) providerClass.newInstance();
 			} catch (Exception e) {
-				ServerPlugin.log(e);
+				Activator.log(e);
 			}
 		}
 		return null;
 	}
 
 	private static void loadProviderExtensions() {
-		IExtensionPoint point = RegistryFactory.getRegistry().getExtensionPoint(ServerPlugin.PI_NAMESPACE, ServerPlugin.PT_PROVIDER);
+		IExtensionPoint point = RegistryFactory.getRegistry().getExtensionPoint(Activator.PI_NAMESPACE, Activator.PT_PROVIDER);
 		IExtension[] types = point.getExtensions();
 		for (int i = 0; i < types.length; i++) {
 			loadProviderConfigurationElements(types[i].getConfigurationElements());
@@ -68,24 +71,23 @@ public class JMXServerFactory {
 			IConfigurationElement element = configElems[j];
 			final String elementName = element.getName();
 			String className, protocol;
-			if (elementName.equals(ServerPlugin.PT_PROVIDER) && null != (className = element.getAttribute("class")) //$NON-NLS-1$
+			if (elementName.equals(Activator.PT_PROVIDER) && null != (className = element.getAttribute("class")) //$NON-NLS-1$
 					&& null != (protocol = element.getAttribute("protocol"))) //$NON-NLS-1$
 			{
 				try {
 					// attempt to load initializer before instantiating provider class
-					String initializer = element.getAttribute("initializerClass");
-					if (initializer != null) {
-						element.createExecutableExtension("initializerClass");
-					}
-					Object obj = element.createExecutableExtension("class"); //$NON-NLS-1$
+					String initializer = element.getAttribute(ATTRIBUTE_INITIALIZER_CLASS);
+					if (initializer != null)
+						element.createExecutableExtension(ATTRIBUTE_INITIALIZER_CLASS);
+					Object obj = element.createExecutableExtension(ATTRIBUTE_CLASS);
 					// cache provider class name for protocol
 					if (jmxProviderCache.containsKey(protocol)) {
-						ServerPlugin.log(NLS.bind(ServerMessages.duplicate_protocol_provider, className));
+						Activator.log(NLS.bind(ServerMessages.duplicate_protocol_provider, className));
 						continue;
 					}
 					jmxProviderCache.put(protocol, obj.getClass());
 				} catch (CoreException e) {
-					ServerPlugin.log(e);
+					Activator.log(e);
 				}
 			}
 		}
@@ -95,7 +97,7 @@ public class JMXServerFactory {
 		if (jmxProviderCache == null) {
 			jmxProviderCache = new HashMap();
 			loadProviderExtensions();
-			RegistryFactory.getRegistry().addRegistryChangeListener(new JMXProviderExtensionListener(), ServerPlugin.PI_NAMESPACE + "." + ServerPlugin.PT_PROVIDER);
+			RegistryFactory.getRegistry().addRegistryChangeListener(new JMXProviderExtensionListener(), Activator.PI_NAMESPACE + "." + Activator.PT_PROVIDER);
 		}
 		return jmxProviderCache;
 	}
@@ -106,7 +108,7 @@ public class JMXServerFactory {
 		 * @see org.eclipse.core.runtime.IRegistryChangeListener#registryChanged(org.eclipse.core.runtime.IRegistryChangeEvent)
 		 */
 		public void registryChanged(IRegistryChangeEvent event) {
-			IExtensionDelta[] deltas = event.getExtensionDeltas(ServerPlugin.PI_NAMESPACE, ServerPlugin.PT_PROVIDER);
+			IExtensionDelta[] deltas = event.getExtensionDeltas(Activator.PI_NAMESPACE, Activator.PT_PROVIDER);
 			for (int i = 0; i < deltas.length; i++) {
 				IExtensionDelta delta = deltas[i];
 				loadProviderConfigurationElements(delta.getExtensionPoint().getConfigurationElements());

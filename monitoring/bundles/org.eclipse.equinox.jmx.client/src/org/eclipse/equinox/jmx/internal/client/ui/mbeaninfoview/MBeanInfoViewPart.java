@@ -49,6 +49,9 @@ public class MBeanInfoViewPart extends ViewPart implements ISelectionListener, I
 	private Label fC_desc;
 	private Text fAttributesText;
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		FontData fd[] = parent.getFont().getFontData();
 		fBFont = new Font(parent.getDisplay(), fd[0].getName(), fd[0].height, SWT.BOLD);
@@ -70,6 +73,9 @@ public class MBeanInfoViewPart extends ViewPart implements ISelectionListener, I
 		return fManagedForm.getToolkit();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
 	public void dispose() {
 		fBFont.dispose();
 		fManagedForm.dispose();
@@ -77,10 +83,16 @@ public class MBeanInfoViewPart extends ViewPart implements ISelectionListener, I
 		super.dispose();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
 	public void setFocus() {
 		fManagedForm.setFocus();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if (!(selection instanceof IStructuredSelection))
 			return;

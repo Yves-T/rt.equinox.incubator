@@ -14,7 +14,7 @@ import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
 import org.eclipse.equinox.jmx.common.ContributionProxy;
 import org.eclipse.equinox.jmx.common.util.MBeanUtils;
-import org.eclipse.equinox.jmx.internal.client.ClientPlugin;
+import org.eclipse.equinox.jmx.internal.client.Activator;
 import org.eclipse.equinox.jmx.internal.client.MBeanServerProxy;
 import org.eclipse.equinox.jmx.internal.client.ui.ClientUI;
 import org.eclipse.equinox.jmx.internal.client.ui.contributionsview.ContributionsViewPart;
@@ -46,6 +46,9 @@ public class InvocationView extends ViewPart implements ISelectionListener {
 	protected ContributionProxy fSelectedContribution;
 	private Composite parentComp;
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		parentComp = parent;
 		FontData fd[] = parent.getFont().getFontData();
@@ -53,6 +56,9 @@ public class InvocationView extends ViewPart implements ISelectionListener {
 		getSite().getPage().addSelectionListener(this);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
 	public void dispose() {
 		fItalicFont.dispose();
 		if (fManagedForm != null)
@@ -61,11 +67,17 @@ public class InvocationView extends ViewPart implements ISelectionListener {
 		super.dispose();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
 	public void setFocus() {
 		if (fManagedForm != null)
 			fManagedForm.setFocus();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if (!(selection instanceof IStructuredSelection))
 			return;
@@ -196,7 +208,7 @@ public class InvocationView extends ViewPart implements ISelectionListener {
 					}
 				}
 			} catch (Exception e) {
-				ClientPlugin.logError(e);
+				Activator.logError(e);
 				MessageDialog.openError(null, MBeanInfoViewMessages.error, e.getMessage());
 			}
 		}

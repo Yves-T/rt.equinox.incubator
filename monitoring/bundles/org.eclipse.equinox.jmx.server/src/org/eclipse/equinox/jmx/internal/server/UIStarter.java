@@ -17,19 +17,22 @@ import org.osgi.framework.BundleException;
 
 public class UIStarter implements IStartup {
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IStartup#earlyStartup()
+	 */
 	public void earlyStartup() {
 		// we really don't need to do anything as the plugin.xml is configured such that
 		// the Activator's start() has is invoked (before earlyStartup()) when a class belonging 
-		// to this plugin is loaded, but we will make sure that noone has disable that option and perform
+		// to this plugin is loaded, but we will make sure that no one has disabled that option and perform
 		// the check...
-		Bundle bundle = ServerPlugin.getDefault().getBundleContext().getBundle();
+		Bundle bundle = Activator.getDefault().getBundleContext().getBundle();
 		Assert.isNotNull(bundle); // this should not be null as this code exists within the referenced bundle
 		if ((bundle.getState() & (Bundle.STARTING | Bundle.ACTIVE)) == 0) {
 			// start the bundle
 			try {
 				bundle.start();
 			} catch (BundleException e) {
-				ServerPlugin.log(e);
+				Activator.log(e);
 			}
 		}
 	}

@@ -13,21 +13,21 @@ package org.eclipse.equinox.jmx.common;
 import java.util.*;
 import javax.management.ObjectName;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.equinox.jmx.internal.common.CommonPlugin;
+import org.eclipse.equinox.jmx.internal.common.Activator;
 
 public class RootContribution extends ContributionProxy implements RootContributionMBean {
 	private static final long serialVersionUID = 7227341044245163642L;
 
 	public static final String CLASS_NAME = RootContribution.class.getName();
 	public static final String NOTIFICATION_TYPE = "contributions"; //$NON-NLS-1$
-	public static final String DEFAULT_DOMAIN = CommonPlugin.DEFAULT_DOMAIN;
+	public static final String DEFAULT_DOMAIN = Activator.DEFAULT_DOMAIN;
 	public static final String OBJECT_NAME_STR = DEFAULT_DOMAIN + ":type=" + CLASS_NAME; //$NON-NLS-1$
 	public static ObjectName OBJECT_NAME;
 	static {
 		try {
 			OBJECT_NAME = ObjectName.getInstance(OBJECT_NAME_STR);
 		} catch (Exception e) {
-			CommonPlugin.logError(e);
+			Activator.logError(e);
 		}
 	}
 	private final Set contributions;

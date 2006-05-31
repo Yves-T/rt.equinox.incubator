@@ -31,6 +31,9 @@ public class BundleImageDescriptor extends CompositeImageDescriptor {
 		this.size = size;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.resource.CompositeImageDescriptor#drawCompositeImage(int, int)
+	 */
 	protected void drawCompositeImage(int width, int height) {
 		ImageData bg = getImageData(baseDescriptor);
 		// draw the base image as background
@@ -39,6 +42,9 @@ public class BundleImageDescriptor extends CompositeImageDescriptor {
 		drawBottomLeft();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.resource.CompositeImageDescriptor#getSize()
+	 */
 	protected Point getSize() {
 		return size;
 	}

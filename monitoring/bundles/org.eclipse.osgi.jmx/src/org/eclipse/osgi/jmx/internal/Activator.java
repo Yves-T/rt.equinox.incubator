@@ -13,7 +13,7 @@ package org.eclipse.osgi.jmx.internal;
 import org.osgi.framework.*;
 
 /**
- * The main plugin class to be used in the desktop.
+ * The activator for this bundle.
  * 
  * @since 1.0
  */

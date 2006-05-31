@@ -13,6 +13,8 @@ package org.eclipse.equinox.internal.preferences.jmx;
 import org.osgi.service.prefs.Preferences;
 
 /**
+ * This class represents a key/value pair in the preferences.
+ * 
  * @since 1.0
  */
 public class KVP {
@@ -21,6 +23,9 @@ public class KVP {
 	private String key;
 	private String value;
 
+	/*
+	 * Constructor. Make a new key/value pair with the given values.
+	 */
 	public KVP(Preferences node, String key, String value) {
 		super();
 		this.node = node;
@@ -28,14 +33,23 @@ public class KVP {
 		this.value = value;
 	}
 
+	/*
+	 * Return the key.
+	 */
 	public String getKey() {
 		return this.key;
 	}
 
+	/*
+	 * Return the value.
+	 */
 	public String getValue() {
 		return this.value;
 	}
 
+	/*
+	 * Return the preference node which is associated with this key/value pair.
+	 */
 	public Preferences getNode() {
 		return this.node;
 	}

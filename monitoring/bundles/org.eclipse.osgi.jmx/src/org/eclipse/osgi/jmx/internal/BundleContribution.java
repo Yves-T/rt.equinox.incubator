@@ -193,7 +193,7 @@ public class BundleContribution extends Contribution implements BundleListener {
 	/* (non-Javadoc)
 	 * @see com.jmx.server.contrib.Contribution#getMBeanInfo(java.lang.Object)
 	 */
-	public MBeanInfo getMBeanInfo(Object contributionDelegate) {
+	public MBeanInfo getMBeanInfo(Object delegate) {
 		MBeanInfo info = new MBeanInfo(getClass().getName(), BundleContributionMessages.bundle_description, getAttributes(), getConstructorInfo(), getOperationInfo(), getNotificationInfo());
 		return info;
 	}
@@ -398,7 +398,7 @@ public class BundleContribution extends Contribution implements BundleListener {
 	 * 
 	 * @see org.osgi.framework.Bundle#getHeaders()
 	 * @param version is a <code>Version</code> that specifying the <code>version</code> for a specific bundle
-	 * @exception <code>IllegalArgumentException</code> if given version is <null>null<null> 
+	 * @exception <code>IllegalArgumentException</code> if given version is <code>null</code> 
 	 */
 	public void setVersion(Version version) throws IllegalArgumentException {
 		Assert.isLegal(version != null);

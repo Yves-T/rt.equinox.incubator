@@ -64,6 +64,11 @@ public abstract class ResourceContribution extends Contribution {
 		return Activator.getImageLocation(getIconPath().toOSString());
 	}
 
+	/**
+	 * Return a path to the icon used to represent this contributions. 
+	 * 
+	 * @return a path in the file-system to the icon
+	 */
 	protected abstract IPath getIconPath();
 
 	/* (non-Javadoc)

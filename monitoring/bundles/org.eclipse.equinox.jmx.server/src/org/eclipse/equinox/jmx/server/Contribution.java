@@ -16,8 +16,8 @@ import java.util.*;
 import javax.management.*;
 import org.eclipse.equinox.jmx.common.*;
 import org.eclipse.equinox.jmx.common.util.ByteArrayHolder;
+import org.eclipse.equinox.jmx.internal.server.Activator;
 import org.eclipse.equinox.jmx.internal.server.ContributionMessages;
-import org.eclipse.equinox.jmx.internal.server.ServerPlugin;
 
 /**
  * A <code>Contribution</code> acts as a mediator between the objects which users would like to
@@ -93,7 +93,7 @@ public abstract class Contribution extends NotificationBroadcasterSupport implem
 				String objectNameStr = JMXConstants.DEFAULT_DOMAIN + ":type=" + getClass().getName() + hashCode(); //$NON-NLS-1$
 				objectName = ObjectName.getInstance(objectNameStr);
 			} catch (MalformedObjectNameException e) {
-				ServerPlugin.logError(e);
+				Activator.logError(e);
 			}
 			if (contributionDelegate != null) {
 				contributionDelegates.put(this.contributionDelegate, this);
@@ -120,9 +120,9 @@ public abstract class Contribution extends NotificationBroadcasterSupport implem
 
 	/**
 	 * Derived classes have the option to provide list of properties
-	 * associated with this contribution to be displayed in the ui.
+	 * associated with this contribution to be displayed in the UI.
 	 * 
-	 * @return The properties of the contribution to be displayed in the ui, or null if none.
+	 * @return The properties of the contribution to be displayed in the UI, or <code>null</code> if none.
 	 */
 	protected abstract Set getProperties();
 
@@ -139,10 +139,10 @@ public abstract class Contribution extends NotificationBroadcasterSupport implem
 	 * returned is manipulated to include <code>Contribution</code> specific
 	 * operations to support traversal.
 	 * 
-	 * @param contributionDelegate The delegate object associated with this contribution.
+	 * @param delegate The delegate object associated with this contribution.
 	 * @return The MBeanInfo object which encapsulates the functionality of the derived contribution.
 	 */
-	protected abstract MBeanInfo getMBeanInfo(Object contributionDelegate);
+	protected abstract MBeanInfo getMBeanInfo(Object delegate);
 
 	/**
 	 * This method is forwarded by the contribution to the derived <code>Contribution</code> when a operation
@@ -175,7 +175,7 @@ public abstract class Contribution extends NotificationBroadcasterSupport implem
 		if (proxy == null || stateChanged) {
 			ByteArrayHolder holder = null;
 			URL imageUrl = getImageLocation();
-			// image url may be null depending on contribution state
+			// image URL may be null depending on contribution state
 			if (imageUrl != null) {
 				if ((holder = (ByteArrayHolder) imageCache.get(imageUrl)) == null) {
 					// create byte array holder from image data and add to cache
@@ -191,13 +191,13 @@ public abstract class Contribution extends NotificationBroadcasterSupport implem
 						holder = new ByteArrayHolder(bout.toByteArray());
 						imageCache.put(imageUrl, holder);
 					} catch (IOException e) {
-						ServerPlugin.logError(e);
+						Activator.logError(e);
 					} finally {
 						if (in != null) {
 							try {
 								in.close();
 							} catch (IOException e) {
-								ServerPlugin.logError(e);
+								Activator.logError(e);
 							}
 						}
 					}
@@ -255,13 +255,13 @@ public abstract class Contribution extends NotificationBroadcasterSupport implem
 				}
 				try {
 					Contribution contrib = provider.createContribution(childs[i]);
-					contrib.registerContribution(ServerPlugin.getDefault().getServer());
+					contrib.registerContribution(Activator.getDefault().getServer());
 					if (proxies == null) {
 						proxies = new ArrayList();
 					}
 					proxies.add(contrib.createProxy());
 				} catch (Exception e) {
-					ServerPlugin.log(e);
+					Activator.log(e);
 				}
 			}
 		}
@@ -282,7 +282,7 @@ public abstract class Contribution extends NotificationBroadcasterSupport implem
 				mbeanServer.registerMBean(this, getObjectName());
 			} catch (InstanceAlreadyExistsException e) {
 				// previously checked for registration, this should not occur
-				ServerPlugin.logError(e);
+				Activator.logError(e);
 			}
 		}
 	}
@@ -326,7 +326,7 @@ public abstract class Contribution extends NotificationBroadcasterSupport implem
 				opsNew[opsNew.length - 1] = new MBeanOperationInfo("", Contribution.class.getMethod("createProxy", new Class[0])); //$NON-NLS-1$ //$NON-NLS-2$
 				return new MBeanInfo(info.getClassName(), info.getDescription(), info.getAttributes(), info.getConstructors(), opsNew /* our customized operations */, info.getNotifications());
 			} catch (Exception e) {
-				ServerPlugin.logError(e);
+				Activator.logError(e);
 			}
 		} else {
 			info = new MBeanInfo(getClass().getName(), getName(), new MBeanAttributeInfo[0], new MBeanConstructorInfo[0], new MBeanOperationInfo[0], new MBeanNotificationInfo[0]);
@@ -360,7 +360,7 @@ public abstract class Contribution extends NotificationBroadcasterSupport implem
 				ContributionProvider delegateProvider = delegateProviders[i];
 				ContributionProxy[] proxies = delegateProvider.getChildContributions();
 				if (proxies != null && proxies.length > 0) {
-					delegateProvider.registerContribution(ServerPlugin.getDefault().getServer());
+					delegateProvider.registerContribution(Activator.getDefault().getServer());
 					delegateProviderList.add(delegateProvider.createProxy());
 				}
 			}
@@ -369,7 +369,7 @@ public abstract class Contribution extends NotificationBroadcasterSupport implem
 			}
 			return (ContributionProxy[]) delegateProviderList.toArray(new ContributionProxy[delegateProviderList.size()]);
 		} catch (Exception e) {
-			ServerPlugin.logError(e);
+			Activator.logError(e);
 		}
 		return null;
 	}
