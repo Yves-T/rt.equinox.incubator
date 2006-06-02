@@ -25,6 +25,7 @@ public class JMXServerFactory {
 
 	private static final String ATTRIBUTE_CLASS = "class"; //$NON-NLS-1$
 	private static final String ATTRIBUTE_INITIALIZER_CLASS = "initializerClass"; //$NON-NLS-1$
+	private static final String ATTRIBUTE_PROTOCOL = "protocol"; //$NON-NLS-1$
 
 	private static Map jmxProviderCache;
 
@@ -32,18 +33,20 @@ public class JMXServerFactory {
 		super();
 	}
 
+	/**
+	 * Create and return a new JMXConnectorServer instance with the given parameters.
+	 * Throw an exception if there is an error or if the given protocol doesn't have a valid 
+	 * registered transport extension.
+	 */
 	public static JMXConnectorServer createJMXServer(String host, int port, String protocol, String domain, Map environment) throws IOException {
 		IJMXConnectorServerProvider provider = getProvider(protocol);
-		JMXConnectorServer result = null;
-		if (provider != null) {
-			MBeanServer mbeanServer = MBeanServerFactory.createMBeanServer(domain);
-			JMXServiceURL providerURL = provider.getJMXServiceURL(host, port, protocol, domain);
-			if (providerURL == null) {
-				providerURL = new JMXServiceURL(protocol, host, port);
-			}
-			result = provider.newJMXConnectorServer(providerURL, environment, mbeanServer);
-		}
-		return result;
+		if (provider == null)
+			throw new IOException(NLS.bind(ServerMessages.protocol_not_available, protocol));
+		MBeanServer mbeanServer = MBeanServerFactory.createMBeanServer(domain);
+		JMXServiceURL providerURL = provider.getJMXServiceURL(host, port, protocol, domain);
+		if (providerURL == null)
+			providerURL = new JMXServiceURL(protocol, host, port);
+		return provider.newJMXConnectorServer(providerURL, environment, mbeanServer);
 	}
 
 	private static IJMXConnectorServerProvider getProvider(String protocol) {
@@ -71,9 +74,7 @@ public class JMXServerFactory {
 			IConfigurationElement element = configElems[j];
 			final String elementName = element.getName();
 			String className, protocol;
-			if (elementName.equals(Activator.PT_PROVIDER) && null != (className = element.getAttribute("class")) //$NON-NLS-1$
-					&& null != (protocol = element.getAttribute("protocol"))) //$NON-NLS-1$
-			{
+			if (elementName.equals(Activator.PT_PROVIDER) && null != (className = element.getAttribute(ATTRIBUTE_CLASS)) && null != (protocol = element.getAttribute(ATTRIBUTE_PROTOCOL))) {
 				try {
 					// attempt to load initializer before instantiating provider class
 					String initializer = element.getAttribute(ATTRIBUTE_INITIALIZER_CLASS);
