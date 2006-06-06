@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin
 Import-Package: javax.management,
  javax.management.remote,
- org.eclipse.core.runtime,
+ org.eclipse.core.runtime; common=split,
  org.eclipse.equinox.jmx.common,
  org.eclipse.equinox.jmx.common.util,
  org.eclipse.equinox.jmx.server,

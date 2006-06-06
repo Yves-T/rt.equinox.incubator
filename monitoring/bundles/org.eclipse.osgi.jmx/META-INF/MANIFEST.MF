@@ -8,7 +8,7 @@ Bundle-Localization: plugin
 Eclipse-LazyStart: true
 Bundle-Vendor: Eclipse.org
 Import-Package: javax.management,
- org.eclipse.core.runtime,
+ org.eclipse.core.runtime; common=split,
  org.eclipse.equinox.jmx.common,
  org.eclipse.equinox.jmx.common.util,
  org.eclipse.equinox.jmx.server,

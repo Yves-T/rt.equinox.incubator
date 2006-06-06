@@ -9,7 +9,7 @@ Eclipse-LazyStart: true
 Import-Package: javax.management,
  javax.management.remote,
  org.eclipse.core.resources,
- org.eclipse.core.runtime;bundle-symbolic-name:="org.eclipse.core.runtime",
+ org.eclipse.core.runtime;common=split,
  org.eclipse.core.runtime.jobs,
  org.eclipse.equinox.jmx.common,
  org.eclipse.equinox.jmx.server,

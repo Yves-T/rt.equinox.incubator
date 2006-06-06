@@ -9,7 +9,7 @@ Bundle-Localization: plugin
 Bundle-Activator: org.eclipse.equinox.internal.preferences.jmx.Activator
 Import-Package: javax.management,
  javax.management.remote,
- org.eclipse.core.runtime,
+ org.eclipse.core.runtime; common=split,
  org.eclipse.core.runtime.preferences,
  org.eclipse.equinox.jmx.common,
  org.eclipse.equinox.jmx.server,
