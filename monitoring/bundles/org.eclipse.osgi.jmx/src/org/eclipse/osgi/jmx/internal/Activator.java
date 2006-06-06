@@ -11,6 +11,8 @@
 package org.eclipse.osgi.jmx.internal;
 
 import org.osgi.framework.*;
+import org.osgi.service.packageadmin.PackageAdmin;
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * The activator for this bundle.
@@ -20,6 +22,7 @@ import org.osgi.framework.*;
 public class Activator implements BundleActivator {
 
 	private static BundleContext context;
+	private static ServiceTracker bundleTracker;
 
 	/**
 	 * The constructor.
@@ -39,6 +42,10 @@ public class Activator implements BundleActivator {
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
+		if (bundleTracker != null) {
+			bundleTracker.close();
+			bundleTracker = null;
+		}
 		Activator.context = null;
 	}
 
@@ -51,5 +58,30 @@ public class Activator implements BundleActivator {
 
 	public static Bundle getBundle() {
 		return context.getBundle();
+	}
+
+	/**
+	 * Return the resolved bundle with the specified symbolic name.
+	 * 
+	 * @see PackageAdmin#getBundles(String, String)
+	 */
+	public static Bundle getBundle(String symbolicName) {
+		if (bundleTracker == null) {
+			bundleTracker = new ServiceTracker(getBundleContext(), PackageAdmin.class.getName(), null);
+			bundleTracker.open();
+		}
+		PackageAdmin admin = (PackageAdmin) bundleTracker.getService();
+		if (admin == null)
+			return null;
+		Bundle[] bundles = admin.getBundles(symbolicName, null);
+		if (bundles == null)
+			return null;
+		//Return the first bundle that is not installed or uninstalled
+		for (int i = 0; i < bundles.length; i++) {
+			if ((bundles[i].getState() & (Bundle.INSTALLED | Bundle.UNINSTALLED)) == 0) {
+				return bundles[i];
+			}
+		}
+		return null;
 	}
 }

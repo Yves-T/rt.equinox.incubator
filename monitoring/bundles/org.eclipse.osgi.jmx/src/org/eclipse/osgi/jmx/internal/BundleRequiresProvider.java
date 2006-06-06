@@ -11,9 +11,8 @@
 package org.eclipse.osgi.jmx.internal;
 
 import java.net.URL;
-import java.util.Set;
+import java.util.*;
 import javax.management.*;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.jmx.server.Contribution;
 import org.eclipse.equinox.jmx.server.ContributionProvider;
 import org.eclipse.osgi.service.resolver.BundleDescription;
@@ -76,20 +75,17 @@ public class BundleRequiresProvider extends ContributionProvider {
 	 * @see org.eclipse.equinox.jmx.server.Contribution#getChildren()
 	 */
 	protected Object[] getChildren() {
-		Object[] ret = null;
-		if (bundle != null) {
-			try {
-				BundleDescription desc = BundleUtils.getBundleDescription(bundle, Activator.getBundleContext());
-				BundleSpecification[] specs = desc.getRequiredBundles();
-				Bundle[] result = new Bundle[specs.length];
-				for (int i = 0; i < specs.length; i++) {
-					result[i] = Platform.getBundle(specs[i].getName());
-				}
-				return result;
-			} catch (Exception e) {
-			}
+		if (bundle == null)
+			return new Object[0];
+		List result = new ArrayList();
+		try {
+			BundleDescription desc = BundleUtils.getBundleDescription(bundle, Activator.getBundleContext());
+			BundleSpecification[] specs = desc.getRequiredBundles();
+			for (int i = 0; i < specs.length; i++)
+				result.add(Activator.getBundle(specs[i].getName()));
+		} catch (Exception e) {
 		}
-		return ret;
+		return result.toArray(new Object[result.size()]);
 	}
 
 	/* (non-Javadoc)
