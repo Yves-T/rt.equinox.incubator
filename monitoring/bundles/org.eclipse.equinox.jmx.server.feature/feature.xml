@@ -17,15 +17,12 @@
       [Enter License Description here.]
    </license>
 
-   <plugin
-         id="org.eclipse.core.resources.jmx"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+   <requires>
+      <import feature="org.eclipse.equinox.jmx.common.feature" version="1.0.0.qualifier"/>
+   </requires>
 
    <plugin
-         id="org.eclipse.equinox.jmx.common"
+         id="org.eclipse.core.resources.jmx"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -75,48 +72,6 @@
 
    <plugin
          id="org.eclipse.equinox.jmx.server.xmlrpc"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.commons.codec"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.commons.httpclient"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.commons.logging"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.ws.commons.util"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.ws.jaxme"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.xmlrpc"
          download-size="0"
          install-size="0"
          version="0.0.0"
