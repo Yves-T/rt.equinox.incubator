@@ -15,5 +15,4 @@ Import-Package: javax.management,
 Bundle-Vendor: Eclipse.org
 Eclipse-LazyStart: true
 Bundle-Activator: org.eclipse.equinox.jmx.internal.vm.Activator
-Require-Bundle: org.eclipse.equinox.jmx.server
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
