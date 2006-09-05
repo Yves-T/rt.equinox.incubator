@@ -42,7 +42,7 @@ public class DeploymentAdminImpl implements DeploymentAdmin {
 		return getDeploymentPackageImpl(symbName);
 	}
 
-	private DeploymentPackageImpl getDeploymentPackageImpl(String symbName) {
+	DeploymentPackageImpl getDeploymentPackageImpl(String symbName) {
 		return (DeploymentPackageImpl) deploymentPackagesMap.get(symbName);
 	}
 	
@@ -65,154 +65,21 @@ public class DeploymentAdminImpl implements DeploymentAdmin {
 	}	
 
 	public DeploymentPackage installDeploymentPackage(InputStream in) throws DeploymentException {
-		DeploymentSession session = new DeploymentSessionImpl();
-		try {
-			JarInputStream jis = new JarInputStream(in);
-			Manifest manifest = jis.getManifest();
-			if (manifest == null)
-				throw new DeploymentException(DeploymentException.CODE_ORDER_ERROR);
-
-			validateManifest(manifest);
-			
-			DeploymentPackageImpl source = new DeploymentPackageImpl(manifest);
-			DeploymentPackageImpl target = getDeploymentPackageImpl(source.getName());
-			if (target != null)
-				target.stopBundles();
-			
-			JarEntry currentEntry = jis.getNextJarEntry();
-			
-			while (currentEntry != null && processSignatureFile(currentEntry))
-					currentEntry = jis.getNextJarEntry();
-			
-			String bundleLocalization = source.getHeader("Bundle-Localization");
-			while (currentEntry != null && processLocalizationFile(bundleLocalization, currentEntry))
-				currentEntry = jis.getNextJarEntry();
-			
-			while (currentEntry != null && processBundle(currentEntry))
-				currentEntry = jis.getNextJarEntry();
-
-			startCustomizers();
-			
-			while (currentEntry != null && processResource(currentEntry))
-				currentEntry = jis.getNextJarEntry();
-
-			dropStaleResources();
-			uninstallStaleBundles();
-			prepare();
-			commit();
-			source.startBundles();
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-		
-	}
-
-	private boolean processResource(JarEntry currentEntry) {
-		return true;
-	}
-
-	private boolean processBundle(JarEntry currentEntry) throws IOException {
-		String bsn = currentEntry.getAttributes().getValue(Constants.BUNDLE_SYMBOLICNAME);
-		if(bsn != null) {
-			return true;			
-		}
-		return false;
-	}
-
-	private void commit() {	
-	}
-
-
-	private void uninstallStaleBundles() {
-	}
-
-	private void dropStaleResources() {
-	}
-
-	private void prepare() {
-	}
-
-	private void startCustomizers() {
-	}
-
-	private boolean processLocalizationFile(String bundleLocalization, JarEntry currentEntry) {
-		String name = currentEntry.getName();
-		if(name.startsWith(bundleLocalization)) {
-			return true;			
-		}
-		return false;
-	}
-
-	private boolean processSignatureFile(JarEntry currentEntry) {
-		String name = currentEntry.getName();
-		if(name.startsWith("META-INF/")) {
-			if (name.endsWith(".SF")) {
-				return true;
-			} else if (name.endsWith("*.DSA")) {
-				return true;
-			} else if (name.endsWith("*.RS")) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private void validateManifest(Manifest manifest) throws DeploymentException{
-		
-		Attributes mainAttributes = manifest.getMainAttributes();
-		String symbolicName = mainAttributes.getValue("DeploymentPackage-SymbolicName");
-		if (symbolicName == null)
-			throw new DeploymentException(DeploymentException.CODE_MISSING_HEADER);
-				
-		String version = mainAttributes.getValue("DeploymentPackage-Version");
-		if (version == null)
-			throw new DeploymentException(DeploymentException.CODE_MISSING_HEADER);
+		InstallDeploymentSession session = new InstallDeploymentSession(in, this);
 		
 		try {
-			if (Version.parseVersion(version).equals(Version.emptyVersion))
-				throw new DeploymentException(DeploymentException.CODE_BAD_HEADER);
-		} catch (IllegalArgumentException e) {
-			throw new DeploymentException(DeploymentException.CODE_BAD_HEADER);
-		}
-
-		DeploymentPackage target = getDeploymentPackage(symbolicName);
-		
-		String fixPack = mainAttributes.getValue("DeploymentPackage-FixPack");
-		boolean isFixPack = (fixPack != null);
-		if (isFixPack) {
-			VersionRange fixPackVersionRange = null;
+			session.begin();
+			session.prepare();
+			session.commit();
+		} catch (Throwable t) {
 			try {
-				fixPackVersionRange = new VersionRange(fixPack);
-			} catch (IllegalArgumentException e) {
-				throw new DeploymentException(DeploymentException.CODE_BAD_HEADER);
+				session.rollback();
+			} catch (Throwable traceOnly) {
+				traceOnly.printStackTrace();
 			}
-			
-			if (target == null || fixPackVersionRange.isIncluded(target.getVersion()))
-				throw new DeploymentException(DeploymentException.CODE_MISSING_FIXPACK_TARGET);
-		}
-
-		for (Iterator it = manifest.getEntries().values().iterator(); it.hasNext();) {
-			Attributes attributes = (Attributes) it.next();
-			String missing = attributes.getValue("DeploymentPackage-Missing");
-			if (!isFixPack && missing != null)
-				throw new DeploymentException(DeploymentException.CODE_BAD_HEADER);
-			
-			boolean isMissing = new Boolean(missing).booleanValue();
-			
-			String bsn = attributes.getValue("Bundle-SymbolicName");
-			if (bsn == null)
-				continue;
-			
-			DeploymentPackage bundleDeploymentPackage = getDeploymentPackage(bsn);
-			if (isMissing && bundleDeploymentPackage != target)
-				throw new DeploymentException(DeploymentException.CODE_MISSING_BUNDLE);
-			
-			if (bundleDeploymentPackage != null && bundleDeploymentPackage != target)
-				throw new DeploymentException(DeploymentException.CODE_BUNDLE_SHARING_VIOLATION);
-		}	
+			throw (t instanceof DeploymentException) ? (DeploymentException) t : new DeploymentException(DeploymentException.CODE_OTHER_ERROR, t.getMessage(), t); 
+		}		
+		return session.getTargetDeploymentPackage();
 	}
 
 	public DeploymentPackage[] listDeploymentPackages() {
