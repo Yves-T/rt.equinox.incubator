@@ -2,16 +2,17 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Apache XML-RPC Plug-in
 Bundle-SymbolicName: org.apache.xmlrpc
-Bundle-Version: 3.0.0.a1
+Bundle-Version: 3.0.0
 Bundle-Localization: plugin
 Export-Package: org.apache.xmlrpc,
  org.apache.xmlrpc.client,
+ org.apache.xmlrpc.client.util,
  org.apache.xmlrpc.common,
  org.apache.xmlrpc.jaxb,
+ org.apache.xmlrpc.metadata,
  org.apache.xmlrpc.parser,
  org.apache.xmlrpc.serializer,
  org.apache.xmlrpc.server,
- org.apache.xmlrpc.test,
  org.apache.xmlrpc.util,
  org.apache.xmlrpc.webserver
 Import-Package: javax.xml.namespace,
