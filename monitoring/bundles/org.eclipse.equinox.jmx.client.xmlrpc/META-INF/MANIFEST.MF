@@ -12,5 +12,6 @@ Import-Package: javax.management,
  org.apache.xmlrpc,
  org.apache.xmlrpc.client,
  org.eclipse.equinox.jmx.common,
+ org.eclipse.equinox.jmx.common.util,
  org.eclipse.equinox.jmx.client,
  org.eclipse.equinox.jmx.client.remote
