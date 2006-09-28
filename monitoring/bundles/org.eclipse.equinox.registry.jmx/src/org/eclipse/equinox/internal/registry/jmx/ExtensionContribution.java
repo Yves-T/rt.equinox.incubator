@@ -55,7 +55,17 @@ public class ExtensionContribution extends Contribution {
 	 */
 	protected String getName() {
 		String name = getDelegate().getUniqueIdentifier();
-		return name == null ? "no name" : name;
+		if (name != null)
+			return name;
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("anonymous "); //$NON-NLS-1$
+		IContributor contributor = getDelegate().getContributor();
+		if (contributor != null) {
+			buffer.append('[');
+			buffer.append(contributor.getName());
+			buffer.append(']');
+		}
+		return buffer.toString();
 	}
 
 	/* (non-Javadoc)
