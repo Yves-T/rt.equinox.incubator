@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     IBM Corporation - initial API and implementation
+ *     Red Hat, Inc. and IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.equinox.internal.initializer;
 
