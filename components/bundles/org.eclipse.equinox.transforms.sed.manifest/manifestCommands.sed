@@ -1,0 +1,1 @@
+s/^Bundle-Version:\(.*\)$/Bundle-Version: \1 _special/

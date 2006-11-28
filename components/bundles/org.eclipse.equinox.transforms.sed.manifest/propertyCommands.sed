@@ -1,0 +1,1 @@
+s/^packagesViewName=.*$/packagesViewName=Java Package Explorer/
