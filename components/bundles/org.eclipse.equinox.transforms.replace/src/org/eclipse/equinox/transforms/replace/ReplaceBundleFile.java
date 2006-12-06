@@ -16,8 +16,8 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.eclipse.equinox.transforms.CSVTransformingBundleFile;
-import org.eclipse.equinox.transforms.LazyBundleInputStream;
-import org.eclipse.equinox.transforms.LazyBundleInputStream.InputStreamProvider;
+import org.eclipse.equinox.transforms.LazyInputStream;
+import org.eclipse.equinox.transforms.LazyInputStream.InputStreamProvider;
 import org.eclipse.osgi.baseadaptor.BaseData;
 import org.eclipse.osgi.baseadaptor.bundlefile.BundleFile;
 import org.osgi.framework.BundleContext;
@@ -33,7 +33,7 @@ public class ReplaceBundleFile extends CSVTransformingBundleFile {
 	protected InputStream getInputStream(InputStream inputStream,
 			final URL transformerUrl) throws IOException {
 
-		return new LazyBundleInputStream(new InputStreamProvider() {
+		return new LazyInputStream(new InputStreamProvider() {
 
 			public InputStream getInputStream() throws IOException {
 				return transformerUrl.openStream();
