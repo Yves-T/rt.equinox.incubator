@@ -54,7 +54,7 @@ public class MBeanInfoViewPart extends ViewPart implements ISelectionListener, I
 	 */
 	public void createPartControl(Composite parent) {
 		FontData fd[] = parent.getFont().getFontData();
-		fBFont = new Font(parent.getDisplay(), fd[0].getName(), fd[0].height, SWT.BOLD);
+		fBFont = new Font(parent.getDisplay(), fd[0].getName(), fd[0].getHeight(), SWT.BOLD);
 		fManagedForm = new ManagedForm(parent);
 		fManagedForm.getForm().setText(MBeanInfoViewMessages.MBeanInfoViewPart_8);
 

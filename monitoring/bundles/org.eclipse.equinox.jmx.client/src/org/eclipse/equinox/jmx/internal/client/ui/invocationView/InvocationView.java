@@ -52,7 +52,7 @@ public class InvocationView extends ViewPart implements ISelectionListener {
 	public void createPartControl(Composite parent) {
 		parentComp = parent;
 		FontData fd[] = parent.getFont().getFontData();
-		fItalicFont = new Font(parent.getDisplay(), fd[0].getName(), fd[0].height, SWT.ITALIC);
+		fItalicFont = new Font(parent.getDisplay(), fd[0].getName(), fd[0].getHeight(), SWT.ITALIC);
 		getSite().getPage().addSelectionListener(this);
 	}
 
