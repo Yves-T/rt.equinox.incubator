@@ -1,9 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2006 Cognos Incorporated.
+ * Copyright (c) 2006, 2007 Cognos Incorporated.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
+ *     Cognos Incorporated - initial API and implementation
  *******************************************************************************/
 package org.eclipse.equinox.log.internal;
 
@@ -35,7 +36,7 @@ public class ExtendedLogServiceImpl implements LogService, Logger {
 	}
 
 	public void log(ServiceReference sr, int level, String message, Throwable exception) {
-		log(sr, level, message, exception);
+		getLogger(null).log(sr, level, message, exception);
 	}
 
 	public void log(Object context, int level, String message) {
