@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: FrameworkAdmin Service for Felix
+Bundle-SymbolicName: org.eclipse.equinox.frameworkadmin.felix
+Bundle-Version: 0.0.0
+Bundle-Activator: org.eclipse.equinox.frameworkadmin.felix.internal.Activator
+Bundle-Vendor: Eclipse.org
+Bundle-Localization: plugin
+Import-Package: org.eclipse.equinox.configurator,
+ org.eclipse.equinox.frameworkadmin,
+ org.eclipse.equinox.internal.frameworkadmin.utils,
+ org.osgi.framework;version="1.3.0",
+ org.osgi.service.log;version="1.3.0",
+ org.osgi.util.tracker;version="1.3.2"
