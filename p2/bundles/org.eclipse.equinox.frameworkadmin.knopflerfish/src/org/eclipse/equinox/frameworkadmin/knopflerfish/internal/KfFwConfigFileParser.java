@@ -296,8 +296,8 @@ public class KfFwConfigFileParser {
 	}
 
 	private void writeCmdLineForProps(Properties props, BufferedWriter bw) throws IOException {
-		for (Enumeration enum = props.keys(); enum.hasMoreElements();) {
-			String key = (String) enum.nextElement();
+		for (Enumeration enumeration = props.keys(); enumeration.hasMoreElements();) {
+			String key = (String) enumeration.nextElement();
 			String value = props.getProperty(key);
 			bw.write(D + key + "=" + value);
 			bw.newLine();

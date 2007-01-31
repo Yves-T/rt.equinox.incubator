@@ -147,8 +147,8 @@ public class FelixFwConfigFileParser {
 		// this.initialize();
 		//		if (fwConfigInfo.fwJar == null)
 		//			throw new ConfigManipulatorException("fwJar must be set in advance", ConfigManipulatorException.UNSATISFIED_CONDITION);
-		for (Enumeration enum = props.keys(); enum.hasMoreElements();) {
-			String key = (String) enum.nextElement();
+		for (Enumeration enumeration = props.keys(); enumeration.hasMoreElements();) {
+			String key = (String) enumeration.nextElement();
 			String value = props.getProperty(key);
 			if (key.equals(FelixConstants.PROP_BUNDLES_STARTLEVEL))
 				configData.setInitialBundleStartLevel(Integer.parseInt(value));
