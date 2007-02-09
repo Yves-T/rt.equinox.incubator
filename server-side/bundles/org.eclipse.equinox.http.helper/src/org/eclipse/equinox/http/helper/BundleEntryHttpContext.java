@@ -65,8 +65,12 @@ public class BundleEntryHttpContext implements HttpContext {
 			return null;
 
 		Set result = new HashSet();
-		while (entryPaths.hasMoreElements())
-			result.add(entryPaths.nextElement());
+		while (entryPaths.hasMoreElements()) {
+			if (bundlePath == null)	
+				result.add(entryPaths.nextElement());
+			else
+				result.add(((String)entryPaths.nextElement()).substring(bundlePath.length()));
+		}
 		return result;
 	}
 }
