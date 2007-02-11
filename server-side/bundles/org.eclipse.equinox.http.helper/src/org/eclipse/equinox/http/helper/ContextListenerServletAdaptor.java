@@ -34,6 +34,6 @@ public class ContextListenerServletAdaptor implements Servlet {
 	}
 
 	public String getServletInfo() {
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 }
