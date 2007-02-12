@@ -38,7 +38,7 @@ public class Activator implements BundleActivator {
 		props.put(FrameworkAdmin.SERVICE_PROP_KEY_LAUNCHER_NAME, FelixConstants.LAUNCHER_NAME);
 		props.put(FrameworkAdmin.SERVICE_PROP_KEY_LAUNCHER_VERSION, FelixConstants.LAUNCHER_VERSION);
 
-		if (!FelixFwAdminImpl.isRunningFw(context)) {
+		if (FelixFwAdminImpl.isRunningFw(context)) {
 			props.put(FrameworkAdmin.SERVICE_PROP_KEY_RUNNING_SYSTEM_FLAG, "true");
 			fwAdmin = new FelixFwAdminImpl(context, true);
 		} else

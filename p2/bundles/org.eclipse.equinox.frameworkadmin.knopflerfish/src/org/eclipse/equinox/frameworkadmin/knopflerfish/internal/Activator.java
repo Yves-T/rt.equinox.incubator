@@ -38,7 +38,7 @@ public class Activator implements BundleActivator {
 		props.put(FrameworkAdmin.SERVICE_PROP_KEY_LAUNCHER_NAME, KfConstants.LAUNCHER_NAME);
 		props.put(FrameworkAdmin.SERVICE_PROP_KEY_LAUNCHER_VERSION, KfConstants.LAUNCHER_VERSION);
 
-		if (!KfFwAdminImpl.isRunningFw(context)) {
+		if (KfFwAdminImpl.isRunningFw(context)) {
 			props.put(FrameworkAdmin.SERVICE_PROP_KEY_RUNNING_SYSTEM_FLAG, "true");
 			fwAdmin = new KfFwAdminImpl(context, true);
 		} else
