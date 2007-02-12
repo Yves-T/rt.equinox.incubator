@@ -88,7 +88,7 @@ public class KfActivator {
 
 		bundleInfoListWithSimpleConfigurator.addAll(bundleInfoListWoSimpleConfigurator);
 		try {
-			bundleInfoListWithSimpleConfigurator.add(new BundleInfo(fwJar.toURL().toExternalForm(), 1, true));
+			bundleInfoListWithSimpleConfigurator.add(new BundleInfo(fwJar.toURL().toExternalForm(), 0, true,0));
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

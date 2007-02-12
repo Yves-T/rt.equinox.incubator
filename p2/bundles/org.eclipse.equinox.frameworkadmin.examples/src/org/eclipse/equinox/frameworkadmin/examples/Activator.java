@@ -174,7 +174,21 @@ public class Activator implements BundleActivator {
 					felix.start();
 					felix.felixSaveAndLaunch(FelixActivator.bundleInfoListWoSimpleConfigurator, false);
 					break;
-
+				case 7 :
+					equinox.equinoxSaveAndGetState(equinox.bundleInfoListWoSimpleConfigurator, false);
+					break;
+				case 8 :
+					
+					equinox.equinoxSaveAndLaunch(equinox.bundleInfoListWithSimpleConfigurator, false);
+					equinox.equinoxGetState();
+					break;
+				case 100 :
+					equinox.equinoxGetRunningState();
+					break;
+				case 101 :
+					Manipulator manipulator = equinox.equinoxSetAndSaveForRunningTest();
+					equinox.launch(manipulator, equinox.cwd);
+					break;
 				default :
 					break;
 			}

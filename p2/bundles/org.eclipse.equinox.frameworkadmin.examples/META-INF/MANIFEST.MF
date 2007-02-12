@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Example of  client bundle of FrameworkAdmin
 Bundle-SymbolicName: org.eclipse.equinox.frameworkadmin.examples
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.1
 Bundle-Activator: org.eclipse.equinox.frameworkadmin.examples.Activator
 Bundle-Localization: plugin
 Import-Package: org.eclipse.equinox.configurator,
