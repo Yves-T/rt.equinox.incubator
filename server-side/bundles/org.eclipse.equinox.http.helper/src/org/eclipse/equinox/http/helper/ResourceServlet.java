@@ -37,6 +37,13 @@ public class ResourceServlet implements Servlet {
 
 	public void init(ServletConfig config) throws ServletException {
 		this.config = config;
+		String baseName = config.getInitParameter("base-name"); //$NON-NLS-1$
+		if (baseName != null) {
+			if (baseName.equals("/")) //$NON-NLS-1$
+				internalName = ""; //$NON-NLS-1$
+			else
+				internalName = baseName;
+		}		
 	}
 
 	public void service(ServletRequest req, ServletResponse resp) throws ServletException, IOException {
