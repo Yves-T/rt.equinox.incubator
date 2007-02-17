@@ -17,6 +17,10 @@ import org.eclipse.equinox.frameworkadmin.*;
 import org.osgi.framework.*;
 import org.osgi.util.tracker.ServiceTracker;
 
+
+/**
+ * TODO revise so that automatically find bundle jars in the plugins directory in Eclipse environment, which would reduce setting up effort for users. 
+ */
 public class EquinoxActivator {
 	final static List bundleInfoListSimpleConfigurator = new LinkedList();
 
@@ -66,9 +70,13 @@ public class EquinoxActivator {
 
 	FrameworkAdmin fwAdmin;
 
-	private InputStreamMonitorThread threadStandardI = null;
+	InputStreamMonitorThread threadStandardI = null;
 
-	private InputStreamMonitorThread threadErrorI = null;
+	InputStreamMonitorThread threadErrorI = null;
+
+	EquinoxActivator(Properties props) {
+		this(null, props);
+	}
 
 	EquinoxActivator(BundleContext context, Properties props) {
 		this.context = context;
@@ -408,10 +416,14 @@ public class EquinoxActivator {
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
 	public void start() throws InvalidSyntaxException {
-		Filter chFilter = context.createFilter(filterFwAdmin);
-		fwAdminTracker = new ServiceTracker(this.context, chFilter, null);
-		fwAdminTracker.open();
-		fwAdmin = (FrameworkAdmin) this.fwAdminTracker.getService();
+		if (context != null) {
+			Filter chFilter = context.createFilter(filterFwAdmin);
+			fwAdminTracker = new ServiceTracker(this.context, chFilter, null);
+			fwAdminTracker.open();
+			fwAdmin = (FrameworkAdmin) this.fwAdminTracker.getService();
+			return;
+		}
+
 	}
 
 	/*

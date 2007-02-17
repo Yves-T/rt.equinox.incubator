@@ -97,8 +97,11 @@ public class Activator implements BundleActivator {
 
 	private Properties initialize(BundleContext context) throws InvalidSyntaxException, IOException {
 		Properties props = new Properties();
-
-		URL url = context.getBundle().getEntry("setting.properties");
+		String path = this.getClass().getName();
+		path = path.replace('.', '/');
+		path = path.substring(0, path.lastIndexOf('/'));
+		path = path + "/" + "setting.properties";
+		URL url = context.getBundle().getResource(path);
 		if (url == null) {
 			RuntimeException ex = new IllegalStateException("Error!!:bundle.getEntry(" + "setting.properties" + ")==null. Check if \"" + "setting.properties" + " exists in the Bundle.\" ");
 			ex.printStackTrace();
@@ -121,7 +124,7 @@ public class Activator implements BundleActivator {
 		System.out.println("");
 	}
 
-	private void readParameters(Properties props) {
+	void readParameters(Properties props) {
 		String value = getValue(props, "mode");
 		try {
 			mode = Integer.parseInt(value);
@@ -178,7 +181,7 @@ public class Activator implements BundleActivator {
 					equinox.equinoxSaveAndGetState(equinox.bundleInfoListWoSimpleConfigurator, false);
 					break;
 				case 8 :
-					
+
 					equinox.equinoxSaveAndLaunch(equinox.bundleInfoListWithSimpleConfigurator, false);
 					equinox.equinoxGetState();
 					break;
