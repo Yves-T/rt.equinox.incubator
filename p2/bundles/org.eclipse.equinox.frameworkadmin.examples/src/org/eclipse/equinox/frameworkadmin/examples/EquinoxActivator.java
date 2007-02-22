@@ -11,15 +11,17 @@ package org.eclipse.equinox.frameworkadmin.examples;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 import org.eclipse.equinox.frameworkadmin.*;
+import org.eclipse.equinox.internal.frameworkadmin.utils.Utils;
 import org.osgi.framework.*;
 import org.osgi.util.tracker.ServiceTracker;
 
-
 /**
- * TODO revise so that automatically find bundle jars in the plugins directory in Eclipse environment, which would reduce setting up effort for users. 
+ * It automatically find bundle jars in the plugins directory in Eclipse environment according to the values of 
+ * equinox.home and equinox.bundlesDir. 
  */
 public class EquinoxActivator {
 	final static List bundleInfoListSimpleConfigurator = new LinkedList();
@@ -31,6 +33,8 @@ public class EquinoxActivator {
 	private String equinoxCommonBundle;
 	private String coreRuntimeBundle;
 	private String updateConfiguratorBundle;
+	String frameworkAdminServiceBundle;
+	String simpleConfiguratorBundle;
 
 	private String jobsBundle;
 	private String registryBundle;
@@ -80,10 +84,8 @@ public class EquinoxActivator {
 
 	EquinoxActivator(BundleContext context, Properties props) {
 		this.context = context;
-		this.readParameters(props);
-
+		readParameters(props);
 		initialieBundlesList();
-
 	}
 
 	void eclipseSaveAndLaunch(List bundleInfoList, boolean backup) throws IOException {
@@ -243,11 +245,11 @@ public class EquinoxActivator {
 		launcherData.setJvm(new File(Activator.jvm));
 		String[] jvmArgs = {Activator.jvmArgs};
 		launcherData.setJvmArgs(jvmArgs);
-		launcherData.setFwPersistentDataLocation(this.configLocForRunningTest, true);
+		launcherData.setFwPersistentDataLocation(configLocForRunningTest, true);
 		launcherData.setFwJar(fwJar);
-		launcherData.setFwConfigLocation(this.configLocForRunningTest);
+		launcherData.setFwConfigLocation(configLocForRunningTest);
 		// 2. Set Parameters to ConfigData.
-		for (Iterator ite = this.bundleInfoListForRunningTest.iterator(); ite.hasNext();) {
+		for (Iterator ite = bundleInfoListForRunningTest.iterator(); ite.hasNext();) {
 			BundleInfo bInfo = (BundleInfo) ite.next();
 			configData.addBundle(bInfo);
 		}
@@ -297,15 +299,15 @@ public class EquinoxActivator {
 
 	}
 
-	private String getFullyQualifiedLocation(String BundleJarName) {
-		try {
-			return (new File(bundlesDir, BundleJarName)).toURL().toExternalForm();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-	}
+	//	private String getFullyQualifiedLocation(String BundleJarName) {
+	//		try {
+	//			return (new File(bundlesDir, BundleJarName)).toURL().toExternalForm();
+	//		} catch (MalformedURLException e) {
+	//			// TODO Auto-generated catch block
+	//			e.printStackTrace();
+	//			return null;
+	//		}
+	//	}
 
 	private void initialieBundlesList() {
 		try {
@@ -314,36 +316,36 @@ public class EquinoxActivator {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		bundleInfoListEclipse.add(new BundleInfo(getFullyQualifiedLocation(equinoxCommonBundle), 3, true));
-		bundleInfoListEclipse.add(new BundleInfo(getFullyQualifiedLocation(updateConfiguratorBundle), 4, true));
-		bundleInfoListEclipse.add(new BundleInfo(getFullyQualifiedLocation(coreRuntimeBundle), BundleInfo.NO_LEVEL, true));
+		bundleInfoListEclipse.add(new BundleInfo(equinoxCommonBundle, 3, true));
+		bundleInfoListEclipse.add(new BundleInfo(updateConfiguratorBundle, 4, true));
+		bundleInfoListEclipse.add(new BundleInfo(coreRuntimeBundle, BundleInfo.NO_LEVEL, true));
 		try {
 			bundleInfoListWoSimpleConfigurator.add(new BundleInfo(fwJar.toURL().toExternalForm(), 0, true));
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		bundleInfoListWoSimpleConfigurator.add(new BundleInfo(getFullyQualifiedLocation(equinoxCommonBundle), 3, true));
-		bundleInfoListWoSimpleConfigurator.add(new BundleInfo(getFullyQualifiedLocation(updateConfiguratorBundle), 4, false));
-		bundleInfoListWoSimpleConfigurator.add(new BundleInfo(getFullyQualifiedLocation(coreRuntimeBundle), BundleInfo.NO_LEVEL, false));
+		bundleInfoListWoSimpleConfigurator.add(new BundleInfo(equinoxCommonBundle, 3, true));
+		bundleInfoListWoSimpleConfigurator.add(new BundleInfo(updateConfiguratorBundle, 4, false));
+		bundleInfoListWoSimpleConfigurator.add(new BundleInfo(coreRuntimeBundle, BundleInfo.NO_LEVEL, false));
 
-		bundleInfoListSimpleConfigurator.add(new BundleInfo(getFullyQualifiedLocation(Activator.frameworkAdminServiceBundle), BundleInfo.NO_LEVEL, false));
-		bundleInfoListSimpleConfigurator.add(new BundleInfo(getFullyQualifiedLocation(Activator.simpleConfiguratorBundle), 2, true));
+		bundleInfoListSimpleConfigurator.add(new BundleInfo(frameworkAdminServiceBundle, BundleInfo.NO_LEVEL, false));
+		bundleInfoListSimpleConfigurator.add(new BundleInfo(simpleConfiguratorBundle, 2, true));
 
 		bundleInfoListWithSimpleConfigurator.addAll(bundleInfoListWoSimpleConfigurator);
 		bundleInfoListWithSimpleConfigurator.addAll(bundleInfoListSimpleConfigurator);
 
-		bundleInfoListForRunningTest.add(new BundleInfo(getFullyQualifiedLocation(equinoxCommonBundle), 3, true));
-		bundleInfoListForRunningTest.add(new BundleInfo(getFullyQualifiedLocation(this.applBundle), BundleInfo.NO_LEVEL, true));
-		bundleInfoListForRunningTest.add(new BundleInfo(getFullyQualifiedLocation(coreRuntimeBundle), BundleInfo.NO_LEVEL, true));
-		bundleInfoListForRunningTest.add(new BundleInfo(getFullyQualifiedLocation(this.jobsBundle), 1, true));
-		bundleInfoListForRunningTest.add(new BundleInfo(getFullyQualifiedLocation(this.registryBundle), 1, true));
-		bundleInfoListForRunningTest.add(new BundleInfo(getFullyQualifiedLocation(this.contenttypeBundle), 1, true));
-		bundleInfoListForRunningTest.add(new BundleInfo(getFullyQualifiedLocation(this.preferencesBundle), 1, true));
-		bundleInfoListForRunningTest.add(new BundleInfo(getFullyQualifiedLocation(this.osgiServicesBundle)));
-		bundleInfoListForRunningTest.add(new BundleInfo(getFullyQualifiedLocation(Activator.frameworkAdminServiceBundle)));
-		bundleInfoListForRunningTest.add(new BundleInfo(getFullyQualifiedLocation(this.fwadminEquinoxBundle), 1, true));
-		bundleInfoListForRunningTest.add(new BundleInfo(getFullyQualifiedLocation(this.fwadminExamplesBundle), 4, true));
+		bundleInfoListForRunningTest.add(new BundleInfo(equinoxCommonBundle, 3, true));
+		bundleInfoListForRunningTest.add(new BundleInfo(applBundle, BundleInfo.NO_LEVEL, true));
+		bundleInfoListForRunningTest.add(new BundleInfo(coreRuntimeBundle, BundleInfo.NO_LEVEL, true));
+		bundleInfoListForRunningTest.add(new BundleInfo(jobsBundle, 1, true));
+		bundleInfoListForRunningTest.add(new BundleInfo(registryBundle, 1, true));
+		bundleInfoListForRunningTest.add(new BundleInfo(contenttypeBundle, 1, true));
+		bundleInfoListForRunningTest.add(new BundleInfo(preferencesBundle, 1, true));
+		bundleInfoListForRunningTest.add(new BundleInfo(osgiServicesBundle));
+		bundleInfoListForRunningTest.add(new BundleInfo(frameworkAdminServiceBundle));
+		bundleInfoListForRunningTest.add(new BundleInfo(fwadminEquinoxBundle, 1, true));
+		bundleInfoListForRunningTest.add(new BundleInfo(fwadminExamplesBundle, 4, true));
 	}
 
 	public void launch(Manipulator manipulator, File runtimeCwd) throws IOException {
@@ -360,15 +362,17 @@ public class EquinoxActivator {
 		System.out.println("fwBundle:" + fwBundle);
 		System.out.println("fwJar:" + fwJar);
 		System.out.println("configLoc:" + configLoc);
+		System.out.println("simpleConfiguratorBundle:" + simpleConfiguratorBundle);
+		System.out.println("frameworkAdminServiceBundle:" + frameworkAdminServiceBundle);
 		System.out.println("coreRuntimeBundle:" + coreRuntimeBundle);
 		System.out.println("updateConfiguratorBundle:" + updateConfiguratorBundle);
-		System.out.println("configLocForRunningTest:" + this.configLocForRunningTest);
-		System.out.println("jobsBundle:" + this.jobsBundle);
-		System.out.println("preferencesBundle:" + this.preferencesBundle);
-		System.out.println("applBundle:" + this.applBundle);
-		System.out.println("fwadminEquinoxBundle:" + this.fwadminEquinoxBundle);
-		System.out.println("fwadminExamplesBundle:" + this.fwadminExamplesBundle);
-		System.out.println("osgiServicesBundle:" + this.osgiServicesBundle);
+		System.out.println("configLocForRunningTest:" + configLocForRunningTest);
+		System.out.println("jobsBundle:" + jobsBundle);
+		System.out.println("preferencesBundle:" + preferencesBundle);
+		System.out.println("applBundle:" + applBundle);
+		System.out.println("fwadminEquinoxBundle:" + fwadminEquinoxBundle);
+		System.out.println("fwadminExamplesBundle:" + fwadminExamplesBundle);
+		System.out.println("osgiServicesBundle:" + osgiServicesBundle);
 		System.out.println("");
 	}
 
@@ -379,24 +383,28 @@ public class EquinoxActivator {
 		eclipseExe = new File(Activator.getValue(props, "equinox.launcher"));
 
 		bundlesDir = new File(fwHome, Activator.getValue(props, "equinox.bundlesDir"));
-		fwBundle = Activator.getValue(props, "equinox.fw");
-		equinoxCommonBundle = Activator.getValue(props, "equinox.bundles.equinox.common");
-		coreRuntimeBundle = Activator.getValue(props, "equinox.bundles.core.runtime");
-		updateConfiguratorBundle = Activator.getValue(props, "equinox.bundles.update.configurator");
+		fwBundle = Utils.getBundleFullLocation("org.eclipse.osgi", bundlesDir);
+		simpleConfiguratorBundle = Utils.getBundleFullLocation("org.eclipse.equinox.simpleconfigurator", bundlesDir);
+		frameworkAdminServiceBundle = Utils.getBundleFullLocation("org.eclipse.equinox.frameworkadmin", bundlesDir);
+		equinoxCommonBundle = Utils.getBundleFullLocation("org.eclipse.equinox.common", bundlesDir);
+		coreRuntimeBundle = Utils.getBundleFullLocation("org.eclipse.core.runtime", bundlesDir);
+		updateConfiguratorBundle = Utils.getBundleFullLocation("org.eclipse.update.configurator", bundlesDir);
 
-		this.jobsBundle = Activator.getValue(props, "equinox.bundles.core.jobs");
-		this.registryBundle = Activator.getValue(props, "equinox.bundles.equinox.registry");
-		this.preferencesBundle = Activator.getValue(props, "equinox.bundles.equinox.preferences");;
-		this.contenttypeBundle = Activator.getValue(props, "equinox.bundles.core.contenttype");;
-		this.osgiServicesBundle = Activator.getValue(props, "equinox.bundles.osgi.services");;
-		this.fwadminExamplesBundle = Activator.getValue(props, "equinox.bundles.equinox.frameworkadmin.examples");;
-		this.fwadminEquinoxBundle = Activator.getValue(props, "equinox.bundles.equinox.frameworkadmin.equinox");
-		this.applBundle = Activator.getValue(props, "equinox.bundles.eclipse.appl");
+		jobsBundle = Utils.getBundleFullLocation("org.eclipse.core.jobs", bundlesDir);
+		registryBundle = Utils.getBundleFullLocation("org.eclipse.equinox.registry", bundlesDir);
+		preferencesBundle = Utils.getBundleFullLocation("org.eclipse.equinox.preferences", bundlesDir);
+		contenttypeBundle = Utils.getBundleFullLocation("org.eclipse.core.contenttype", bundlesDir);
+		osgiServicesBundle = Utils.getBundleFullLocation("org.eclipse.osgi.services", bundlesDir);
+		fwadminExamplesBundle = Utils.getBundleFullLocation("org.eclipse.equinox.frameworkadmin.examples", bundlesDir);
+		fwadminEquinoxBundle = Utils.getBundleFullLocation("org.eclipse.equinox.frameworkadmin.equinox", bundlesDir);
+		applBundle = Utils.getBundleFullLocation("org.eclipse.equinox.app", bundlesDir);
 
-		//		equinox.bundles.equinox.frameworkadmin.knopflerfish=org.eclipse.equinox.frameworkadmin.knopflerfish_1.0.2.jar
-		//		equinox.bundles.equinox.frameworkadmin.felix=org.eclipse.equinox.frameworkadmin.felix_1.0.2.jar
-
-		fwJar = new File(fwHome, fwBundle);
+		try {
+			fwJar = new File((new URL(fwBundle)).getFile());
+		} catch (MalformedURLException e) {
+			// never happen;
+			e.printStackTrace();
+		}
 		propsValueConsolePort = Activator.getValue(props, "equinox.console.port");
 		configLoc = new File(fwHome, Activator.getValue(props, "equinox.configLoc"));
 		configLocForRunningTest = new File(fwHome, Activator.getValue(props, "equinox.configLocForRunningTest"));
@@ -418,9 +426,9 @@ public class EquinoxActivator {
 	public void start() throws InvalidSyntaxException {
 		if (context != null) {
 			Filter chFilter = context.createFilter(filterFwAdmin);
-			fwAdminTracker = new ServiceTracker(this.context, chFilter, null);
+			fwAdminTracker = new ServiceTracker(context, chFilter, null);
 			fwAdminTracker.open();
-			fwAdmin = (FrameworkAdmin) this.fwAdminTracker.getService();
+			fwAdmin = (FrameworkAdmin) fwAdminTracker.getService();
 			return;
 		}
 
@@ -432,10 +440,10 @@ public class EquinoxActivator {
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop() throws Exception {
-		this.context = null;
+		context = null;
 		fwAdminTracker.close();
 		fwAdminTracker = null;
-		this.fwAdmin = null;
+		fwAdmin = null;
 		InputStreamMonitorThread.stopProcess(process, threadStandardI, threadErrorI);
 
 	}

@@ -41,10 +41,10 @@ public class KfActivator {
 	File configLoc;
 
 	private File fwHome;
-	private File fwJar;
-	private File cwd;
+	File fwJar;
+	File cwd;
 	private String bundlesDir;
-	private File fwPersistentDataLoc;
+	File fwPersistentDataLoc;
 
 	private String filterFwAdmin;
 
@@ -53,13 +53,17 @@ public class KfActivator {
 	private ServiceTracker fwAdminTracker;
 
 	FrameworkAdmin fwAdmin;
-	private InputStreamMonitorThread threadStandardI = null;
-	private InputStreamMonitorThread threadErrorI = null;
+	InputStreamMonitorThread threadStandardI = null;
+	InputStreamMonitorThread threadErrorI = null;
 
 	private List bundlesList = new LinkedList();
 	private final int initialBundleSl = 7;
 
 	private final int beginningFwSl = 7;
+
+	KfActivator(Properties props) {
+		this(null, props);
+	}
 
 	KfActivator(BundleContext context, Properties props) {
 		this.context = context;
@@ -88,7 +92,7 @@ public class KfActivator {
 
 		bundleInfoListWithSimpleConfigurator.addAll(bundleInfoListWoSimpleConfigurator);
 		try {
-			bundleInfoListWithSimpleConfigurator.add(new BundleInfo(fwJar.toURL().toExternalForm(), 0, true,0));
+			bundleInfoListWithSimpleConfigurator.add(new BundleInfo(fwJar.toURL().toExternalForm(), 0, true, 0));
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

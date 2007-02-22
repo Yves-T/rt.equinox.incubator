@@ -24,15 +24,15 @@ public class FelixActivator {
 
 	private final static String FILTER_OBJECTCLASS = "(" + Constants.OBJECTCLASS + "=" + FrameworkAdmin.class.getName() + ")";
 	static List bundleInfoListWoSimpleConfigurator = new LinkedList();
-	static List bundleInfoListWithSimpleConfigurator = new LinkedList();
+	List bundleInfoListWithSimpleConfigurator = new LinkedList();
 	private File fwHome;
 
-	private File fwJar;
-	private File configLoc;
-	private File cwd;
+	File fwJar;
+	File configLoc;
+	File cwd;
 	private String bundlesDir;
 
-	private File fwPersistentDataLoc;
+	File fwPersistentDataLoc;
 
 	private String filterFwAdmin;
 	private List bundlesList = new LinkedList();
@@ -42,11 +42,15 @@ public class FelixActivator {
 	private ServiceTracker fwAdminTracker;
 	private FrameworkAdmin fwAdmin;
 
-	private InputStreamMonitorThread threadStandardI = null;
-	private InputStreamMonitorThread threadErrorI = null;
+	InputStreamMonitorThread threadStandardI = null;
+	InputStreamMonitorThread threadErrorI = null;
 	private final int initialBundleSl = 7;
 
 	private final int beginningFwSl = 7;
+
+	FelixActivator(Properties props) {
+		this(null, props);
+	}
 
 	FelixActivator(BundleContext context, Properties props) {
 		this.context = context;
@@ -104,7 +108,7 @@ public class FelixActivator {
 
 		bundleInfoListWithSimpleConfigurator.addAll(bundleInfoListWoSimpleConfigurator);
 		try {
-			bundleInfoListWithSimpleConfigurator.add(new BundleInfo(fwJar.toURL().toExternalForm(), 1, true,0));
+			bundleInfoListWithSimpleConfigurator.add(new BundleInfo(fwJar.toURL().toExternalForm(), 1, true, 0));
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -24,9 +24,6 @@ import org.osgi.framework.*;
  */
 public class Activator implements BundleActivator {
 
-	static String frameworkAdminServiceBundle;
-
-	static String simpleConfiguratorBundle;
 	static String jvmArgs;
 	static String jvm;
 
@@ -119,8 +116,6 @@ public class Activator implements BundleActivator {
 		System.out.println("mode:" + mode);
 		System.out.println("jvm:" + jvm);
 		System.out.println("jvmArgs:" + jvmArgs);
-		System.out.println("simpleConfiguratorBundle:" + simpleConfiguratorBundle);
-		System.out.println("frameworkAdminServiceBundle:" + frameworkAdminServiceBundle);
 		System.out.println("");
 	}
 
@@ -136,8 +131,6 @@ public class Activator implements BundleActivator {
 		jvm = value;
 		jvmArgs = props.getProperty("jvm.args");
 
-		simpleConfiguratorBundle = getValue(props, "general.bundles.simpleconfigurator");
-		frameworkAdminServiceBundle = getValue(props, "general.bundles.frameworkadmin");
 		printout();
 	}
 
@@ -181,7 +174,6 @@ public class Activator implements BundleActivator {
 					equinox.equinoxSaveAndGetState(equinox.bundleInfoListWoSimpleConfigurator, false);
 					break;
 				case 8 :
-
 					equinox.equinoxSaveAndLaunch(equinox.bundleInfoListWithSimpleConfigurator, false);
 					equinox.equinoxGetState();
 					break;
