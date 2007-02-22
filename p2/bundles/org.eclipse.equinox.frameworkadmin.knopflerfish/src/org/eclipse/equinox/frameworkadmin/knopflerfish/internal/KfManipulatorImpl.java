@@ -41,12 +41,14 @@ public class KfManipulatorImpl implements Manipulator {
 	KfManipulatorImpl(BundleContext context, KfFwAdminImpl ManipulatorAdmin) {
 		this.context = context;
 		this.fwAdmin = ManipulatorAdmin;
-		cmTracker = new ServiceTracker(context, ConfiguratorManipulator.class.getName(), null);
-		cmTracker.open();
+		if (context != null) {
+			cmTracker = new ServiceTracker(context, ConfiguratorManipulator.class.getName(), null);
+			cmTracker.open();
+		}
 	}
 
 	public BundlesState getBundlesState() throws FrameworkAdminRuntimeException {
-		return new SimpleBundlesState(context, fwAdmin, this, SYSTEMBUNDLE_NAME, SYSTEMBUNDLE_VENDOR);
+		return new SimpleBundlesState(fwAdmin, this, SYSTEMBUNDLE_NAME, SYSTEMBUNDLE_VENDOR);
 		//		return new KfBundlesState(context, ManipulatorAdmin, this);
 	}
 
@@ -151,6 +153,11 @@ public class KfManipulatorImpl implements Manipulator {
 	 * 
 	 */
 	private void setConfiguratorManipulator() {
+		if (context == null) {
+			this.configuratorManipulator = this.fwAdmin.getConfiguratorManipulator();
+			return;
+		}
+
 		ServiceReference[] references = cmTracker.getServiceReferences();
 		int count = cmTracker.getTrackingCount();
 		if (count == this.trackingCount)

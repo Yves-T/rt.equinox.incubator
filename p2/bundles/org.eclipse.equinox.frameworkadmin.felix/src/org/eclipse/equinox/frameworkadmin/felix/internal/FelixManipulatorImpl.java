@@ -39,12 +39,14 @@ public class FelixManipulatorImpl implements Manipulator {
 	FelixManipulatorImpl(BundleContext context, FelixFwAdminImpl fwAdmin) {
 		this.context = context;
 		this.fwAdmin = fwAdmin;
-		cmTracker = new ServiceTracker(context, ConfiguratorManipulator.class.getName(), null);
-		cmTracker.open();
+		if (context != null) {
+			cmTracker = new ServiceTracker(context, ConfiguratorManipulator.class.getName(), null);
+			cmTracker.open();
+		}
 	}
 
 	public BundlesState getBundlesState() throws FrameworkAdminRuntimeException {
-		return new SimpleBundlesState(context, fwAdmin, this, SYSTEMBUNDLE_SYMBOLICNAME);
+		return new SimpleBundlesState(fwAdmin, this, SYSTEMBUNDLE_SYMBOLICNAME);
 	}
 
 	public ConfigData getConfigData() throws FrameworkAdminRuntimeException {
@@ -147,6 +149,11 @@ public class FelixManipulatorImpl implements Manipulator {
 	 * 
 	 */
 	private void setConfiguratorManipulator() {
+		if (context == null) {
+			this.configuratorManipulator = this.fwAdmin.getConfiguratorManipulator();
+			return;
+		}
+
 		ServiceReference[] references = cmTracker.getServiceReferences();
 		int count = cmTracker.getTrackingCount();
 		if (count == this.trackingCount)

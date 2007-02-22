@@ -38,7 +38,7 @@ public class Log {
 	}
 
 	public static void log(int level, Object obj, String method, String message, Throwable e) {
-		LogService logService = (LogService) logTracker.getService();
+		LogService logService = null;
 		String msg = "";
 		if (method == null) {
 			if (obj != null)
@@ -48,6 +48,9 @@ public class Log {
 		else
 			msg = "[" + method + "](" + obj.getClass().getName() + ")";
 		msg += message;
+		if (logTracker != null)
+			logService = (LogService) logTracker.getService();
+
 		if (logService != null) {
 			logService.log(level, msg, e);
 		} else {
@@ -63,7 +66,7 @@ public class Log {
 
 			System.err.println("[" + levelSt + "]" + msg);
 			if (e != null)
-				System.err.println(e);
+				e.printStackTrace();
 		}
 	}
 
@@ -85,4 +88,5 @@ public class Log {
 
 	private Log() {
 	}
+
 }

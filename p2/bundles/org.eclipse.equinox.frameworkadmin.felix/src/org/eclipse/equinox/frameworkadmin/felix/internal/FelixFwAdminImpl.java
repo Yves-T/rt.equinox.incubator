@@ -13,6 +13,8 @@ package org.eclipse.equinox.frameworkadmin.felix.internal;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.equinox.configurator.ConfiguratorManipulator;
+import org.eclipse.equinox.configurator.ConfiguratorManipulatorFactory;
 import org.eclipse.equinox.frameworkadmin.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -45,6 +47,11 @@ public class FelixFwAdminImpl implements FrameworkAdmin {
 	boolean active = false;
 
 	private boolean runningFw = false;
+	private ConfiguratorManipulator configuratorManipulator = null;
+
+	FelixFwAdminImpl() {
+		this(null, false);
+	}
 
 	FelixFwAdminImpl(BundleContext context) {
 		this(context, false);
@@ -55,6 +62,22 @@ public class FelixFwAdminImpl implements FrameworkAdmin {
 		this.context = context;
 		this.active = true;
 		this.runningFw = runningFw;
+	}
+
+	FelixFwAdminImpl(String configuratorManipulatorFactoryName) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+		this.context = null;
+		this.active = true;
+		this.runningFw = false;
+		//		this.configuratorManipulatorFactoryName = configuratorManipulatorFactoryName;
+		loadConfiguratorManipulator(configuratorManipulatorFactoryName);
+	}
+
+	private void loadConfiguratorManipulator(String configuratorManipulatorFactoryName) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+		if (configuratorManipulatorFactoryName == null)
+			this.configuratorManipulator = null;
+		else
+			this.configuratorManipulator = ConfiguratorManipulatorFactory.getInstance(configuratorManipulatorFactoryName);
+		return;
 	}
 
 	void deactivate() {
@@ -82,4 +105,7 @@ public class FelixFwAdminImpl implements FrameworkAdmin {
 		return new FelixLauncherImpl(context, this).launch(manipulator, cwd);
 	}
 
+	public ConfiguratorManipulator getConfiguratorManipulator() {
+		return configuratorManipulator;
+	}
 }

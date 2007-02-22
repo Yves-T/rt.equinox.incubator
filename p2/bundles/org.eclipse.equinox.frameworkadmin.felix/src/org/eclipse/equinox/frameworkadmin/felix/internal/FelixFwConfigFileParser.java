@@ -27,7 +27,12 @@ public class FelixFwConfigFileParser {
 
 		String entry = Utils.replaceAll(this.getClass().getPackage().getName(), ".", "/") + "/" + FelixConstants.FELIX_BASIC_PROPERTIES_FILE;
 		//		String entry = Utils.replaceAll(this.getClass().getName(), ".", "/") + ".class";
-		URL url = Activator.context.getBundle().getResource(entry);
+
+		URL url = null;
+		if (Activator.context == null)
+			url = this.getClass().getClassLoader().getResource(entry);
+		else
+			url = Activator.context.getBundle().getResource(entry);
 
 		try {
 			is = url.openStream();
