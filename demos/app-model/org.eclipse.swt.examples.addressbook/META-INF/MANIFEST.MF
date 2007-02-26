@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Addressbook Example
+Bundle-SymbolicName: org.eclipse.swt.examples.addressbook;singleton:=true
+Bundle-Version: 1.0.0
+Import-Package: org.eclipse.equinox.app;version="1.0.0",
+ org.eclipse.swt,
+ org.eclipse.swt.events,
+ org.eclipse.swt.graphics,
+ org.eclipse.swt.layout,
+ org.eclipse.swt.widgets
