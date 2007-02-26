@@ -14,6 +14,8 @@ import java.net.URL;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.management.*;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.equinox.jmx.common.ContributionNotificationEvent;
 import org.eclipse.equinox.jmx.server.Contribution;
 import org.eclipse.equinox.jmx.server.ContributionProvider;
@@ -23,6 +25,7 @@ import org.eclipse.swt.widgets.Display;
 public class SleakContributionProvider extends ContributionProvider {
 
 	private static int DEFAULT_REFRESH_INTERVAL = 10000;
+	private static final String SLEAK_IMG_PATH = "icons/sleak.png"; //$NON-NLS-1$
 
 	private int colors, cursors, fonts, gcs, images, regions;
 	private boolean started;
@@ -116,7 +119,7 @@ public class SleakContributionProvider extends ContributionProvider {
 	 * @see org.eclipse.equinox.jmx.server.Contribution#getImageLocation()
 	 */
 	protected URL getImageLocation() {
-		return null;
+		return FileLocator.find(Activator.getBundle(), new Path(SLEAK_IMG_PATH), null);
 	}
 
 	/* (non-Javadoc)

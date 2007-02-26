@@ -4,7 +4,7 @@ Bundle-Name: SWT JMX Plug-in
 Bundle-SymbolicName: org.eclipse.swt.jmx;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin
-Eclipse-LazyStart: false
+Eclipse-LazyStart: true
 Import-Package: javax.management,
  javax.management.remote,
  org.eclipse.core.runtime; common=split,
@@ -17,3 +17,4 @@ Import-Package: javax.management,
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
  CDC-1.0/Foundation-1.0,
  J2SE-1.3
+Bundle-Activator: org.eclipse.swt.jmx.internal.Activator
