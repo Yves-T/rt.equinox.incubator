@@ -13,7 +13,7 @@ package org.eclipse.equinox.frameworkadmin.knopflerfish.internal;
 import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.equinox.configurator.ConfiguratorManipulator;
+import org.eclipse.equinox.configuratormanipulator.ConfiguratorManipulator;
 import org.eclipse.equinox.frameworkadmin.*;
 import org.eclipse.equinox.frameworkadmin.knopflerfish.KfConfigData;
 import org.eclipse.equinox.internal.frameworkadmin.utils.SimpleBundlesState;

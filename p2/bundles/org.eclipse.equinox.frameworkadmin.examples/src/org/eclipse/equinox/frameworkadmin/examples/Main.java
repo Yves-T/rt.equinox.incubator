@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.*;
 
 import org.eclipse.equinox.frameworkadmin.*;
+import org.eclipse.equinox.configuratormanipulator.ConfiguratorManipulatorFactory;
 
 /**
  * This is an example how a Java application configure an framework with bundles and launch it. 
@@ -57,7 +58,7 @@ public class Main {
 
 			// Method 3: set ConfiguratorManipulatorFactory magic system property in advance.
 			//           and specify FrameworkAdminFactoryImplementation as an argument.
-			System.setProperty("org.eclipse.equinox.frameworkadmin.configuratorManipulatorFactory", configuratorManipulatorFactoryClassName);//		FrameworkAdmin fwAdmin = FrameworkAdminFactory.getInstance(className);
+			System.setProperty(ConfiguratorManipulatorFactory.SYSTEM_PROPERTY_KEY, configuratorManipulatorFactoryClassName);//		FrameworkAdmin fwAdmin = FrameworkAdminFactory.getInstance(className);
 			fwAdmin = FrameworkAdminFactory.getInstance(frameworkAdminFactoryClassName);
 		} catch (InstantiationException e) {
 			System.err.println("frameworkAdminFactoryClassName=" + frameworkAdminFactoryClassName);
@@ -136,7 +137,7 @@ public class Main {
 
 			// Method 3: set ConfiguratorManipulatorFactory magic system property in advance.
 			//           and specify FrameworkAdminFactoryImplementation as an argument.
-			System.setProperty("org.eclipse.equinox.frameworkadmin.configuratorManipulatorFactory", configuratorManipulatorFactoryClassName);//		FrameworkAdmin fwAdmin = FrameworkAdminFactory.getInstance(className);
+			System.setProperty(ConfiguratorManipulatorFactory.SYSTEM_PROPERTY_KEY, configuratorManipulatorFactoryClassName);//		FrameworkAdmin fwAdmin = FrameworkAdminFactory.getInstance(className);
 			fwAdmin = FrameworkAdminFactory.getInstance(frameworkAdminFactoryClassName);
 		} catch (InstantiationException e) {
 			System.err.println("frameworkAdminFactoryClassName=" + frameworkAdminFactoryClassName);
@@ -216,7 +217,7 @@ public class Main {
 
 			// Method 3: set ConfiguratorManipulatorFactory magic system property in advance.
 			//           and specify FrameworkAdminFactoryImplementation as an argument.
-			System.setProperty("org.eclipse.equinox.frameworkadmin.configuratorManipulatorFactory", configuratorManipulatorFactoryClassName);//		FrameworkAdmin fwAdmin = FrameworkAdminFactory.getInstance(className);
+			System.setProperty(ConfiguratorManipulatorFactory.SYSTEM_PROPERTY_KEY, configuratorManipulatorFactoryClassName);//		FrameworkAdmin fwAdmin = FrameworkAdminFactory.getInstance(className);
 			fwAdmin = FrameworkAdminFactory.getInstance(frameworkAdminFactoryClassName);
 		} catch (InstantiationException e) {
 			System.err.println("frameworkAdminFactoryClassName=" + frameworkAdminFactoryClassName);
