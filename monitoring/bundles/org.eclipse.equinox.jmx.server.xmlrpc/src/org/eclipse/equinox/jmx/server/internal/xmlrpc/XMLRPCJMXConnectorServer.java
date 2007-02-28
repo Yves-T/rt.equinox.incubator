@@ -15,7 +15,6 @@ import java.util.Map;
 import javax.management.MBeanServer;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXServiceURL;
-import org.apache.xmlrpc.webserver.WebServer;
 
 public class XMLRPCJMXConnectorServer extends JMXConnectorServer {
 
@@ -24,7 +23,7 @@ public class XMLRPCJMXConnectorServer extends JMXConnectorServer {
 
 	public XMLRPCJMXConnectorServer(JMXServiceURL url, MBeanServer mbeanServer) {
 		this.url = url;
-		xmlrpcServer = new XMLRPCMBeanServerAdapter(new WebServer(url.getPort()), mbeanServer);
+		xmlrpcServer = new XMLRPCMBeanServerAdapter(url.getPort(), mbeanServer);
 		super.setMBeanServerForwarder(xmlrpcServer);
 	}
 

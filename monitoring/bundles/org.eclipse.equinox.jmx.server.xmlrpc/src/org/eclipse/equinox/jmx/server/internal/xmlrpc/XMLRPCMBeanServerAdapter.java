@@ -17,18 +17,26 @@ import java.util.*;
 import javax.management.*;
 import javax.management.loading.ClassLoaderRepository;
 import javax.management.remote.MBeanServerForwarder;
+import javax.servlet.*;
 import org.apache.xmlrpc.*;
-import org.apache.xmlrpc.server.*;
-import org.apache.xmlrpc.webserver.WebServer;
+import org.apache.xmlrpc.server.XmlRpcHandlerMapping;
+import org.apache.xmlrpc.server.XmlRpcNoSuchHandlerException;
+import org.apache.xmlrpc.webserver.XmlRpcServlet;
 import org.eclipse.equinox.jmx.common.NamedNotification;
 import org.eclipse.equinox.jmx.common.util.RingBuffer;
+import org.mortbay.http.*;
+import org.mortbay.jetty.servlet.ServletHandler;
+import org.mortbay.jetty.servlet.ServletHolder;
 
 public class XMLRPCMBeanServerAdapter implements MBeanServerForwarder, NotificationListener {
 
 	private static final int NOTIFICATIONS_BUFFER_SIZE = 100;
+	private static final String INTERNAL_CONTEXT_CLASSLOADER = "internal.ContextClassLoader"; //$NON-NLS-1$
+	private static final String INTERNAL_MAPPING = "internal.Mapping"; //$NON-NLS-1$
+
 	private final Map notificationBroadcasters = new HashMap();
 	private final RingBuffer notificationsBuffer = new RingBuffer(NOTIFICATIONS_BUFFER_SIZE);
-	private final WebServer webServer;
+	private final HttpServer webServer;
 	private final XmlRpcHandlerMappingImpl mapping;
 	private MBeanServer mbs;
 	private boolean started;
@@ -40,27 +48,53 @@ public class XMLRPCMBeanServerAdapter implements MBeanServerForwarder, Notificat
 	 * 
 	 * @param webServer The webserver to adapt.
 	 */
-	public XMLRPCMBeanServerAdapter(WebServer webServer, MBeanServer mbs) {
-		this.webServer = webServer;
+	public XMLRPCMBeanServerAdapter(int port, MBeanServer mbs) {
+		this.webServer = new HttpServer();
 		this.mbs = mbs;
 		mapping = new XmlRpcHandlerMappingImpl();
 		// support retrieval of notifications from clients
 		mapping.addNameHandler("retrieveNotifications"); //$NON-NLS-1$
-		XmlRpcServerConfigImpl serverConfig = new XmlRpcServerConfigImpl();
-		serverConfig.setEnabledForExtensions(true);
-		serverConfig.setContentLengthOptional(true);
-		serverConfig.setKeepAliveEnabled(false);
-		webServer.getXmlRpcServer().setConfig(serverConfig);
-		webServer.getXmlRpcServer().setHandlerMapping(mapping);
+		SocketListener httpListener = new SocketListener();
+		httpListener.setPort(port);
+		if (httpListener != null)
+			webServer.addListener(httpListener);
+
+		ServletHandler servlets = new ServletHandler();
+		servlets.setAutoInitializeServlets(true);
+
+		ServletHolder holder = servlets.addServlet("/", InternalHttpServiceServlet.class.getName()); //$NON-NLS-1$
+		holder.setInitOrder(0);
+		holder.setInitParameter("enabledForExtensions", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		HttpContext httpContext = new HttpContext();
+		httpContext.setAttribute(INTERNAL_CONTEXT_CLASSLOADER, Thread.currentThread().getContextClassLoader());
+		httpContext.setAttribute(INTERNAL_MAPPING, mapping);
+		httpContext.setClassLoader(this.getClass().getClassLoader());
+		httpContext.setContextPath("/"); //$NON-NLS-1$
+		httpContext.addHandler(servlets);
+
+		webServer.addContext(httpContext);
 	}
 
 	public void start() throws IOException {
-		webServer.start();
+		try {
+			webServer.start();
+		} catch (IOException e) {
+			throw e;
+		}catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
 		started = true;
 	}
 
 	public void stop() {
-		webServer.shutdown();
+		try {
+			webServer.stop();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return;
+		}
 		started = false;
 	}
 
@@ -68,10 +102,55 @@ public class XMLRPCMBeanServerAdapter implements MBeanServerForwarder, Notificat
 		return started;
 	}
 
-	public WebServer getWebServer() {
-		return webServer;
-	}
+	public static class InternalHttpServiceServlet extends XmlRpcServlet {
+		private static final long serialVersionUID = 6297772804215794345L;
+		private ClassLoader contextLoader;
+		private XmlRpcHandlerMappingImpl mapping;
 
+		public void init(ServletConfig config) throws ServletException {
+			ServletContext context = config.getServletContext();
+			contextLoader = (ClassLoader) context.getAttribute(INTERNAL_CONTEXT_CLASSLOADER);
+			mapping = (XmlRpcHandlerMappingImpl) context.getAttribute(INTERNAL_MAPPING);
+
+			Thread thread = Thread.currentThread();
+			ClassLoader current = thread.getContextClassLoader();
+			thread.setContextClassLoader(contextLoader);
+			try {
+				super.init(config);
+			} finally {
+				thread.setContextClassLoader(current);
+			}
+		}
+
+		public void destroy() {
+			Thread thread = Thread.currentThread();
+			ClassLoader current = thread.getContextClassLoader();
+			thread.setContextClassLoader(contextLoader);
+			try {
+				super.destroy();
+			} finally {
+				thread.setContextClassLoader(current);
+			}
+			contextLoader = null;
+		}
+
+		public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
+			Thread thread = Thread.currentThread();
+			ClassLoader current = thread.getContextClassLoader();
+			thread.setContextClassLoader(contextLoader);
+			try {
+				super.service(req, res);
+			} finally {
+				thread.setContextClassLoader(current);
+			}
+		}
+		
+		protected XmlRpcHandlerMapping newXmlRpcHandlerMapping() {
+			return mapping;
+		}
+		
+	}
+	
 	private class XmlRpcHandlerMappingImpl implements XmlRpcHandlerMapping {
 
 		// use hashtable as synchronization is required

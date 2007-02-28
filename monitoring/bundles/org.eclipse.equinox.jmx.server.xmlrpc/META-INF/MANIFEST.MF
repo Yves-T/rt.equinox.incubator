@@ -16,4 +16,9 @@ Import-Package: javax.management,
  org.apache.xmlrpc.webserver,
  org.eclipse.equinox.jmx.common,
  org.eclipse.equinox.jmx.common.util,
- org.eclipse.equinox.jmx.server
+ org.eclipse.equinox.jmx.server,
+ javax.servlet;version="[2.4.0,2.5.0)",
+ javax.servlet.http;version="[2.4.0,2.5.0)",
+ org.mortbay.http;version="[5.1.0,6.0.0)",
+ org.mortbay.jetty.servlet;version="[5.1.0,6.0.0)",
+ org.mortbay.util;version="[5.1.0,6.0.0)"
