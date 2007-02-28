@@ -6,6 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
+ * 	Jeff Mesnil - Bug 151266 - [monitoring] Browsing our server in jconsole is really unfriendly
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.equinox.internal.registry.jmx;
@@ -56,6 +57,17 @@ public class ExtensionRegistryContribution extends Contribution {
 	 */
 	protected String getName() {
 		return "Extension Registry";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.jmx.server.Contribution#getObjectName()
+	 */
+	protected ObjectName getObjectName() {
+		try {
+			return new ObjectName("jmxserver:type=ExtensionRegistry,name=" + getName()); //$NON-NLS-1$
+		} catch (Exception e) {
+			return super.getObjectName();
+		}
 	}
 
 	/* (non-Javadoc)

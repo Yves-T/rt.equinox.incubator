@@ -6,6 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
+ * 	Jeff Mesnil - Bug 151266 - [monitoring] Browsing our server in jconsole is really unfriendly
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.equinox.internal.preferences.jmx;
