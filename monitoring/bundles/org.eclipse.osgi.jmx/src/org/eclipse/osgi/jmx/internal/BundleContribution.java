@@ -15,6 +15,7 @@ import java.util.*;
 import javax.management.*;
 import org.eclipse.core.runtime.*;
 import org.eclipse.equinox.jmx.common.ContributionNotificationEvent;
+import org.eclipse.equinox.jmx.common.JMXConstants;
 import org.eclipse.equinox.jmx.server.Contribution;
 import org.osgi.framework.*;
 
@@ -60,6 +61,17 @@ public class BundleContribution extends Contribution implements BundleListener {
 		setProperties(bundle);
 		Activator.getBundleContext().addBundleListener(this);
 	}
+
+    /* (non-Javadoc)
+     * @see org.eclipse.equinox.jmx.server.Contribution#getObjectName()
+     */
+    protected ObjectName getObjectName() {
+        try {
+            return new ObjectName(JMXConstants.DEFAULT_DOMAIN + ":type=Bundle,name=" + getName()); //$NON-NLS-1$
+        } catch (Exception e) {
+            return super.getObjectName();
+        }
+    }
 
 	/* (non-Javadoc)
 	 * @see com.jmx.server.contrib.Contribution#getChildren()

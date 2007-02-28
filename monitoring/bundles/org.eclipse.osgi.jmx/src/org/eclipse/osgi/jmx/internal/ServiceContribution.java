@@ -60,6 +60,17 @@ public class ServiceContribution extends Contribution implements ServiceListener
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.jmx.server.Contribution#getObjectName()
+	 */
+	protected ObjectName getObjectName() {
+		try {
+			return new ObjectName("jmxserver:type=Service,name=" + getName()); //$NON-NLS-1$
+		} catch (Exception e) {
+			return super.getObjectName();
+		}
+	}
+
+	/* (non-Javadoc)
 	 * @see com.jmx.server.contrib.Contribution#getName()
 	 */
 	protected String getName() {

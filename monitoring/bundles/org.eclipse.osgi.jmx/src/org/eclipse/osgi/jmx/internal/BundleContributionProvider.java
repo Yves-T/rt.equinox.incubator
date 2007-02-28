@@ -44,7 +44,8 @@ public class BundleContributionProvider extends ContributionProvider implements 
 			try {
 				serverPluginDependencies = BundleUtils.computeDependencies(Activator.getBundle(), Activator.getBundleContext());
 			} catch (Exception e) {
-				throw new RuntimeException(e);
+				e.printStackTrace();
+				throw new RuntimeException(e.getMessage());
 			}
 		}
 	}

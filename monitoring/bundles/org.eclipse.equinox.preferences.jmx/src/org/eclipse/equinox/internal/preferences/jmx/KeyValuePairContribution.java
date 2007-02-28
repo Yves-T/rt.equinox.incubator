@@ -15,6 +15,7 @@ import java.util.*;
 import javax.management.*;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.equinox.jmx.common.JMXConstants;
 import org.eclipse.equinox.jmx.server.Contribution;
 import org.osgi.service.prefs.Preferences;
 
@@ -29,6 +30,18 @@ public class KeyValuePairContribution extends Contribution {
 	public KeyValuePairContribution(KVP delegate) {
 		super(delegate);
 	}
+
+    /* (non-Javadoc)
+     * @see org.eclipse.equinox.jmx.server.Contribution#getObjectName()
+     */
+    protected ObjectName getObjectName() {
+        try {
+            return new ObjectName(JMXConstants.DEFAULT_DOMAIN + ":type=KVPair,Preference=" + getDelegate().getNode().name() //$NON-NLS-1$
+            		+ "name=" + getDelegate().getKey()); //$NON-NLS-1$
+        } catch (Exception e) {
+            return super.getObjectName();
+        }
+    }
 
 	/* (non-Javadoc)
 	 * @see com.jmx.server.contrib.Contribution#getName()

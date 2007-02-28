@@ -15,6 +15,7 @@ import java.util.*;
 import javax.management.*;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.equinox.jmx.common.JMXConstants;
 import org.eclipse.equinox.jmx.server.Contribution;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
@@ -44,6 +45,17 @@ public class PreferenceContribution extends Contribution {
 	public PreferenceContribution(Preferences delegate) {
 		super(delegate.absolutePath());
 	}
+
+    /* (non-Javadoc)
+     * @see org.eclipse.equinox.jmx.server.Contribution#getObjectName()
+     */
+    protected ObjectName getObjectName() {
+        try {
+            return new ObjectName(JMXConstants.DEFAULT_DOMAIN + ":type=Preferences,name=" + getName()); //$NON-NLS-1$
+        } catch (Exception e) {
+            return super.getObjectName();
+        }
+    }
 
 	/*
 	 * Return the delegate associated with this contribution.

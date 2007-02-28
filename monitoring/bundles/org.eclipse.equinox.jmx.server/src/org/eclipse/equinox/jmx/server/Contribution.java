@@ -349,7 +349,7 @@ public abstract class Contribution extends NotificationBroadcasterSupport implem
 		return invokeOperation(arg0, arg1, arg2);
 	}
 
-	private ObjectName getObjectName() {
+	protected ObjectName getObjectName() {
 		return objectName;
 	}
 
