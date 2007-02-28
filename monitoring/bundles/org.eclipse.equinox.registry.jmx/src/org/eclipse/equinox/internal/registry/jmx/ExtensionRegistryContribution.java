@@ -34,10 +34,6 @@ public class ExtensionRegistryContribution extends Contribution {
 		return new Object[0];
 	}
 
-	private IExtensionRegistry getDeletgate() {
-		return (IExtensionRegistry) contributionDelegate;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.equinox.jmx.server.Contribution#getImageLocation()
 	 */
