@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launchConfiguration type="org.eclipse.pde.ui.EquinoxLauncher">
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-console -application org.eclipse.equinox.examples.sharedisplay.application"/>
+<stringAttribute key="configLocation" value=""/>
+<booleanAttribute key="automaticAdd" value="false"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Declipse.ignoreApp=false -Dosgi.noShutdown=false -Declipse.application.registerDescriptors=true"/>
+<booleanAttribute key="default_auto_start" value="false"/>
+<booleanAttribute key="clearConfig" value="false"/>
+<stringAttribute key="bootstrap" value=""/>
+<stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
+<intAttribute key="default_start_level" value="4"/>
+<booleanAttribute key="useDefaultConfigArea" value="true"/>
+<booleanAttribute key="includeOptional" value="true"/>
+<stringAttribute key="workspace_bundles" value="org.eclipse.equinox.examples.sharedisplay@default:default,org.eclipse.swt.examples.addressbook@default:default,org.eclipse.swt.examples.browserexample@default:default,org.eclipse.swt.examples.clipboard@default:default,org.eclipse.swt.examples.graphics@default:default,org.eclipse.swt.examples.paint@default:default"/>
+<stringAttribute key="checked" value="[NONE]"/>
+<stringAttribute key="target_bundles" value="org.eclipse.core.jobs@default:default,org.eclipse.core.runtime.compatibility.registry@default:default,org.eclipse.equinox.app@default:true,org.eclipse.equinox.common@default:default,org.eclipse.equinox.registry@default:default,org.eclipse.osgi@:,org.eclipse.osgi.services@default:default,org.eclipse.swt@default:default,org.eclipse.swt.win32.win32.x86@default:default"/>
+<booleanAttribute key="tracing" value="false"/>
+<booleanAttribute key="automaticValidate" value="false"/>
+<booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
+</launchConfiguration>
