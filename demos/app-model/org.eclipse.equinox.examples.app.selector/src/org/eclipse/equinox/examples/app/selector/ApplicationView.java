@@ -95,11 +95,20 @@ public class ApplicationView extends ViewPart implements ServiceTrackerCustomize
 		column = new TableColumn(newViewer.getTable(),SWT.NONE);
 		column.setWidth(75);
 		column.setText("State");
-
+		newViewer.setInput(applications.getServices());
 		viewer = newViewer;
 		makeActions();
 		hookContextMenu();
 		contributeToActionBars();
+		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(SelectionChangedEvent event) {
+				ISelection selection = viewer.getSelection();
+				ApplicationInfo appInfo = (ApplicationInfo) ((IStructuredSelection) selection)
+						.getFirstElement();
+				startAction.setEnabled(appInfo.isEnabled());
+				stopAction.setEnabled(!appInfo.isEnabled());
+			}
+		});
 	}
 
 	private void hookContextMenu() {
@@ -178,12 +187,12 @@ public class ApplicationView extends ViewPart implements ServiceTrackerCustomize
 
 	@Override
 	public void dispose() {
+		viewer = null;
 		Object[] applicationInfos = applications.getServices();
 		if (applicationInfos != null) {
 			for (int i = 0; i < applicationInfos.length; i++)
 				((ApplicationInfo) applicationInfos[i]).close();
 		}
-		viewer = null;
 		super.dispose();
 	}
 
@@ -192,32 +201,41 @@ public class ApplicationView extends ViewPart implements ServiceTrackerCustomize
 			return null;
 			
 		final ApplicationInfo info = new ApplicationInfo(reference, this);
-		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-			public void run() {
-				TableViewer updateViewer = getViewer();
-				if (updateViewer != null)
+		final TableViewer updateViewer = getViewer();
+		if (updateViewer != null) {
+			if (PlatformUI.getWorkbench().getDisplay().isDisposed())
+				return info;
+			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+				public void run() {
 					updateViewer.add(info);
-			}
-		});
+				}
+			});
+		}
 		return info;
 	}
 
 	public void modifiedService(ServiceReference reference, final Object service) {
+		final TableViewer updateViewer = getViewer();
+		if (updateViewer == null)
+			return;
+		if (PlatformUI.getWorkbench().getDisplay().isDisposed())
+			return;
 		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				TableViewer updateViewer = getViewer();
-				if (updateViewer != null)
-					updateViewer.update(service, null);
+				updateViewer.update(service, null);
 			}
 		});
 	}
 
 	public void removedService(ServiceReference reference, final Object service) {
+		final TableViewer updateViewer = getViewer();
+		if (updateViewer == null)
+			return;
+		if (PlatformUI.getWorkbench().getDisplay().isDisposed())
+			return;
 		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				TableViewer updateViewer = getViewer();
-				if (updateViewer != null)
-					updateViewer.remove(service);
+				updateViewer.remove(service);
 			}
 		});
 	}

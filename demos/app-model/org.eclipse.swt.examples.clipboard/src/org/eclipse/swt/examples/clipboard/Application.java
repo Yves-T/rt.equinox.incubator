@@ -28,7 +28,12 @@ public class Application implements IApplication {
 		context.applicationRunning();
 		while (!app.isDisposed())
 			Thread.sleep(200);
-		app.dispose();
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				if (app != null && !app.isDisposed())
+					app.dispose();
+			}
+		});
 		return null;
 	}
 
