@@ -77,6 +77,8 @@ public class ConnectionSelectionDialog extends SelectionDialog {
 		label.setText(ActionMessages.host);
 		// 2 host text entry
 		hostText = new Text(fieldComposite, SWT.BORDER);
+		hostText.setText("localhost");
+		hostText.selectAll();
 		data = new GridData();
 		data.widthHint = convertWidthInCharsToPixels(25);
 		hostText.setLayoutData(data);
