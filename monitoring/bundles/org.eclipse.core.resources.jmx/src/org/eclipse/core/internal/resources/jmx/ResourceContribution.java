@@ -16,6 +16,7 @@ import javax.management.*;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.equinox.jmx.common.JMXConstants;
 import org.eclipse.equinox.jmx.server.Contribution;
 
 /**
@@ -34,6 +35,17 @@ public abstract class ResourceContribution extends Contribution {
 	public ResourceContribution(IResource delegate) {
 		super(delegate);
 	}
+
+    /* (non-Javadoc)
+     * @see org.eclipse.equinox.jmx.server.Contribution#getObjectName()
+     */
+    protected ObjectName getObjectName() {
+        try {
+            return new ObjectName(JMXConstants.DEFAULT_DOMAIN +":type=Resource,name=" + getName()); //$NON-NLS-1$
+        } catch (Exception e) {
+            return super.getObjectName();
+        }
+    }
 
 	/*
 	 * Return this contribution's delegate. It is stored in the super-class as
