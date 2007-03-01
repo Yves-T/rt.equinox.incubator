@@ -175,7 +175,14 @@ public class Activator implements BundleActivator {
 					break;
 				case 8 :
 					equinox.equinoxSaveAndLaunch(equinox.bundleInfoListWithSimpleConfigurator, false);
-					equinox.equinoxGetState();
+					equinox.equinoxGetState(true);
+					break;
+				case 9 :
+					equinox.equinoxSaveAndLaunch(equinox.bundleInfoListWithSimpleConfigurator, false);
+					equinox.stop();
+					Thread.sleep(1000);
+					equinox.start();
+					equinox.equinoxGetState(false);
 					break;
 				case 100 :
 					equinox.equinoxGetRunningState();

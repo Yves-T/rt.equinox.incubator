@@ -115,17 +115,16 @@ public class EquinoxActivator {
 		// 4. Launch it.
 		process = fwAdmin.launch(manipulator, cwd);
 		InputStreamMonitorThread.monitorThreadStart(process, threadStandardI, threadErrorI);
-
 	}
 
-	void equinoxGetState() throws IOException {
+	void equinoxGetState(boolean clean) throws IOException {
 		System.out.println("equinoxGetState()");
 		Manipulator manipulator = fwAdmin.getManipulator();
 		//ConfigData configData = manipulator.getConfigData();
 		LauncherData launcherData = manipulator.getLauncherData();
 		// 1. getState from the persistently stored data.
 		// Set Parameters.
-		launcherData.setFwPersistentDataLocation(configLoc, false);
+		launcherData.setFwPersistentDataLocation(configLoc, clean);
 		launcherData.setFwJar(fwJar);
 		launcherData.setFwConfigLocation(configLoc);
 		manipulator.load();
@@ -152,10 +151,12 @@ public class EquinoxActivator {
 		//configData = manipulator.getConfigData();
 		LauncherData launcherData = manipulator.getLauncherData();
 		// Set Parameters.
-		launcherData.setFwPersistentDataLocation(configLoc, false);
+
+		launcherData.setFwPersistentDataLocation(configLoc, true);
 		launcherData.setFwJar(fwJar);
 		launcherData.setFwConfigLocation(configLoc);
 		manipulator.load();
+
 		BundleInfo[] bInfos = manipulator.getExpectedState();
 		System.out.println("ExpectedState:");
 		for (int i = 0; i < bInfos.length; i++)
@@ -440,7 +441,7 @@ public class EquinoxActivator {
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop() throws Exception {
-		context = null;
+		//context = null;
 		fwAdminTracker.close();
 		fwAdminTracker = null;
 		fwAdmin = null;
