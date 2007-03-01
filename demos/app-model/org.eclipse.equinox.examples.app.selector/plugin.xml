@@ -29,5 +29,17 @@
             id="org.eclipse.equinox.app.selector.appview">
       </view>
    </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.equinox.examples.app.selector.application"
+            name="App Selector">
+         <property
+               name="appName"
+               value="App Selector">
+         </property>
+      </product>
+   </extension>
 
 </plugin>
