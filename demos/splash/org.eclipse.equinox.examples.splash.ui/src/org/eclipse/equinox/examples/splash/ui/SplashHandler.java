@@ -44,11 +44,7 @@ public class SplashHandler extends AbstractSplashHandler {
 	private boolean movieLoaded = false, done = false;
 
 	public void init(final Shell splash) {
-		Point point = splash.getSize();
-		splash.setSize( point.x * 2, point.y * 2);
-		point = splash.getLocation();
-		splash.setLocation(point.x - 50, point.y - 50);
-		
+		splash.setSize( 440, 430);
 		splash.setLayout(new GridLayout(1, true));
 		final Browser browser = new Browser(splash, SWT.NONE);
 		browser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -89,13 +85,7 @@ public class SplashHandler extends AbstractSplashHandler {
 		// make the shell bigger to see the flash better
 		splash.layout(true);
 		while (!movieLoaded) {
-			while (getSplash().getDisplay().readAndDispatch());
-			try {
-				Thread.sleep(50); //yield a bit
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			while (splash.getDisplay().readAndDispatch());
 		}
 	}
 

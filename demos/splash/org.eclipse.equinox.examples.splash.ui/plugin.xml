@@ -41,8 +41,12 @@
             class="org.eclipse.equinox.examples.splash.ui.SplashHandler"
             id="org.eclipse.equinox.examples.splash.ui">
       </splashHandler>
-      <splashHandlerProductBinding
+      <!--<splashHandlerProductBinding
             productId="org.eclipse.equinox.examples.splash.ui.product"
+            splashId="org.eclipse.equinox.examples.splash.ui">
+      </splashHandlerProductBinding> -->
+      <splashHandlerProductBinding
+            productId="org.eclipse.sdk.ide"
             splashId="org.eclipse.equinox.examples.splash.ui">
       </splashHandlerProductBinding>
    </extension>

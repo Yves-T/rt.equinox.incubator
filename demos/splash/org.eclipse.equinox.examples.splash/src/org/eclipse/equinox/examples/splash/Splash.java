@@ -14,7 +14,9 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.osgi.service.runnable.StartupMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -59,8 +61,14 @@ public class Splash implements StartupMonitor, SynchronousBundleListener {
 		
 		display = new Display();
 		shell = Shell.internal_new(display, handle.intValue());
-		String splashLoc = System.getProperty("org.eclipse.equinox.launcher.splash.location"); //$NON-NLS-1$
-		background = loadImage(splashLoc);
+
+		URL url = Activator.getDefault().getBundle().getEntry("/splash_early.bmp");
+		try {
+			background = loadImage(FileLocator.toFileURL(url).getPath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		shell.setLayout(new FillLayout());
 		shell.setBackgroundMode(SWT.INHERIT_DEFAULT);
