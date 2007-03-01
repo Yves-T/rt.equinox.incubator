@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Splash Plug-in
+Bundle-SymbolicName: org.eclipse.equinox.examples.splash;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.eclipse.equinox.examples.splash.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.swt
+Export-Package: org.eclipse.equinox.examples.splash
+
