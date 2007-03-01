@@ -52,7 +52,7 @@ public class PreferenceContribution extends Contribution {
      */
     protected ObjectName getObjectName() {
         try {
-            return new ObjectName(JMXConstants.DEFAULT_DOMAIN + ":type=Preferences,name=" + getName()); //$NON-NLS-1$
+            return new ObjectName(JMXConstants.DEFAULT_DOMAIN + ":type=Preferences,name=" + contributionDelegate); //$NON-NLS-1$
         } catch (Exception e) {
             return super.getObjectName();
         }
