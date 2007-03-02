@@ -60,7 +60,7 @@ public class ResourceContributionProvider extends ContributionProvider {
 			case IResource.PROJECT :
 				return new ProjectContribution((IProject) obj);
 			case IResource.ROOT :
-				return new WorkspaceRootContribution((IWorkspaceRoot) obj);
+				return null;
 			default :
 				throw new IllegalArgumentException("Resource type unknown: " + resource.getType()); //$NON-NLS-1$
 		}
@@ -77,7 +77,7 @@ public class ResourceContributionProvider extends ContributionProvider {
 	 * @see com.jmx.server.contrib.Contribution#getChildren()
 	 */
 	protected Object[] getChildren() {
-		return new IResource[] {ResourcesPlugin.getWorkspace().getRoot()};
+		return ResourcesPlugin.getWorkspace().getRoot().getProjects();
 	}
 
 	/* (non-Javadoc)

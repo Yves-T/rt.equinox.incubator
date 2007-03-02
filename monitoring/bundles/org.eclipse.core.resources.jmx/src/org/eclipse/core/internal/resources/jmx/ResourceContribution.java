@@ -42,7 +42,7 @@ public abstract class ResourceContribution extends Contribution {
      */
     protected ObjectName getObjectName() {
         try {
-            return new ObjectName(JMXConstants.DEFAULT_DOMAIN +":type=Resource,name=" + getName()); //$NON-NLS-1$
+            return new ObjectName(JMXConstants.DEFAULT_DOMAIN +":type=Resource,name=" + getDelegate().getFullPath()); //$NON-NLS-1$
         } catch (Exception e) {
             return super.getObjectName();
         }
