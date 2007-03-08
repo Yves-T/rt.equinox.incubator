@@ -13,51 +13,54 @@ package org.eclipse.equinox.frameworkadmin.examples;
 import java.io.*;
 
 public class InputStreamMonitorThread extends Thread {
-		static void monitorThreadStart(Process process, InputStreamMonitorThread threadStandard, InputStreamMonitorThread threadError) {
-			threadStandard = new InputStreamMonitorThread("S", process.getInputStream());
-			threadError = new InputStreamMonitorThread("E", process.getErrorStream());
-			threadStandard.start();
-			threadError.start();
-		}
-		static void stopProcess(Process process, InputStreamMonitorThread threadStandard, InputStreamMonitorThread threadError) {
-			if (process != null) {
-				try {
-					process.exitValue();
-				} catch (IllegalThreadStateException e) {
-					process.destroy();
-					process = null;
-				}
-			}
-		
-			if (threadStandard != null)
-				threadStandard.inactivate();
-			if (threadError != null)
-				threadError.inactivate();
-		}
-		private final String name ;
-		private BufferedReader br;
+	static void monitorThreadStart(Process process, InputStreamMonitorThread threadStandard, InputStreamMonitorThread threadError) {
+		threadStandard = new InputStreamMonitorThread("S", process.getInputStream());
+		threadError = new InputStreamMonitorThread("E", process.getErrorStream());
+		threadStandard.start();
+		threadError.start();
+	}
 
-		private boolean active = false;
-		
-		InputStreamMonitorThread(String name,InputStream is) {
-			this.name=name;
-			br = new BufferedReader(new InputStreamReader(is));
-		}
-
-		public void inactivate(){
-			active = false;
-		}
-
-		public void run() {
-			String line = null;
+	static void stopProcess(Process process, InputStreamMonitorThread threadStandard, InputStreamMonitorThread threadError) {
+		if (process != null) {
 			try {
-				active =true;
-				while (active == true && (line = br.readLine()) != null ) {
-					System.out.println("["+name+"]" + line);
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				process.exitValue();
+			} catch (IllegalThreadStateException e) {
+				process.destroy();
+				System.out.println("process is stopped.");
+				process = null;
 			}
+		}
+
+		if (threadStandard != null)
+			threadStandard.inactivate();
+		if (threadError != null)
+			threadError.inactivate();
+	}
+
+	private final String name;
+	private BufferedReader br;
+
+	private boolean active = false;
+
+	InputStreamMonitorThread(String name, InputStream is) {
+		this.name = name;
+		br = new BufferedReader(new InputStreamReader(is));
+	}
+
+	public void inactivate() {
+		active = false;
+	}
+
+	public void run() {
+		String line = null;
+		try {
+			active = true;
+			while (active == true && (line = br.readLine()) != null) {
+				System.out.println("[" + name + "]" + line);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
+}

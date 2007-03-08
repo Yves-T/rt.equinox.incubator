@@ -15,7 +15,7 @@ import java.net.URL;
 import java.util.*;
 
 import org.eclipse.equinox.frameworkadmin.*;
-import org.eclipse.equinox.internal.frameworkadmin.utils.Utils;
+import org.eclipse.equinox.frameworkadmin.equinox.internal.utils.FileUtils;
 import org.osgi.framework.*;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -384,21 +384,21 @@ public class EquinoxActivator {
 		eclipseExe = new File(Activator.getValue(props, "equinox.launcher"));
 
 		bundlesDir = new File(fwHome, Activator.getValue(props, "equinox.bundlesDir"));
-		fwBundle = Utils.getBundleFullLocation("org.eclipse.osgi", bundlesDir);
-		simpleConfiguratorBundle = Utils.getBundleFullLocation("org.eclipse.equinox.simpleconfigurator", bundlesDir);
-		frameworkAdminServiceBundle = Utils.getBundleFullLocation("org.eclipse.equinox.frameworkadmin", bundlesDir);
-		equinoxCommonBundle = Utils.getBundleFullLocation("org.eclipse.equinox.common", bundlesDir);
-		coreRuntimeBundle = Utils.getBundleFullLocation("org.eclipse.core.runtime", bundlesDir);
-		updateConfiguratorBundle = Utils.getBundleFullLocation("org.eclipse.update.configurator", bundlesDir);
+		fwBundle = FileUtils.getEclipsePluginFullLocation("org.eclipse.osgi", bundlesDir);
+		simpleConfiguratorBundle = FileUtils.getEclipsePluginFullLocation("org.eclipse.equinox.simpleconfigurator", bundlesDir);
+		frameworkAdminServiceBundle = FileUtils.getEclipsePluginFullLocation("org.eclipse.equinox.frameworkadmin", bundlesDir);
+		equinoxCommonBundle = FileUtils.getEclipsePluginFullLocation("org.eclipse.equinox.common", bundlesDir);
+		coreRuntimeBundle = FileUtils.getEclipsePluginFullLocation("org.eclipse.core.runtime", bundlesDir);
+		updateConfiguratorBundle = FileUtils.getEclipsePluginFullLocation("org.eclipse.update.configurator", bundlesDir);
 
-		jobsBundle = Utils.getBundleFullLocation("org.eclipse.core.jobs", bundlesDir);
-		registryBundle = Utils.getBundleFullLocation("org.eclipse.equinox.registry", bundlesDir);
-		preferencesBundle = Utils.getBundleFullLocation("org.eclipse.equinox.preferences", bundlesDir);
-		contenttypeBundle = Utils.getBundleFullLocation("org.eclipse.core.contenttype", bundlesDir);
-		osgiServicesBundle = Utils.getBundleFullLocation("org.eclipse.osgi.services", bundlesDir);
-		fwadminExamplesBundle = Utils.getBundleFullLocation("org.eclipse.equinox.frameworkadmin.examples", bundlesDir);
-		fwadminEquinoxBundle = Utils.getBundleFullLocation("org.eclipse.equinox.frameworkadmin.equinox", bundlesDir);
-		applBundle = Utils.getBundleFullLocation("org.eclipse.equinox.app", bundlesDir);
+		jobsBundle = FileUtils.getEclipsePluginFullLocation("org.eclipse.core.jobs", bundlesDir);
+		registryBundle = FileUtils.getEclipsePluginFullLocation("org.eclipse.equinox.registry", bundlesDir);
+		preferencesBundle = FileUtils.getEclipsePluginFullLocation("org.eclipse.equinox.preferences", bundlesDir);
+		contenttypeBundle = FileUtils.getEclipsePluginFullLocation("org.eclipse.core.contenttype", bundlesDir);
+		osgiServicesBundle = FileUtils.getEclipsePluginFullLocation("org.eclipse.osgi.services", bundlesDir);
+		fwadminExamplesBundle = FileUtils.getEclipsePluginFullLocation("org.eclipse.equinox.frameworkadmin.examples", bundlesDir);
+		fwadminEquinoxBundle = FileUtils.getEclipsePluginFullLocation("org.eclipse.equinox.frameworkadmin.equinox", bundlesDir);
+		applBundle = FileUtils.getEclipsePluginFullLocation("org.eclipse.equinox.app", bundlesDir);
 
 		try {
 			fwJar = new File((new URL(fwBundle)).getFile());
