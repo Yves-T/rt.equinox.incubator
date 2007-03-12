@@ -193,4 +193,8 @@ public class FelixManipulatorImpl implements Manipulator {
 				this.launcherData.setFwJar(launcherData.getFwJar());
 			}
 	}
+
+	public long getTimeStamp() {
+		throw new FrameworkAdminRuntimeException(FrameworkAdminRuntimeException.UNSUPPORTED_OPERATION, "getTimeStamp() is not supported by FelixManipulator.");
+	}
 }
