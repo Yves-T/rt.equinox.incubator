@@ -18,13 +18,16 @@ public class Main {
 	private static FelixActivator felix = null;
 	private static KfActivator knopflerfish = null;
 	private static Properties props = new Properties();
+	private static final boolean differentThread = true;
+	private static Process process = null;
+	private static int mode;
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		initialize();
-		int mode = Integer.parseInt(props.getProperty("main.mode"));
+		mode = Integer.parseInt(props.getProperty("main.mode"));
 
 		switch (mode) {
 			case 0 :
@@ -107,9 +110,16 @@ public class Main {
 			manipulator.save(false);
 			System.out.println("Saved");
 			// 4. Launch it.
-			Process process = fwAdmin.launch(manipulator, equinox.cwd);
+			//if (differentThread)
+			//	process = launchThread(fwAdmin, manipulator, equinox.cwd);
+			//else
+			process = fwAdmin.launch(manipulator, equinox.cwd);
 			System.out.println("Launched");
 			InputStreamMonitorThread.monitorThreadStart(process, equinox.threadStandardI, equinox.threadErrorI);
+			System.out.println("Monitors Started");
+			Runtime.getRuntime().addShutdownHook(new ShutdownHookForEquinox(Integer.parseInt(equinox.propsValueConsolePort)));
+			System.out.println("ShutdownHookForEquinox Added");
+
 			// Remark: How to communicate with launched framework is out of scope of FrameworkAdmin, so far.
 		} catch (FrameworkAdminRuntimeException e) {
 			// TODO Auto-generated catch block
@@ -118,6 +128,31 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	static void stop() {
+		InputStreamMonitorThread threadStandardI = null;
+		InputStreamMonitorThread threadErrorI = null;
+		switch (mode) {
+			case 0 :
+				threadStandardI = equinox.threadStandardI;
+				threadErrorI = equinox.threadErrorI;
+				break;
+			case 1 :
+				threadStandardI = knopflerfish.threadStandardI;
+				threadErrorI = knopflerfish.threadErrorI;
+				break;
+			case 2 :
+				threadStandardI = felix.threadStandardI;
+				threadErrorI = felix.threadErrorI;
+				break;
+			default :
+				break;
+		}
+		if (threadStandardI != null)
+			threadStandardI.inactivate();
+		if (threadErrorI != null)
+			threadErrorI.inactivate();
 	}
 
 	private static void launchKnopflerfish() {

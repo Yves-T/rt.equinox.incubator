@@ -442,11 +442,11 @@ public class EquinoxActivator {
 	 */
 	public void stop() throws Exception {
 		//context = null;
-		fwAdminTracker.close();
+		if (fwAdminTracker != null)
+			fwAdminTracker.close();
 		fwAdminTracker = null;
 		fwAdmin = null;
 		InputStreamMonitorThread.stopProcess(process, threadStandardI, threadErrorI);
-
 	}
 
 }

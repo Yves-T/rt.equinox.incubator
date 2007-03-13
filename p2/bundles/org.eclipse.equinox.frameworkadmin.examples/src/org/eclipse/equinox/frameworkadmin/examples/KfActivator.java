@@ -231,7 +231,8 @@ public class KfActivator {
 	 */
 	public void stop() throws Exception {
 		this.context = null;
-		fwAdminTracker.close();
+		if (fwAdminTracker != null)
+			fwAdminTracker.close();
 		fwAdminTracker = null;
 		this.fwAdmin = null;
 		InputStreamMonitorThread.stopProcess(process, threadStandardI, threadErrorI);
