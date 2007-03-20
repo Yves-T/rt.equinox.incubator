@@ -3,7 +3,6 @@
 
 <product name="App Selector" id="org.eclipse.equinox.examples.app.selector.product" application="org.eclipse.equinox.examples.app.selector.application" useFeatures="false">
 
-
    <configIni use="custom" path="/org.eclipse.equinox.examples.app.selector/config.ini"/>
 
    <launcherArgs>
@@ -11,14 +10,12 @@
 
    <windowImages/>
 
-
    <launcher>
       <solaris/>
       <win useIco="false">
          <bmp/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>
@@ -42,7 +39,6 @@
       <plugin id="org.eclipse.jface"/>
       <plugin id="org.eclipse.jface.databinding"/>
       <plugin id="org.eclipse.osgi"/>
-      <plugin id="org.eclipse.osgi.services"/>
       <plugin id="org.eclipse.swt"/>
       <plugin id="org.eclipse.swt.examples.addressbook"/>
       <plugin id="org.eclipse.swt.examples.browserexample"/>

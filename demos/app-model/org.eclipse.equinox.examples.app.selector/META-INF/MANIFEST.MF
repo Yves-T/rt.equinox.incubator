@@ -7,3 +7,4 @@ Bundle-Activator: org.eclipse.equinox.examples.app.selector.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Eclipse-LazyStart: true
+Bundle-RequiredExecutionEnvironment: J2SE-1.4

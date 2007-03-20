@@ -185,7 +185,6 @@ public class ApplicationView extends ViewPart implements ServiceTrackerCustomize
 		return applications.getServices();
 	}
 
-	@Override
 	public void dispose() {
 		viewer = null;
 		Object[] applicationInfos = applications.getServices();
