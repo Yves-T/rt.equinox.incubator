@@ -28,7 +28,6 @@ import org.eclipse.ui.splash.AbstractSplashHandler;
 public class SplashHandler extends AbstractSplashHandler {
 	private boolean initialized = false;
 
-	@Override
 	public Shell getSplash() {
 		if (!initialized) {
 			init();
