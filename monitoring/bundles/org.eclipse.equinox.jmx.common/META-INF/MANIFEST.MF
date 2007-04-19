@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: JMX Common Bundle
+Bundle-Name: Resource Monitoring Common Bundle (Incubation)
 Bundle-SymbolicName: org.eclipse.equinox.jmx.common
 Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin

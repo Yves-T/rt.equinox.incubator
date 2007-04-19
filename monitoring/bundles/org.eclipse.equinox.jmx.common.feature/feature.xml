@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.equinox.jmx.common.feature"
-      label="Resource Monitoring Common Feature"
+      label="Resource Monitoring Common Feature (Incubation)"
       version="1.0.0.qualifier"
       provider-name="Eclipse.org">
 

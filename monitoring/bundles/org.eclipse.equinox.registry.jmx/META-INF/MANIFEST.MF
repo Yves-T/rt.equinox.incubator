@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Equinox Registry JMX Plug-in
+Bundle-Name: Resource Monitoring Equinox Registry Extensions (Incubation)
 Bundle-SymbolicName: org.eclipse.equinox.registry.jmx;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.equinox.internal.registry.jmx.Activator

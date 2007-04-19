@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: JMX Client Plug-in
+Bundle-Name: Resource Monitoring Client Plug-in (Incubation)
 Bundle-SymbolicName: org.eclipse.equinox.jmx.client;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.equinox.jmx.internal.client.Activator

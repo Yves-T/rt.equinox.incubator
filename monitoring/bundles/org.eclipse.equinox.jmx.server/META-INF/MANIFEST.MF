@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: JMX Server Bundle
+Bundle-Name: Resource Monitoring Server Bundle (Incubation)
 Bundle-SymbolicName: org.eclipse.equinox.jmx.server;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin

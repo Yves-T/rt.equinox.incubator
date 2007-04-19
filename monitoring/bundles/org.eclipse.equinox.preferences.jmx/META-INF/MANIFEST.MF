@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Preferences JMX Extensions
+Bundle-Name: Resource Monitoring Preferences Extensions (Incubation)
 Bundle-SymbolicName: org.eclipse.equinox.preferences.jmx;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Eclipse.org

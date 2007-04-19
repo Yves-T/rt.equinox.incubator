@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: SWT JMX Plug-in
+Bundle-Name: Resource Monitoring SWT Extensions (Incubation)
 Bundle-SymbolicName: org.eclipse.swt.jmx;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin

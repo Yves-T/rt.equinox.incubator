@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: RMI Transport Provider Plug-in
+Bundle-Name: RMI Transport Server Plug-in (Incubation)
 Bundle-SymbolicName: org.eclipse.equinox.jmx.server.rmi;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin

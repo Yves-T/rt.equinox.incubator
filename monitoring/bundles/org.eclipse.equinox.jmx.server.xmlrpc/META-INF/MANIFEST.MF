@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Server XML-RPC Plug-in
+Bundle-Name: XMLRPC Transport Server Plug-in (Incubation)
 Bundle-SymbolicName: org.eclipse.equinox.jmx.server.xmlrpc;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: .

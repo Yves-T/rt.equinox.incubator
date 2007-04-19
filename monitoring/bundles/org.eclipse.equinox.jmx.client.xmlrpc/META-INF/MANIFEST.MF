@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Xmlrpc Plug-in
+Bundle-Name: XMLRPC Transport Client Plug-in (Incubation)
 Bundle-SymbolicName: org.eclipse.equinox.jmx.client.xmlrpc;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin
