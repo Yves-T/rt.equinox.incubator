@@ -14,6 +14,7 @@ Import-Package: javax.management,
  org.eclipse.swt.widgets,
  org.osgi.framework,
  org.eclipse.equinox.jmx.server
-Bundle-RequiredExecutionEnvironment: CDC-1.0/Foundation-1.0,
+Bundle-RequiredExecutionEnvironment: J2SE-1.5,
+ CDC-1.0/Foundation-1.0,
  J2SE-1.3
 Bundle-Activator: org.eclipse.swt.jmx.internal.Activator
