@@ -45,8 +45,8 @@ public class OperatingSystemContribution extends Contribution {
 	/* (non-Javadoc)
 	 * @see org.eclipse.equinox.jmx.server.Contribution#getProperties()
 	 */
-	protected Set getProperties() {
-		Set result = new HashSet();
+	protected Set<String> getProperties() {
+		Set<String> result = new HashSet<String>();
 		OperatingSystemMXBean mbean = (OperatingSystemMXBean) contributionDelegate;
 		result.add(VMStatsMessages.os_name + ": " + mbean.getName()); //$NON-NLS-1$
 		result.add(VMStatsMessages.os_version + ": " + mbean.getVersion()); //$NON-NLS-1$

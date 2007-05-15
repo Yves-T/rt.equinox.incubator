@@ -45,8 +45,8 @@ public class ClassLoadingContribution extends Contribution {
 	/* (non-Javadoc)
 	 * @see org.eclipse.equinox.jmx.server.Contribution#getProperties()
 	 */
-	protected Set getProperties() {
-		Set result = new HashSet();
+	protected Set<String> getProperties() {
+		Set<String> result = new HashSet<String>();
 		ClassLoadingMXBean mbean = (ClassLoadingMXBean) contributionDelegate;
 		result.add(VMStatsMessages.cl_loadedclscnt + ": " + mbean.getLoadedClassCount()); //$NON-NLS-1$
 		result.add(VMStatsMessages.cl_totloadedclscnt + ": " + mbean.getTotalLoadedClassCount()); //$NON-NLS-1$

@@ -65,23 +65,23 @@ public class MemoryContribution extends Contribution implements NotificationList
 	/* (non-Javadoc)
 	 * @see org.eclipse.equinox.jmx.server.Contribution#getProperties()
 	 */
-	protected Set getProperties() {
-		Set result = new TreeSet();
+	protected Set<String> getProperties() {
+		Set<String> result = new TreeSet<String>();
 		MemoryMXBean memDelegate = (MemoryMXBean) contributionDelegate;
 
 		MemoryUsage mu = memDelegate.getHeapMemoryUsage();
 		result.add(VMStatsMessages.mem_heapusage);
-		result.add(VMStatsMessages.mem_commited + ": " + (mu.getCommitted() >> 10) + "KB");
-		result.add(VMStatsMessages.mem_initreq + ": " + (mu.getInit() >> 10) + "KB");
-		result.add(VMStatsMessages.mem_max + ": " + (mu.getMax() >> 10) + "KB");
-		result.add(VMStatsMessages.mem_used + ": " + (mu.getUsed() >> 10) + "KB");
+		result.add(VMStatsMessages.mem_commited + ": " + (mu.getCommitted() >> 10) + "KB"); //$NON-NLS-1$ //$NON-NLS-2$
+		result.add(VMStatsMessages.mem_initreq + ": " + (mu.getInit() >> 10) + "KB");  //$NON-NLS-1$//$NON-NLS-2$
+		result.add(VMStatsMessages.mem_max + ": " + (mu.getMax() >> 10) + "KB"); //$NON-NLS-1$ //$NON-NLS-2$
+		result.add(VMStatsMessages.mem_used + ": " + (mu.getUsed() >> 10) + "KB"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		mu = memDelegate.getNonHeapMemoryUsage();
 		result.add(VMStatsMessages.mem_noheapusage);
-		result.add(VMStatsMessages.mem_commited + ": " + (mu.getCommitted() >> 10) + "KB");
-		result.add(VMStatsMessages.mem_initreq + ": " + (mu.getInit() >> 10) + "KB");
-		result.add(VMStatsMessages.mem_max + ": " + (mu.getMax() >> 10) + "KB");
-		result.add(VMStatsMessages.mem_used + ": " + (mu.getUsed() >> 10) + "KB");
+		result.add(VMStatsMessages.mem_commited + ": " + (mu.getCommitted() >> 10) + "KB"); //$NON-NLS-1$ //$NON-NLS-2$
+		result.add(VMStatsMessages.mem_initreq + ": " + (mu.getInit() >> 10) + "KB"); //$NON-NLS-1$ //$NON-NLS-2$
+		result.add(VMStatsMessages.mem_max + ": " + (mu.getMax() >> 10) + "KB"); //$NON-NLS-1$ //$NON-NLS-2$
+		result.add(VMStatsMessages.mem_used + ": " + (mu.getUsed() >> 10) + "KB"); //$NON-NLS-1$ //$NON-NLS-2$
 		return result;
 	}
 

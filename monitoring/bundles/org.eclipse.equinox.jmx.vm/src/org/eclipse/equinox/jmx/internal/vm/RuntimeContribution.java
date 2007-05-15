@@ -44,8 +44,8 @@ public class RuntimeContribution extends Contribution {
 	/* (non-Javadoc)
 	 * @see org.eclipse.equinox.jmx.server.Contribution#getProperties()
 	 */
-	protected Set getProperties() {
-		Set result = new HashSet();
+	protected Set<String> getProperties() {
+		Set<String> result = new HashSet<String>();
 		RuntimeMXBean mbean = (RuntimeMXBean) contributionDelegate;
 		result.add(VMStatsMessages.rt_vmname + ": " + mbean.getVmName()); //$NON-NLS-1$
 		result.add(VMStatsMessages.rt_vmvendor + ": " + mbean.getVmVendor()); //$NON-NLS-1$

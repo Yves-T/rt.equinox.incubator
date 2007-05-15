@@ -85,8 +85,8 @@ public class VMStatsProvider extends ContributionProvider {
 	/* (non-Javadoc)
 	 * @see org.eclipse.equinox.jmx.server.Contribution#getProperties()
 	 */
-	protected Set getProperties() {
-		return new HashSet();
+	protected Set<String> getProperties() {
+		return new HashSet<String>();
 	}
 
 	/* (non-Javadoc)

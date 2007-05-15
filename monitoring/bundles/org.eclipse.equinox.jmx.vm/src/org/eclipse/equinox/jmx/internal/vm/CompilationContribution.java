@@ -45,8 +45,8 @@ public class CompilationContribution extends Contribution {
 	/* (non-Javadoc)
 	 * @see org.eclipse.equinox.jmx.server.Contribution#getProperties()
 	 */
-	protected Set getProperties() {
-		Set result = new HashSet();
+	protected Set<String> getProperties() {
+		Set<String> result = new HashSet<String>();
 		CompilationMXBean mbean = (CompilationMXBean) contributionDelegate;
 		result.add(VMStatsMessages.cmp_jitname + ": " + mbean.getName()); //$NON-NLS-1$
 		result.add(VMStatsMessages.cmp_tottime + ": " + mbean.getTotalCompilationTime()); //$NON-NLS-1$
