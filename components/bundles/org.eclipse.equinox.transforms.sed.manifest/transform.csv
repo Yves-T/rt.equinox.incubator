@@ -1,3 +1,0 @@
-#Bundle ID regex, Resource Path regex, resource path
-org\.eclipse\.jdt\.ui,plugin\.properties,/propertyCommands.sed
-org\.eclipse\.jdt\.ui,META-INF/MANIFEST\.MF,/manifestCommands.sed
