@@ -34,10 +34,10 @@ public class XMLRPCMBeanServerAdapter implements MBeanServerForwarder, Notificat
 	private static final String INTERNAL_CONTEXT_CLASSLOADER = "internal.ContextClassLoader"; //$NON-NLS-1$
 	private static final String INTERNAL_MAPPING = "internal.Mapping"; //$NON-NLS-1$
 
-	private final Map notificationBroadcasters = new HashMap();
+	final Map notificationBroadcasters = new HashMap();
 	private final RingBuffer notificationsBuffer = new RingBuffer(NOTIFICATIONS_BUFFER_SIZE);
 	private final HttpServer webServer;
-	private final XmlRpcHandlerMappingImpl mapping;
+	static XmlRpcHandlerMappingImpl mapping;
 	private MBeanServer mbs;
 	private boolean started;
 
@@ -46,7 +46,8 @@ public class XMLRPCMBeanServerAdapter implements MBeanServerForwarder, Notificat
 	 * is important to note that any handler mapping registered with the server
 	 * is replaced with our custom handler mapping implementation.
 	 * 
-	 * @param webServer The webserver to adapt.
+	 * @param port The port for the web server to listen on.
+	 * @param mbs The <code>MBeanServer</code> which stores the registered mbeans.
 	 */
 	public XMLRPCMBeanServerAdapter(int port, MBeanServer mbs) {
 		this.webServer = new HttpServer();
@@ -77,35 +78,34 @@ public class XMLRPCMBeanServerAdapter implements MBeanServerForwarder, Notificat
 	}
 
 	public void start() throws IOException {
-		try {
-			webServer.start();
-		} catch (IOException e) {
-			throw e;
-		}catch (Exception e) {
-			e.printStackTrace();
-			return;
+		if (!started) {
+			try {
+				webServer.start();
+			} catch (IOException e) {
+				throw e;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-		started = true;
 	}
 
 	public void stop() {
-		try {
-			webServer.stop();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			return;
+		if (webServer.isStarted()) {
+			try {
+				webServer.stop();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
-		started = false;
 	}
 
 	public boolean isActive() {
-		return started;
+		return webServer.isStarted();
 	}
 
 	public static class InternalHttpServiceServlet extends XmlRpcServlet {
 		private static final long serialVersionUID = 6297772804215794345L;
 		private ClassLoader contextLoader;
-		private XmlRpcHandlerMappingImpl mapping;
 
 		public void init(ServletConfig config) throws ServletException {
 			ServletContext context = config.getServletContext();
@@ -151,7 +151,7 @@ public class XMLRPCMBeanServerAdapter implements MBeanServerForwarder, Notificat
 		
 	}
 	
-	private class XmlRpcHandlerMappingImpl implements XmlRpcHandlerMapping {
+	protected class XmlRpcHandlerMappingImpl implements XmlRpcHandlerMapping {
 
 		// use hashtable as synchronization is required
 		private final Map handlerMap = new Hashtable();
@@ -194,9 +194,6 @@ public class XMLRPCMBeanServerAdapter implements MBeanServerForwarder, Notificat
 		}
 
 		private class Handler implements XmlRpcHandler {
-
-			public Handler() {
-			}
 
 			public Object execute(XmlRpcRequest pRequest) throws XmlRpcException {
 				String request[] = parseRequest(pRequest.getMethodName());

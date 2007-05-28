@@ -31,7 +31,9 @@ public class XMLRPCJMXConnectorServer extends JMXConnectorServer {
 	 * @see javax.management.remote.JMXConnectorServerMBean#start()
 	 */
 	public synchronized void start() throws IOException {
-		xmlrpcServer.start();
+		if (!xmlrpcServer.isActive()) {
+			xmlrpcServer.start();
+		}
 	}
 
 	/* (non-Javadoc)
