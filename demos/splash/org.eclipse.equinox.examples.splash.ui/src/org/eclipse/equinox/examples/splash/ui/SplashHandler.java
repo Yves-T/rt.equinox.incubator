@@ -4,14 +4,12 @@
 package org.eclipse.equinox.examples.splash.ui;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.equinox.examples.splash.Splash;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.ProgressEvent;
-import org.eclipse.swt.browser.ProgressListener;
+import org.eclipse.swt.browser.*;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
@@ -43,7 +41,9 @@ public class SplashHandler extends AbstractSplashHandler {
 	private boolean movieLoaded = false, done = false;
 
 	public void init(final Shell splash) {
-		splash.setSize( 440, 430);
+		splash.setSize( Integer.parseInt(System.getProperty("splash.x", "400")),  Integer.parseInt(System.getProperty("splash.y", "300")));
+		Point location = new Point((splash.getDisplay().getBounds().width / 2) - (splash.getSize().x / 2), (splash.getDisplay().getBounds().height / 2) - (splash.getSize().y / 2));
+		splash.setLocation(location);
 		splash.setLayout(new GridLayout(1, true));
 		final Browser browser = new Browser(splash, SWT.NONE);
 		browser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -71,8 +71,17 @@ public class SplashHandler extends AbstractSplashHandler {
 				});
 			}
 		});
-
-		URL url = Activator.getDefault().getBundle().getEntry("/content/debugging.html");
+		URL url = null;
+		String file = System.getProperty("splash.file");
+		if (file != null)
+			try {
+				url = new URL(file);
+			} catch (MalformedURLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		else
+			url = Activator.getDefault().getBundle().getEntry("content/debugging.html");
 		
 		try {
 			browser.setUrl(FileLocator.toFileURL(url).toExternalForm());
