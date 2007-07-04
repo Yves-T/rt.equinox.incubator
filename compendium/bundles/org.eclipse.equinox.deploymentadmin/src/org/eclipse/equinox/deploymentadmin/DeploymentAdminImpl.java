@@ -10,16 +10,11 @@
  *******************************************************************************/
 package org.eclipse.equinox.deploymentadmin;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.jar.Attributes;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
-import java.util.jar.Manifest;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
@@ -28,7 +23,6 @@ import org.osgi.service.deploymentadmin.BundleInfo;
 import org.osgi.service.deploymentadmin.DeploymentAdmin;
 import org.osgi.service.deploymentadmin.DeploymentException;
 import org.osgi.service.deploymentadmin.DeploymentPackage;
-import org.osgi.service.deploymentadmin.spi.DeploymentSession;
 
 public class DeploymentAdminImpl implements DeploymentAdmin {
 

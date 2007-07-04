@@ -69,7 +69,7 @@ public class DeploymentPackageImpl implements DeploymentPackage {
 			throw new IllegalStateException();
 		}
 
-		public void uninstallForced() throws DeploymentException {
+		public boolean uninstallForced() throws DeploymentException {
 			throw new IllegalStateException();
 		}
 		
@@ -129,8 +129,9 @@ public class DeploymentPackageImpl implements DeploymentPackage {
 		admin.remove(this);
 	}
 
-	public void uninstallForced() throws DeploymentException {
+	public boolean uninstallForced() throws DeploymentException {
 		admin.remove(this);
+		return true;
 	}
 
 	public void stopBundles() {

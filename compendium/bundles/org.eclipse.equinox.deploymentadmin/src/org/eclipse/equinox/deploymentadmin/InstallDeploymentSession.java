@@ -10,7 +10,6 @@ import java.util.jar.Manifest;
 
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
-import org.osgi.service.deploymentadmin.DeploymentAdmin;
 import org.osgi.service.deploymentadmin.DeploymentException;
 import org.osgi.service.deploymentadmin.DeploymentPackage;
 import org.osgi.service.deploymentadmin.spi.DeploymentSession;
