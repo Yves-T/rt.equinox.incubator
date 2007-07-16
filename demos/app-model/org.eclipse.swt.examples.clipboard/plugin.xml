@@ -7,6 +7,7 @@
          point="org.eclipse.core.runtime.applications">
       <application
             cardinality="1"
+            icon="paste_edit.gif"
             thread="any">
          <run
                class="org.eclipse.swt.examples.clipboard.Application">
