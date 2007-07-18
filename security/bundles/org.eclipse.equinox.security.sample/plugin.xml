@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+     <!-- A sample product for inspecting the subject -->   
+   <extension
+         id="authProduct"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.equinox.security.sample.authApplication"
+            name="Product with initial Authentication">
+         <property
+               name="preferenceCustomization"
+               value="data/plugin_customization.ini"/>
+      </product>
+   </extension>
+
+   <!-- A sample application with authentication -->
+   <extension
+     name="Application with initial Authentication"
+     id="authApplication"
+     point="org.eclipse.core.runtime.applications">
+     
+      <application>
+         <run class="org.eclipse.equinox.security.sample.AuthApplication"/>
+      </application>
+      
+   </extension>
+   
+   <!-- A sample perspective for inspecting the subject -->   
+   <extension
+     name="Subject Inspection Perspective"
+     id="subjectPerspective"
+     point="org.eclipse.ui.perspectives">
+         
+      <perspective
+        name="Subject Perspective"
+        id="org.eclipse.equinox.security.sample.subjectPerspective"
+        class="org.eclipse.equinox.security.sample.SubjectPerspective"
+        fixed="true">
+      </perspective>
+      
+   </extension>
+   
+   <!-- A sample view for inspecting the subject -->
+   <extension
+         id="subjectView"
+         name="Subject View"
+         point="org.eclipse.ui.views">
+      
+      <category
+        name="Subject Category"
+        id="org.eclipse.equinox.security.sample.subjectCategory">
+      </category>
+      
+      <view
+        name="Subject View"
+        id="org.eclipse.equinox.security.sample.subjectView"
+        category="org.eclipse.equinox.security.sample.subjectCategory"
+        class="org.eclipse.equinox.security.sample.SubjectView">
+      </view>
+      
+   </extension>
+   
+   <!-- The windows loginmodule for sun JRE -->
+   <extension
+     id="ntLoginModule"
+     name="Windows NT LoginModule"
+     point="org.eclipse.equinox.security.auth.loginModule">
+      <loginModule
+        class="com.sun.security.auth.module.NTLoginModule"
+        description="LoginModule for Windows NT"/>
+   </extension>
+     
+</plugin>
