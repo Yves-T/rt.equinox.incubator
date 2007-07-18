@@ -127,7 +127,7 @@ public class ApplicationsServlet extends HttpServlet {
 	private void writeInstallbar(PrintWriter pw) {
 		pw.println("<tr class=\"toolview\"><td colspan=\"2\" class=\"toolview\">");
 		pw.println("<input alt=\"Install Bundles\" type=\"image\" class=\"iconcmd\" name=\"" + INSTALL_BUNDLE + "\" src=\"resources/repo_rep.gif\"/>");
-		pw.println("<input alt=\"Directory\" type=\"text\" name=\"" + INSTALL_BUNDLE_DIR + "\">");
+		pw.println("<input alt=\"Directory\" type=\"text\" size=\"50\" name=\"" + INSTALL_BUNDLE_DIR + "\">");
 		pw.println("</td></tr>");
 	}
 
