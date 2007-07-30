@@ -157,6 +157,16 @@ public abstract class Contribution extends NotificationBroadcasterSupport implem
 	protected abstract Object invokeOperation(String operationName, Object[] args, String[] argTypes);
 
 	/**
+	 * Gets the <code>Contribution</code> instance that was constructed with the provided
+	 * <code>contributionDelegate</code> or null if no such <code>Contribution</code> was created.
+	 * @param contributionDelegate The object used during construction of the <code>Contribution</code>.
+	 * @return The <code>Contribution</code>, or null if not found.
+	 */
+	public static final Contribution getContribution(final Object contributionDelegate) {
+		return (Contribution)contributionDelegates.get(contributionDelegate);
+	}
+	
+	/**
 	 * Get the object delegate that is associated with this contribution.  The
 	 * delegate may be null; this is typical for provider contributions..
 	 * 
@@ -349,11 +359,11 @@ public abstract class Contribution extends NotificationBroadcasterSupport implem
 		// delegate to implementing class
 		return invokeOperation(arg0, arg1, arg2);
 	}
-
+	
 	protected ObjectName getObjectName() {
 		return objectName;
 	}
-
+	
 	private final ContributionProxy[] getChildContributions(ContributionProvider[] delegateProviders) {
 		try {
 			List delegateProviderList = new ArrayList();
