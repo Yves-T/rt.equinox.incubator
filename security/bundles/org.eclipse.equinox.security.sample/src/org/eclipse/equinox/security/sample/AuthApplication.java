@@ -38,7 +38,7 @@ public class AuthApplication implements IPlatformRunnable {
 		
 		try {
 			/* Set the login provider so that we can potentially use the XML provider, and set the jaas_config.xml as an available config */ 
-			Security.setProperty( "login.configuration.provider", "org.eclipse.equinox.security.auth.ConfigurationProvider");
+			Security.setProperty( "login.configuration.provider", "org.eclipse.equinox.security.boot.auth.ConfigurationProvider");
 			Security.setProperty( "login.config.url.1", AuthAppPlugin.getDefault( ).getBundle( ).getEntry( "data/jaas_config.xml").toExternalForm( ));
 			//Security.setProperty( "keystore.url", AuthAppPlugin.getDefault( ).getBundle( ).getEntry( "data/test_user.jks").toExternalForm( ));
 			
@@ -53,7 +53,9 @@ public class AuthApplication implements IPlatformRunnable {
 				returnValue = (Integer)getRunAction( display).run( );
 			}
 		}
-		catch ( LoginException le) { }
+		catch ( Throwable le) {
+			le.printStackTrace( );
+		}
 		
 		return returnValue;
 	}

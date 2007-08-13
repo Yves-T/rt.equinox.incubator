@@ -1,7 +1,7 @@
 <jaasConfiguration>
 
    <appConfiguration configName="Win32">
-      <appConfigurationEntry type="class" target="org.eclipse.equinox.security.auth.ExtLoginModuleProxy" controlFlag="REQUIRED" index="0">
+      <appConfigurationEntry type="class" target="org.eclipse.equinox.security.boot.auth.ExtLoginModuleProxy" controlFlag="REQUIRED" index="0">
          <option name="modulePoint" value="org.eclipse.equinox.security.sample.ntLoginModule"/>
          <option name="debug" value="true"/>
       </appConfigurationEntry>
