@@ -16,9 +16,9 @@ import java.util.ResourceBundle;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.equinox.internal.security.ssl.PlatformKeyManagerFactorySpiFactory;
 import org.eclipse.equinox.internal.security.ssl.PlatformTrustManagerFactorySpiFactory;
-import org.eclipse.equinox.security.KeyStoreProxy;
-import org.eclipse.equinox.security.ssl.KeyManagerFactoryProxy;
-import org.eclipse.equinox.security.ssl.TrustManagerFactoryProxy;
+import org.eclipse.equinox.security.boot.KeyStoreProxy;
+import org.eclipse.equinox.security.boot.ssl.KeyManagerFactoryProxy;
+import org.eclipse.equinox.security.boot.ssl.TrustManagerFactoryProxy;
 import org.osgi.framework.BundleContext;
 
 

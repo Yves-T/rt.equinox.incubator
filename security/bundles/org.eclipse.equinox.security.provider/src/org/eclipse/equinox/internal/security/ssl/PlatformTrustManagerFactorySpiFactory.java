@@ -15,7 +15,7 @@ import java.util.Hashtable;
 
 import javax.net.ssl.TrustManagerFactorySpi;
 
-import org.eclipse.equinox.security.ssl.TrustManagerFactoryProxy;
+import org.eclipse.equinox.security.boot.ssl.TrustManagerFactoryProxy;
 import org.eclipse.equinox.security.ssl.TrustManagerFactorySpiService;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;

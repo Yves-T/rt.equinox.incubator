@@ -14,7 +14,7 @@ import java.security.KeyStoreSpi;
 import java.security.Security;
 import java.util.Hashtable;
 
-import org.eclipse.equinox.security.KeyStoreProxy;
+import org.eclipse.equinox.security.boot.KeyStoreProxy;
 import org.eclipse.equinox.security.KeyStoreSpiService;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;

@@ -15,7 +15,7 @@ import java.util.Hashtable;
 
 import javax.net.ssl.KeyManagerFactorySpi;
 
-import org.eclipse.equinox.security.ssl.KeyManagerFactoryProxy;
+import org.eclipse.equinox.security.boot.ssl.KeyManagerFactoryProxy;
 import org.eclipse.equinox.security.ssl.KeyManagerFactorySpiService;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
