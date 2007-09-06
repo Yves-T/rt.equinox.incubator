@@ -13,16 +13,16 @@ package org.eclipse.equinox.internal.security.provider;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.eclipse.core.runtime.Plugin;
 import org.eclipse.equinox.internal.security.provider.ssl.PlatformKeyManagerFactorySpiFactory;
 import org.eclipse.equinox.internal.security.provider.ssl.PlatformTrustManagerFactorySpiFactory;
 import org.eclipse.equinox.security.boot.KeyStoreProxy;
 import org.eclipse.equinox.security.boot.ssl.KeyManagerFactoryProxy;
 import org.eclipse.equinox.security.boot.ssl.TrustManagerFactoryProxy;
+import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 
-public class SecurityPlugin extends Plugin {
+public class SecurityPlugin implements BundleActivator {
 
 	private static SecurityPlugin s_instance;
 	private static ResourceBundle _resourceBundle;
@@ -46,8 +46,6 @@ public class SecurityPlugin extends Plugin {
 	 */
 	public void start( BundleContext context)
 		throws Exception {
-
-		super.start(context);
 
 		/* Attach the key store proxy 
 		 */
@@ -88,7 +86,6 @@ public class SecurityPlugin extends Plugin {
 	public void stop( BundleContext context)
 		throws Exception {
 		
-		super.stop(context);
 	}
 	
 	/**
