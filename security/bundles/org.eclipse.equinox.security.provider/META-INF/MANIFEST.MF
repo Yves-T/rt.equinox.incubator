@@ -5,8 +5,11 @@ Bundle-SymbolicName: org.eclipse.equinox.security.provider
 Bundle-Version: 0.0.1
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Require-Bundle: org.eclipse.osgi
 Export-Package: org.eclipse.equinox.security.provider,
  org.eclipse.equinox.security.provider.ssl
 Bundle-Activator: org.eclipse.equinox.internal.security.provider.SecurityPlugin
 Eclipse-LazyStart: true
+Import-Package: org.eclipse.equinox.security.boot,
+ org.eclipse.equinox.security.boot.auth,
+ org.eclipse.equinox.security.boot.ssl,
+ org.osgi.framework;version="1.4.0"
