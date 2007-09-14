@@ -12,3 +12,4 @@ Require-Bundle: org.eclipse.equinox.security.auth,
  org.eclipse.rcp
 Eclipse-LazyStart: true
 Bundle-Activator: org.eclipse.equinox.security.sample.AuthAppPlugin
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
