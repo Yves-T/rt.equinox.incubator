@@ -13,11 +13,6 @@ package org.eclipse.equinox.internal.security.provider;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.eclipse.equinox.internal.security.provider.ssl.PlatformKeyManagerFactorySpiFactory;
-import org.eclipse.equinox.internal.security.provider.ssl.PlatformTrustManagerFactorySpiFactory;
-import org.eclipse.equinox.security.boot.KeyStoreProxy;
-import org.eclipse.equinox.security.boot.ssl.KeyManagerFactoryProxy;
-import org.eclipse.equinox.security.boot.ssl.TrustManagerFactoryProxy;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -47,37 +42,7 @@ public class SecurityPlugin implements BundleActivator {
 	public void start( BundleContext context)
 		throws Exception {
 
-		/* Attach the key store proxy 
-		 */
-		KeyStoreProxy.IKeyStoreSpiFactory storeFactory =
-			PlatformKeyStoreSpiFactory.getInstance( );
-		KeyStoreProxy.setPlatformKeyStoreSpiFactory( storeFactory);
-		
-		/* Add the service listener for the key store Factory.
-		 */
-		PlatformKeyStoreSpiFactory.attachServiceListener( context);
-
-		
-		/* Attach the trust manager proxy 
-		 */
-		TrustManagerFactoryProxy.ITrustManagerFactorySpiFactory trustFactory =
-			PlatformTrustManagerFactorySpiFactory.getInstance( );
-		TrustManagerFactoryProxy.setPlatformTrustManagerFactorySpiFactory( trustFactory);
-		
-		/* Add the service listener for the trust manager Factory.
-		 */
-		PlatformTrustManagerFactorySpiFactory.attachServiceListener( context);
-		
-		/* Attach the key manager proxy 
-		 */
-		KeyManagerFactoryProxy.IKeyManagerFactorySpiFactory keyFactory =
-			PlatformKeyManagerFactorySpiFactory.getInstance( );
-		KeyManagerFactoryProxy.setPlatformKeyManagerFactorySpiFactory( keyFactory);
-		
-		/* Add the service listener for the key manager Factory.
-		 */
-		PlatformKeyManagerFactorySpiFactory.attachServiceListener( context);
-
+		ProviderServiceListener.attachServiceListener(context);
 	}
 	
 	/* (non-Javadoc)
