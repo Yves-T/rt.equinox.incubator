@@ -2,10 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.equinox.security.provider
-Bundle-Version: 0.0.1
+Bundle-Version: 0.0.1.qualifier
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Export-Package: org.eclipse.equinox.security.provider
+Export-Package: org.eclipse.equinox.internal.security.provider;x-internal:=true,
+ org.eclipse.equinox.security.provider
 Bundle-Activator: org.eclipse.equinox.internal.security.provider.SecurityPlugin
 Eclipse-LazyStart: true
 Import-Package: org.eclipse.equinox.internal.security.boot,
