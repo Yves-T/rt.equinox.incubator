@@ -17,11 +17,8 @@ public class SubjectPerspective implements IPerspectiveFactory {
 
 	public void createInitialLayout(IPageLayout layout) {
 		layout.setEditorAreaVisible(false);
-		layout.addStandaloneView( "org.eclipse.equinox.security.sample.subjectView", false,
-			            IPageLayout.TOP,
-			            IPageLayout.RATIO_MAX,
-			            IPageLayout.ID_EDITOR_AREA);
-		layout.addPerspectiveShortcut( "org.eclipse.equinox.security.sample.subjectPerspective");
-		layout.addShowViewShortcut( "org.eclipse.equinox.security.sample.subjectView");
+		layout.addStandaloneView("org.eclipse.equinox.security.sample.subjectView", false, IPageLayout.TOP, IPageLayout.RATIO_MAX, IPageLayout.ID_EDITOR_AREA);
+		layout.addPerspectiveShortcut("org.eclipse.equinox.security.sample.subjectPerspective");
+		layout.addShowViewShortcut("org.eclipse.equinox.security.sample.subjectView");
 	}
 }

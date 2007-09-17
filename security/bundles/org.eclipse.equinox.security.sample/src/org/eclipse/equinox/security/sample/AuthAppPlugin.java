@@ -11,17 +11,22 @@
 
 package org.eclipse.equinox.security.sample;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
 
-public class AuthAppPlugin extends AbstractUIPlugin {
-	private static AuthAppPlugin plugin;
-    
-	public AuthAppPlugin( ) {
-		super( );
-        plugin = this;
+public class AuthAppPlugin implements BundleActivator {
+
+	private static BundleContext bundleContext;
+
+	public void start(BundleContext context) throws Exception {
+		bundleContext = context;
 	}
 
-    public static AuthAppPlugin getDefault() {
-        return plugin;
-    }
+	public void stop(BundleContext context) throws Exception {
+		bundleContext = context;
+	}
+
+	public static BundleContext getBundleContext() {
+		return bundleContext;
+	}
 }
