@@ -71,10 +71,10 @@ public class ProviderServiceListener implements ServiceListener {
 		ProviderServiceLoader loader = new ProviderServiceLoader(ref.getBundle());
 		
 		ProviderServiceInternal internalService = service.getInternalService( );
-		internalService.setLoader(loader);
+		internalService.setClassLoader(loader);
 		internalService.setProvider(provider);
 
-		provider.registerService(provider.newService( internalService));
+		provider.registerService(internalService);
 	}
 	
 	private void unregisterService( ServiceReference ref) {
