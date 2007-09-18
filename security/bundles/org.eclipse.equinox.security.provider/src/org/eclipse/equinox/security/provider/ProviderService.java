@@ -13,33 +13,32 @@ package org.eclipse.equinox.security.provider;
 import java.security.Provider;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.equinox.internal.security.boot.ProviderServiceInternal;
 
 public class ProviderService {
-	
+
 	private ProviderServiceInternal internalService;
-	
+
 	public ProviderService(String type, String algorithm, String className, List aliases, Map attributes) {
 		internalService = new ProviderServiceInternal(type, algorithm, className, aliases, attributes);
 	}
-	
+
 	public String getAlgorithm() {
 		return internalService.getAlgorithm();
 	}
-	
+
 	public String getAttribute(String name) {
-		return (String)internalService.getAttributes().get(name);
+		return (String) internalService.getAttributes().get(name);
 	}
-	
+
 	public Provider getProvider() {
 		return internalService.getProvider();
 	}
-	
-	public String getType(){
+
+	public String getType() {
 		return internalService.getType();
 	}
-	
+
 	public Object newInstance(Object parameter) {
 		return internalService.newInstance(parameter);
 	}
@@ -47,13 +46,13 @@ public class ProviderService {
 	public boolean supportsParameter(Object parameter) {
 		return internalService.supportsParameter(parameter);
 	}
-	
+
 	public String toString() {
 		return internalService.toString();
 	}
-	
+
 	//TODO: this can't be exposed
-	public ProviderServiceInternal getInternalService( ) {
+	public ProviderServiceInternal getInternalService() {
 		return internalService;
 	}
 }

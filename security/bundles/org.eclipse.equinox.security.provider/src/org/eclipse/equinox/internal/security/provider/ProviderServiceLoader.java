@@ -15,11 +15,11 @@ import org.osgi.framework.Bundle;
 public class ProviderServiceLoader extends ClassLoader {
 
 	private Bundle bundle;
-	
+
 	public ProviderServiceLoader(Bundle bundle) {
 		this.bundle = bundle;
 	}
-	
+
 	public Class loadClass(String name) throws ClassNotFoundException {
 		return bundle.loadClass(name);
 	}

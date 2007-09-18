@@ -11,73 +11,68 @@
 package org.eclipse.equinox.internal.security.provider;
 
 import java.security.Security;
-
 import org.eclipse.equinox.internal.security.boot.ProviderServiceInternal;
+import org.eclipse.equinox.internal.security.provider.nls.SecProviderMessages;
 import org.eclipse.equinox.security.boot.ServiceProvider;
 import org.eclipse.equinox.security.provider.ProviderService;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
-import org.osgi.framework.ServiceReference;
+import org.osgi.framework.*;
 
 public class ProviderServiceListener implements ServiceListener {
 
-	private static ProviderServiceListener s_instance = new ProviderServiceListener( );
-	public static ProviderServiceListener getInstance( ) { return s_instance; }
+	private static final String FILTER_STRING = "(objectclass=" + ProviderService.class.getName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 
-	private static final String FILTER_STRING = "(objectclass=" + ProviderService.class.getName( ) + ")";;
-	
 	private BundleContext bundleContext;
 	private ServiceProvider provider;
-	
-	public static void attachServiceListener( BundleContext bundleContext) {
-		getInstance( ).attachServiceListenerInternal( bundleContext);
+
+	private static ProviderServiceListener instance = new ProviderServiceListener();
+
+	public static ProviderServiceListener getInstance() {
+		return instance;
 	}
-	
-	private void attachServiceListenerInternal( BundleContext bundleContext) {
+
+	public static void attachServiceListener(BundleContext bundleContext) {
+		getInstance().attachServiceListenerInternal(bundleContext);
+	}
+
+	private void attachServiceListenerInternal(BundleContext context) {
 		try {
-			provider = (ServiceProvider)Security.getProvider("EQUINOX");
-			this.bundleContext = bundleContext;
-			bundleContext.addServiceListener( this, FILTER_STRING);
-		}
-		catch ( InvalidSyntaxException e) {
-			throw new RuntimeException( "FATAL: Syntax of ServiceListener String is invalid!!!!");
+			provider = (ServiceProvider) Security.getProvider("EQUINOX"); //$NON-NLS-1$
+			bundleContext = context;
+			bundleContext.addServiceListener(this, FILTER_STRING);
+		} catch (InvalidSyntaxException e) {
+			throw new RuntimeException(SecProviderMessages.invalidServiceListenerString);
 		}
 	}
-	
+
 	public void serviceChanged(ServiceEvent event) {
 
-		switch ( event.getType( )) {
-			case ServiceEvent.REGISTERED:
-				registerService( event.getServiceReference( ));
+		switch (event.getType()) {
+			case ServiceEvent.REGISTERED :
+				registerService(event.getServiceReference());
 				break;
-				
-			case ServiceEvent.UNREGISTERING:
-				unregisterService( event.getServiceReference( ));
+			case ServiceEvent.UNREGISTERING :
+				unregisterService(event.getServiceReference());
 				break;
-				
-			case ServiceEvent.MODIFIED:
+			case ServiceEvent.MODIFIED :
 				break;
-				
-			default:
+			default :
 				break;
 		}
 	}
 
-	private void registerService( ServiceReference ref) {
-		
-		ProviderService service = (ProviderService)bundleContext.getService(ref);
+	private void registerService(ServiceReference ref) {
+
+		ProviderService service = (ProviderService) bundleContext.getService(ref);
 		ProviderServiceLoader loader = new ProviderServiceLoader(ref.getBundle());
-		
-		ProviderServiceInternal internalService = service.getInternalService( );
+
+		ProviderServiceInternal internalService = service.getInternalService();
 		internalService.setClassLoader(loader);
 		internalService.setProvider(provider);
 
 		provider.registerService(internalService);
 	}
-	
-	private void unregisterService( ServiceReference ref) {
+
+	private void unregisterService(ServiceReference ref) {
 		//tell the provider to remove the service
 	}
 }
