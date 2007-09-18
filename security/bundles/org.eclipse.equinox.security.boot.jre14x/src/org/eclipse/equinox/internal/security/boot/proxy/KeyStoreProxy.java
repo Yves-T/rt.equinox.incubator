@@ -25,20 +25,25 @@ import java.security.cert.CertificateException;
 import java.util.Date;
 import java.util.Enumeration;
 
+import org.eclipse.equinox.internal.security.boot.ProviderServiceInternal;
+
 /**
  * OSGI service proxy implementation of <code>java.security.KeyStoreSpi</code>.
  */
 public class KeyStoreProxy extends KeyStoreSpi {
 
-	private static final String ALG_NAME = "ServiceProxy";
+	private static final String ALG_NAME = "PROXY";
 	
-	private static IKeyStoreSpiFactory s_platformFactory; 
+	private static ProviderServiceInternal s_internalService; 
 	private KeyStoreSpi targetKeyStoreSpi;
 	
 	/**
 	 * Instantiate a new instance of KeyStoreProxy.
 	 */
-	public KeyStoreProxy( ) { }
+	public KeyStoreProxy( ) {
+		
+		
+	}
 	
 	/**
 	 * Return the algorithm name that is used for this service proxy.
@@ -48,25 +53,17 @@ public class KeyStoreProxy extends KeyStoreSpi {
 	public static String getAlgorithm( ) { return ALG_NAME; }
 
 	/**
-	 * Internal interface for instantiating instances of the target KeyStoreSpi
-	 */
-	public interface IKeyStoreSpiFactory {
-		KeyStoreSpi newInstance( );
-	}
-
-	/**
-	 * Sets the single static instance of the KeyStoreSpi factory. Should only
-	 * be called at plugin startup of <code>org.eclipse.equinox.security.proxy</code>.
+	 * Sets the single static instance of the ProviderServiceInternal.
 	 * 
 	 * @param platformFactory - the platform factory
 	 */
-	public static void setPlatformKeyStoreSpiFactory( IKeyStoreSpiFactory platformFactory) {
-		s_platformFactory = platformFactory;
+	public static void setProviderService( ProviderServiceInternal internalService) {
+		s_internalService = internalService;
 	}
 	
 	private void initProxy( ) {
 		if ( null == targetKeyStoreSpi) {
-			targetKeyStoreSpi = s_platformFactory.newInstance( );
+			targetKeyStoreSpi = (KeyStoreSpi)s_internalService.newInstance( null);
 		}
 	}
 

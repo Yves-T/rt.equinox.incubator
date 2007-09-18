@@ -22,6 +22,8 @@ import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactorySpi;
 
+import org.eclipse.equinox.internal.security.boot.ProviderServiceInternal;
+
 /**
  * OSGI service proxy implementation of <code>javax.net.ssl.TrustManagerFactorySpi</code>.
  */
@@ -37,9 +39,9 @@ public class TrustManagerFactoryProxy extends TrustManagerFactorySpi {
 	  s_logger = Logger.getLogger( packageStr);
 	}
 	
-	private static final String ALG_NAME = "ServiceProxy";
+	private static final String ALG_NAME = "PROXY";
 
-	private static ITrustManagerFactorySpiFactory s_platformFactory;
+	private static ProviderServiceInternal s_providerService;
 	private TrustManagerFactorySpi targetTrustManagerFactory;
 	
 	/**
@@ -55,34 +57,27 @@ public class TrustManagerFactoryProxy extends TrustManagerFactorySpi {
 	public static String getAlgorithm( ) { return ALG_NAME; }
 
 	/**
-	 * Internal interface for instantiating instances of the target TrustManagerFactorySpi
-	 */
-	public interface ITrustManagerFactorySpiFactory {
-		TrustManagerFactorySpi newInstance( );
-	}
-
-	/**
 	 * Sets the single static instance of the TrustManagerFactorySpi factory. Should only
 	 * be called at plugin startup of <code>org.eclipse.equinox.security.proxy</code>.
 	 * 
 	 * @param platformFactory - the platform factory
 	 */
-	public static void setPlatformTrustManagerFactorySpiFactory( ITrustManagerFactorySpiFactory platformFactory) {
+	public static void setProviderService( ProviderServiceInternal providerService) {
 		
 		if( s_logger.isLoggable( Level.FINE)) {
-			s_logger.entering( TrustManagerFactoryProxy.class.toString( ), "setPlatformTrustManagerFactorySpiFactory", new Object[] {platformFactory});
+			s_logger.entering( TrustManagerFactoryProxy.class.toString( ), "setProviderService", new Object[] {providerService});
 		}
 		
-		s_platformFactory = platformFactory;
+		s_providerService = providerService;
 		
 		if( s_logger.isLoggable( Level.FINE)) {
-			s_logger.exiting(TrustManagerFactoryProxy.class.toString( ), "setPlatformTrustManagerFactorySpiFactory");
+			s_logger.exiting(TrustManagerFactoryProxy.class.toString( ), "setProviderService");
 		}
 	}
 
 	private void initProxy( ) {
 		if ( null == targetTrustManagerFactory) {
-			targetTrustManagerFactory = s_platformFactory.newInstance( );
+			targetTrustManagerFactory = (TrustManagerFactorySpi)s_providerService.newInstance(null);
 		}
 	}
 

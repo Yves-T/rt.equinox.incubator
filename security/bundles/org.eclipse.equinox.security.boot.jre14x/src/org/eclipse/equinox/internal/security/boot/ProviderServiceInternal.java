@@ -62,7 +62,7 @@ public class ProviderServiceInternal {
 		this.provider = provider;
 	}
 
-	public ClassLoader getClasLoader( ) {
+	public ClassLoader getClassLoader( ) {
 		return classLoader;
 	}
 	
@@ -75,8 +75,15 @@ public class ProviderServiceInternal {
 	}
 	
 	public Object newInstance(Object parameter) {
-		//TODO: Throw.
-		return null;
+		Object obj = null;
+		try {
+			Class clazz = classLoader.loadClass(getClassName());
+			obj = clazz.newInstance();				
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return obj;
 	}
 
 	public boolean supportsParameter(Object parameter) {

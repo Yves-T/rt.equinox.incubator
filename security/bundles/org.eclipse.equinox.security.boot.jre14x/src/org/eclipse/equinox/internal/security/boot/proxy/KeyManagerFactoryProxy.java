@@ -24,6 +24,8 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactorySpi;
 import javax.net.ssl.ManagerFactoryParameters;
 
+import org.eclipse.equinox.internal.security.boot.ProviderServiceInternal;
+
 /**
  * OSGI service proxy implementation of <code>javax.net.ssl.KeyManagerFactorySpi</code>.
  */
@@ -39,7 +41,7 @@ public class KeyManagerFactoryProxy extends KeyManagerFactorySpi {
 	  s_logger = Logger.getLogger( packageStr);
 	}
 	
-	private static final String ALG_NAME = "ServiceProxy";
+	private static final String ALG_NAME = "PROXY";
 
 	/**
 	 * Instantiate a new instance of KeyManagerFactoryProxy.
@@ -53,38 +55,30 @@ public class KeyManagerFactoryProxy extends KeyManagerFactorySpi {
 	 */
 	public static String getAlgorithm( ) { return ALG_NAME; }
 
-	private static IKeyManagerFactorySpiFactory s_platformFactory;
+	private static ProviderServiceInternal s_providerService;
 	private static KeyManagerFactorySpi targetKeyManagerFactory;
 
-	/**
-	 * Internal interface for instantiating instances of the target KeyManagerFactorySpi
-	 */
-	public interface IKeyManagerFactorySpiFactory {
-		KeyManagerFactorySpi newInstance( );
-	}
-	
 	private void initProxy( ) {
 		if ( null == targetKeyManagerFactory) {
-			targetKeyManagerFactory = s_platformFactory.newInstance( );
+			targetKeyManagerFactory = (KeyManagerFactorySpi)s_providerService.newInstance( null);
 		}
 	}
 	
 	/**
-	 * Sets the single static instance of the KeyManagerFactorySpi factory. Should only
-	 * be called at plugin startup of <code>org.eclipse.equinox.security.proxy</code>.
+	 * Sets the single static instance of the ProviderServiceInternal
 	 * 
-	 * @param platformFactory - the platform factory
+	 * @param providerService - the ProviderServiceInternal
 	 */
-	public static void setPlatformKeyManagerFactorySpiFactory( IKeyManagerFactorySpiFactory platformFactory) {
+	public static void setProviderService( ProviderServiceInternal providerService) {
 		
 		if (s_logger.isLoggable( Level.FINE)) {
-			s_logger.entering( KeyManagerFactoryProxy.class.toString( ), "setKeyManagerFactory", new Object[] {platformFactory});
+			s_logger.entering( KeyManagerFactoryProxy.class.toString( ), "setProviderService", new Object[] {providerService});
 		}
 
-		s_platformFactory = platformFactory;
+		s_providerService = providerService;
 
 		if (s_logger.isLoggable(Level.FINE)) {
-			s_logger.exiting( KeyManagerFactoryProxy.class.toString( ), "setKeyManagerFactory");
+			s_logger.exiting( KeyManagerFactoryProxy.class.toString( ), "setProviderService");
 		}
 	}
 
