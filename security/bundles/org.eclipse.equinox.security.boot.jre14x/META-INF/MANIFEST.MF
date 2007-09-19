@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Equinox security provider for JRE 1.4.x
-Bundle-SymbolicName: org.eclipse.equinox.security.boot.jre14x
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.eclipse.equinox.security.boot.jre14x;singleton:=true
 Bundle-Version: 0.0.1.qualifier
-Bundle-Vendor: Eclipse.org
+Bundle-Vendor: %providerName
 Fragment-Host: system.bundle; extension:="extclasspath"
 Export-Package: org.eclipse.equinox.internal.security.boot;x-friends:="org.eclipse.equinox.security.provider,org.eclipse.equinox.security.auth",
  org.eclipse.equinox.internal.security.boot.proxy;x-friends:="org.eclipse.equinox.security.provider,org.eclipse.equinox.security.auth",

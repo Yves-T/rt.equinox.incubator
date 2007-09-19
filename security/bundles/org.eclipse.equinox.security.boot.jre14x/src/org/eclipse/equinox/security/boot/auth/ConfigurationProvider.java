@@ -10,127 +10,49 @@
  *******************************************************************************/
 package org.eclipse.equinox.security.boot.auth;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
-
 import org.eclipse.equinox.internal.security.boot.MessageAccess;
 
 public class ConfigurationProvider extends Configuration {
 
-//	private static Logger s_logger = Logger.getLogger( ConfigurationProvider.class.getPackage( ).toString( ));
-	
-	private static Logger s_logger; 
-	static {
-	  Class cls = ConfigurationProvider.class;
-	  Package configProviderPack = cls.getPackage();
-	  String packageStr = configProviderPack.toString();
-	  s_logger = Logger.getLogger( packageStr);
-	}
-	
-	private static Configuration s_target = null;
-	
-	public static void setTargetConfiguration( Configuration proxy) {
+	private static Configuration target = null;
 
-		if ( s_logger.isLoggable( Level.FINER)) {
-			s_logger.entering( ConfigurationProvider.class.toString( ), "setTargetConfiguration", new Object[] {proxy}); //$NON-NLS-1$
-		}
+	public ConfigurationProvider() {
+		// placeholder
+	}
 
-		s_target = proxy;
-		
-		if ( s_logger.isLoggable( Level.FINER)) {
-			s_logger.exiting( ConfigurationProvider.class.toString( ), "setTargetConfiguration"); //$NON-NLS-1$
-		}
+	public static void setTargetConfiguration(Configuration proxy) {
+		target = proxy;
 	}
-	
-	public ConfigurationProvider( ) {
-		
-		if ( s_logger.isLoggable( Level.FINER)) {
-			s_logger.entering( ConfigurationProvider.class.toString( ), "<<constructor>>"); //$NON-NLS-1$
-		}
-		if ( s_logger.isLoggable( Level.FINER)) {
-			s_logger.exiting( ConfigurationProvider.class.toString( ), "<<constructor>>"); //$NON-NLS-1$
-		}
-	}
-	
+
 	/* (non-Javadoc)
 	 * @see javax.security.auth.login.Configuration#getAppConfigurationEntry(java.lang.String)
 	 */
-	public synchronized AppConfigurationEntry[] getAppConfigurationEntry( String name) {
-		
-		if ( s_logger.isLoggable( Level.FINER)) {
-			s_logger.entering( ConfigurationProvider.class.toString( ), "getAppConfigurationEntry", new Object[] {name}); //$NON-NLS-1$
-		}
-		
-		if ( null == s_target) {
-			throw new RuntimeException( MessageAccess.getString( "err.configuration.not.set.1")); //$NON-NLS-1$
-		}
-		
-		AppConfigurationEntry[] entries = s_target.getAppConfigurationEntry( name);
-		
-		if ( s_logger.isLoggable( Level.FINER)) {
-			s_logger.exiting( ConfigurationProvider.class.toString( ), "getAppConfigurationEntry", new Object[] {entries}); //$NON-NLS-1$
-		}
-		
-		return entries;
+	public synchronized AppConfigurationEntry[] getAppConfigurationEntry(String name) {
+		if (target == null)
+			throw new RuntimeException(MessageAccess.getString("configurationNotSet")); //$NON-NLS-1$
+		return target.getAppConfigurationEntry(name);
 	}
 
 	/* (non-Javadoc)
 	 * @see javax.security.auth.login.Configuration#refresh()
 	 */
-	public synchronized void refresh( ) {
-		
-		if ( s_logger.isLoggable( Level.FINER)) {
-			s_logger.entering( ConfigurationProvider.class.toString( ), "refresh"); //$NON-NLS-1$
-		}
-		
-		s_target.refresh( );
-
-		if ( s_logger.isLoggable( Level.FINER)) {
-			s_logger.exiting( ConfigurationProvider.class.toString( ), "refresh"); //$NON-NLS-1$
-		}
+	public synchronized void refresh() {
+		target.refresh();
 	}
-	
-	public synchronized void setAppConfigurationEntry( String providerId, String name, AppConfigurationEntry[] entryList) {
-		
-		if ( s_logger.isLoggable( Level.FINER)) {
-			s_logger.entering( ConfigurationProvider.class.toString( ), "setAppConfigurationEntry"); //$NON-NLS-1$
-		}
-		
-		if ( s_target instanceof ConfigurationProvider) {
-			((ConfigurationProvider)s_target).setAppConfigurationEntry( providerId, name, entryList);
-		}
-		else {
-			throw new UnsupportedOperationException( );
-		}
 
-		if ( s_logger.isLoggable( Level.FINER)) {
-			s_logger.exiting( ConfigurationProvider.class.toString( ), "setAppConfigurationEntry"); //$NON-NLS-1$
-		}
+	public synchronized void setAppConfigurationEntry(String providerId, String name, AppConfigurationEntry[] entryList) {
+		if (target instanceof ConfigurationProvider)
+			((ConfigurationProvider) target).setAppConfigurationEntry(providerId, name, entryList);
+		else
+			throw new UnsupportedOperationException();
 	}
-	
-	public synchronized String[] listAppConfigurationEntries( String providerId) {
-		
-		if ( s_logger.isLoggable( Level.FINER)) {
-			s_logger.entering( ConfigurationProvider.class.toString( ), "listAppConfigurationEntries"); //$NON-NLS-1$
-		}
-		
-		String[] returnValue = null;
-		
-		if ( s_target instanceof ConfigurationProvider) {
-			returnValue = ((ConfigurationProvider)s_target).listAppConfigurationEntries( providerId);
-		}
-		else {
-			throw new UnsupportedOperationException( );
-		}
 
-		if ( s_logger.isLoggable( Level.FINER)) {
-			s_logger.exiting( ConfigurationProvider.class.toString( ), "listAppConfigurationEntries"); //$NON-NLS-1$
-		}
-		
-		return returnValue;
+	public synchronized String[] listAppConfigurationEntries(String providerId) {
+		if (target instanceof ConfigurationProvider)
+			return ((ConfigurationProvider) target).listAppConfigurationEntries(providerId);
+		throw new UnsupportedOperationException();
 	}
-	
+
 }

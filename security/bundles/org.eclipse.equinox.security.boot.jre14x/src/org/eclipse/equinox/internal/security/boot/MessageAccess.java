@@ -13,19 +13,25 @@ package org.eclipse.equinox.internal.security.boot;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+/**
+ * In the class loading hierarchy this fragment is placed below farmework. As such,
+ * the normal logging (supplied by Runtime), OSGi logging (supplied by the framework),
+ * and NLS mechanism (supplied by the framework) are not available.
+ * 
+ * Hence, this fragment does not log errors but throws exceptions allowing logging
+ * to be done by callers.
+ * 
+ * As NLS is not available, this bundle uses Java resource bundles for internationalization.
+ */
 public class MessageAccess {
-	
-	private static final String BUNDLE_NAME = "org.eclipse.equinox.internal.security.messages";//$NON-NLS-1$
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle( BUNDLE_NAME);
 
-	private MessageAccess( ) { }
+	private static final String BUNDLE_NAME = "org.eclipse.equinox.internal.security.boot.messages"; //$NON-NLS-1$
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
-	public static String getString( String key) {
-		
+	public static String getString(String key) {
 		try {
-			return RESOURCE_BUNDLE.getString( key);
-		}
-		catch ( MissingResourceException e) {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
 			return '!' + key + '!';
 		}
 	}
