@@ -22,7 +22,6 @@ public class ProviderServiceListener implements ServiceListener {
 	private static final String FILTER_STRING = "(objectclass=" + ProviderService.class.getName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private BundleContext bundleContext;
-	private ServiceProvider provider;
 
 	private static ProviderServiceListener instance = new ProviderServiceListener();
 
@@ -34,9 +33,12 @@ public class ProviderServiceListener implements ServiceListener {
 		getInstance().attachServiceListenerInternal(bundleContext);
 	}
 
+	private ServiceProvider getProvider() {
+		return (ServiceProvider) Security.getProvider("EQUINOX"); //$NON-NLS-1$;
+	}
+
 	private void attachServiceListenerInternal(BundleContext context) {
 		try {
-			provider = (ServiceProvider) Security.getProvider("EQUINOX"); //$NON-NLS-1$
 			bundleContext = context;
 			bundleContext.addServiceListener(this, FILTER_STRING);
 		} catch (InvalidSyntaxException e) {
@@ -67,12 +69,15 @@ public class ProviderServiceListener implements ServiceListener {
 
 		ProviderServiceInternal internalService = service.getInternalService();
 		internalService.setClassLoader(loader);
-		internalService.setProvider(provider);
+		internalService.setProvider(getProvider());
 
-		provider.registerService(internalService);
+		getProvider().registerService(internalService);
 	}
 
 	private void unregisterService(ServiceReference ref) {
-		//tell the provider to remove the service
+		ProviderService service = (ProviderService) bundleContext.getService(ref);
+		ProviderServiceInternal internalService = service.getInternalService();
+
+		getProvider().unregisterService(internalService);
 	}
 }
