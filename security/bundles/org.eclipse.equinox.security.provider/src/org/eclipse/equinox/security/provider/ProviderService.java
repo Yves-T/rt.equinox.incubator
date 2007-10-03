@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.equinox.internal.security.boot.ProviderServiceInternal;
 
+/**
+ * The class is used to register a security service with the system.
+ */
 public class ProviderService {
 
 	private ProviderServiceInternal internalService;
