@@ -11,10 +11,9 @@
 package org.eclipse.equinox.security.boot;
 
 import java.security.Provider;
-import org.eclipse.equinox.internal.security.boot.ProviderServiceInternal;
 import org.eclipse.equinox.internal.security.boot.proxy.*;
 
-public class ServiceProvider extends Provider {
+public class EquinoxProvider extends Provider {
 
 	private static class TypeStrToInt {
 		public String typeStr;
@@ -42,24 +41,24 @@ public class ServiceProvider extends Provider {
 			new TypeStrToInt(TYPE_STR_KEYMANAGERFACTORY, TYPE_INT_KEYMANAGERFACTORY) // 
 	};
 
-	public ServiceProvider() {
+	public EquinoxProvider() {
 		super("EQUINOX", 0.1, ""); //$NON-NLS-1$//$NON-NLS-2$
 	}
 
-	public void registerService(ProviderServiceInternal providerService) {
-		String key = providerService.getType() + "." + providerService.getAlgorithm(); //$NON-NLS-1$
+	public void registerService(IProviderService service) {
+		String key = service.getType() + "." + service.getAlgorithm(); //$NON-NLS-1$
 
-		switch (getType(providerService.getType())) {
+		switch (getType(service.getType())) {
 			case TYPE_INT_KEYSTORE :
-				KeyStoreProxy.setProviderService(providerService);
+				KeyStoreProxy.setProviderService(service);
 				put(key, KeyStoreProxy.class.getName());
 				break;
 			case TYPE_INT_TRUSTMANAGERFACTORY :
-				TrustManagerFactoryProxy.setProviderService(providerService);
+				TrustManagerFactoryProxy.setProviderService(service);
 				put(key, TrustManagerFactoryProxy.class.getName());
 				break;
 			case TYPE_INT_KEYMANAGERFACTORY :
-				KeyManagerFactoryProxy.setProviderService(providerService);
+				KeyManagerFactoryProxy.setProviderService(service);
 				put(key, KeyManagerFactoryProxy.class.getName());
 				break;
 			default :
@@ -67,7 +66,7 @@ public class ServiceProvider extends Provider {
 		}
 	}
 
-	public void unregisterService(ProviderServiceInternal providerService) {
+	public void unregisterService(IProviderService service) {
 		//TODO:
 	}
 

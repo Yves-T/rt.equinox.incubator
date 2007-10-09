@@ -14,7 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.*;
 import javax.net.ssl.*;
-import org.eclipse.equinox.internal.security.boot.ProviderServiceInternal;
+import org.eclipse.equinox.security.boot.IProviderService;
 
 /**
  * OSGI service proxy implementation of <code>javax.net.ssl.KeyManagerFactorySpi</code>.
@@ -23,7 +23,7 @@ public class KeyManagerFactoryProxy extends KeyManagerFactorySpi {
 
 	private static final String ALG_NAME = "PROXY"; //$NON-NLS-1$
 
-	private static ProviderServiceInternal providerService;
+	private static IProviderService s_service;
 	private static KeyManagerFactorySpi targetKeyManagerFactory;
 
 	/**
@@ -43,15 +43,19 @@ public class KeyManagerFactoryProxy extends KeyManagerFactorySpi {
 
 	private void initProxy() {
 		if (targetKeyManagerFactory == null)
-			targetKeyManagerFactory = (KeyManagerFactorySpi) providerService.newInstance(null);
+			try {
+				targetKeyManagerFactory = (KeyManagerFactorySpi) s_service.newInstance(null);
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace(); //TODO: ERROR
+			}
 	}
 
 	/**
 	 * Sets the single static instance of the ProviderServiceInternal
 	 * @param providerService - the ProviderServiceInternal
 	 */
-	public static void setProviderService(ProviderServiceInternal service) {
-		providerService = service;
+	public static void setProviderService(IProviderService service) {
+		s_service = service;
 	}
 
 	/* (non-Javadoc)

@@ -14,7 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.*;
 import javax.net.ssl.*;
-import org.eclipse.equinox.internal.security.boot.ProviderServiceInternal;
+import org.eclipse.equinox.security.boot.IProviderService;
 
 /**
  * OSGI service proxy implementation of <code>javax.net.ssl.TrustManagerFactorySpi</code>.
@@ -23,7 +23,7 @@ public class TrustManagerFactoryProxy extends TrustManagerFactorySpi {
 
 	private static final String ALG_NAME = "PROXY"; //$NON-NLS-1$
 
-	private static ProviderServiceInternal providerService;
+	private static IProviderService s_service;
 	private TrustManagerFactorySpi targetTrustManagerFactory;
 
 	/**
@@ -46,13 +46,17 @@ public class TrustManagerFactoryProxy extends TrustManagerFactorySpi {
 	 * Sets the single static instance of the TrustManagerFactorySpi factory. Should only
 	 * be called at plugin startup of <code>org.eclipse.equinox.security.proxy</code>.
 	 */
-	public static void setProviderService(ProviderServiceInternal service) {
-		providerService = service;
+	public static void setProviderService(IProviderService service) {
+		s_service = service;
 	}
 
 	private void initProxy() {
 		if (targetTrustManagerFactory == null)
-			targetTrustManagerFactory = (TrustManagerFactorySpi) providerService.newInstance(null);
+			try {
+				targetTrustManagerFactory = (TrustManagerFactorySpi) s_service.newInstance(null);
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace(); //TODO: ERROR
+			}
 	}
 
 	/* (non-Javadoc)

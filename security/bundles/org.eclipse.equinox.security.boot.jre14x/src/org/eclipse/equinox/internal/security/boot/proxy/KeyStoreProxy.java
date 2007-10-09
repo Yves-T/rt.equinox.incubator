@@ -18,7 +18,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.Date;
 import java.util.Enumeration;
-import org.eclipse.equinox.internal.security.boot.ProviderServiceInternal;
+import org.eclipse.equinox.security.boot.IProviderService;
 
 /**
  * OSGI service proxy implementation of <code>java.security.KeyStoreSpi</code>.
@@ -27,7 +27,7 @@ public class KeyStoreProxy extends KeyStoreSpi {
 
 	private static final String ALG_NAME = "PROXY"; //$NON-NLS-1$
 
-	private static ProviderServiceInternal internalService;
+	private static IProviderService s_service;
 	private KeyStoreSpi targetKeyStoreSpi;
 
 	/**
@@ -51,13 +51,17 @@ public class KeyStoreProxy extends KeyStoreSpi {
 	 * 
 	 * @param platformFactory - the platform factory
 	 */
-	public static void setProviderService(ProviderServiceInternal service) {
-		internalService = service;
+	public static void setProviderService(IProviderService service) {
+		s_service = service;
 	}
 
 	private void initProxy() {
 		if (targetKeyStoreSpi == null)
-			targetKeyStoreSpi = (KeyStoreSpi) internalService.newInstance(null);
+			try {
+				targetKeyStoreSpi = (KeyStoreSpi) s_service.newInstance(null);
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace(); //TODO: ERROR
+			}
 	}
 
 	/* (non-Javadoc)
