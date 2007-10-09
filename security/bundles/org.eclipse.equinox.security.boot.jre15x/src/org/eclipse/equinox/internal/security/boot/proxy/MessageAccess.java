@@ -8,13 +8,13 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.equinox.internal.security.boot;
+package org.eclipse.equinox.internal.security.boot.proxy;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
- * In the class loading hierarchy this fragment is placed below farmework. As such,
+ * In the class loading hierarchy this fragment is placed below framework. As such,
  * the normal logging (supplied by Runtime), OSGi logging (supplied by the framework),
  * and NLS mechanism (supplied by the framework) are not available.
  * 
@@ -25,7 +25,7 @@ import java.util.ResourceBundle;
  */
 public class MessageAccess {
 
-	private static final String BUNDLE_NAME = "org.eclipse.equinox.internal.security.boot.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.equinox.internal.security.boot.proxy.messages"; //$NON-NLS-1$
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
 	public static String getString(String key) {

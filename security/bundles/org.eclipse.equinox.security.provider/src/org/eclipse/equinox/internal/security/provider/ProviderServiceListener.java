@@ -10,74 +10,31 @@
  *******************************************************************************/
 package org.eclipse.equinox.internal.security.provider;
 
-import java.security.Security;
-import org.eclipse.equinox.internal.security.boot.ProviderServiceInternal;
-import org.eclipse.equinox.internal.security.provider.nls.SecProviderMessages;
-import org.eclipse.equinox.security.boot.ServiceProvider;
+import org.eclipse.equinox.security.boot.EquinoxProvider;
 import org.eclipse.equinox.security.provider.ProviderService;
-import org.osgi.framework.*;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-public class ProviderServiceListener implements ServiceListener {
+public class ProviderServiceListener implements ServiceTrackerCustomizer {
+	private final BundleContext context;
 
-	private static final String FILTER_STRING = "(objectclass=" + ProviderService.class.getName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-
-	private BundleContext bundleContext;
-
-	private static ProviderServiceListener instance = new ProviderServiceListener();
-
-	public static ProviderServiceListener getInstance() {
-		return instance;
+	public ProviderServiceListener(BundleContext context) {
+		this.context = context;
 	}
 
-	public static void attachServiceListener(BundleContext bundleContext) {
-		getInstance().attachServiceListenerInternal(bundleContext);
+	public Object addingService(ServiceReference reference) {
+		ProviderService service = (ProviderService) context.getService(reference);
+		((EquinoxProvider) service.getProvider()).registerService(service);
+		return service;
 	}
 
-	private ServiceProvider getProvider() {
-		return (ServiceProvider) Security.getProvider("EQUINOX"); //$NON-NLS-1$;
+	public void modifiedService(ServiceReference reference, Object service) {
+		// do nothing
 	}
 
-	private void attachServiceListenerInternal(BundleContext context) {
-		try {
-			bundleContext = context;
-			bundleContext.addServiceListener(this, FILTER_STRING);
-		} catch (InvalidSyntaxException e) {
-			throw new RuntimeException(SecProviderMessages.invalidServiceListenerString);
-		}
-	}
-
-	public void serviceChanged(ServiceEvent event) {
-
-		switch (event.getType()) {
-			case ServiceEvent.REGISTERED :
-				registerService(event.getServiceReference());
-				break;
-			case ServiceEvent.UNREGISTERING :
-				unregisterService(event.getServiceReference());
-				break;
-			case ServiceEvent.MODIFIED :
-				break;
-			default :
-				break;
-		}
-	}
-
-	private void registerService(ServiceReference ref) {
-
-		ProviderService service = (ProviderService) bundleContext.getService(ref);
-		ProviderServiceLoader loader = new ProviderServiceLoader(ref.getBundle());
-
-		ProviderServiceInternal internalService = service.getInternalService();
-		internalService.setClassLoader(loader);
-		internalService.setProvider(getProvider());
-
-		getProvider().registerService(internalService);
-	}
-
-	private void unregisterService(ServiceReference ref) {
-		ProviderService service = (ProviderService) bundleContext.getService(ref);
-		ProviderServiceInternal internalService = service.getInternalService();
-
-		getProvider().unregisterService(internalService);
+	public void removedService(ServiceReference reference, Object service) {
+		ProviderService provider = (ProviderService) service;
+		((EquinoxProvider) provider.getProvider()).unregisterService(provider);
 	}
 }

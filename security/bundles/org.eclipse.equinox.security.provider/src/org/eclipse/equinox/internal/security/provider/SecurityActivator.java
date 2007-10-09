@@ -10,17 +10,24 @@
  *******************************************************************************/
 package org.eclipse.equinox.internal.security.provider;
 
+import org.eclipse.equinox.security.boot.IProviderService;
+import org.eclipse.equinox.security.provider.ProviderService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.util.tracker.ServiceTracker;
 
-public class SecurityPlugin implements BundleActivator {
+public class SecurityActivator implements BundleActivator {
+	private static final String FILTER_STRING = "(|(objectclass=" + ProviderService.class.getName() + ")(objectclass=" + IProviderService.class.getName() + "))"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	private ServiceTracker providerTracker;
 
 	public void start(BundleContext context) throws Exception {
-		ProviderServiceListener.attachServiceListener(context);
+		providerTracker = new ServiceTracker(context, context.createFilter(FILTER_STRING), new ProviderServiceListener(context));
+		providerTracker.open();
 	}
 
 	public void stop(BundleContext context) throws Exception {
-		// TBD anything to do here?  
+		providerTracker.close();
+		providerTracker = null;
 	}
 
 }

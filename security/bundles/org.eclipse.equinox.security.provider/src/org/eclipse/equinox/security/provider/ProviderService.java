@@ -10,52 +10,87 @@
  *******************************************************************************/
 package org.eclipse.equinox.security.provider;
 
-import java.security.Provider;
+import java.lang.reflect.Constructor;
+import java.security.*;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.equinox.internal.security.boot.ProviderServiceInternal;
+import org.eclipse.equinox.security.boot.IProviderService;
+import org.osgi.framework.Bundle;
 
 /**
  * The class is used to register a security service with the system.
  */
-public class ProviderService {
+public class ProviderService implements IProviderService {
+	public final String EQUINOX_PROVIDER = "EQUINOX"; //$NON-NLS-1$
+	private final String type;
+	private final String algorithm;
+	private final String className;
+	private final List aliases;
+	private final Map attributes;
+	private final Bundle providingBundle;
 
-	private ProviderServiceInternal internalService;
-
-	public ProviderService(String type, String algorithm, String className, List aliases, Map attributes) {
-		internalService = new ProviderServiceInternal(type, algorithm, className, aliases, attributes);
-	}
-
-	public String getAlgorithm() {
-		return internalService.getAlgorithm();
-	}
-
-	public String getAttribute(String name) {
-		return (String) internalService.getAttributes().get(name);
-	}
-
-	public Provider getProvider() {
-		return internalService.getProvider();
+	public ProviderService(String type, String algorithm, String className, List aliases, Map attributes, Bundle providingBundle) {
+		this.type = type;
+		this.algorithm = algorithm;
+		this.className = className;
+		this.aliases = aliases;
+		this.attributes = attributes;
+		this.providingBundle = providingBundle;
 	}
 
 	public String getType() {
-		return internalService.getType();
+		return type;
 	}
 
-	public Object newInstance(Object parameter) {
-		return internalService.newInstance(parameter);
+	public String getAlgorithm() {
+		return algorithm;
+	}
+
+	public String getClassName() {
+		return className;
+	}
+
+	public List getAliases() {
+		return aliases;
+	}
+
+	public Map getAttributes() {
+		return attributes;
+	}
+
+	public Provider getProvider() {
+		return Security.getProvider(EQUINOX_PROVIDER);
+	}
+
+	public Object newInstance(Object parameter) throws NoSuchAlgorithmException {
+		Object obj = null;
+		try {
+			Class clazz = providingBundle.loadClass(getClassName());
+			if (parameter != null) {
+				try {
+					Constructor cons = clazz.getDeclaredConstructor(new Class[] {parameter.getClass()});
+					obj = cons.newInstance(new Object[] {parameter});
+				} catch (NoSuchMethodException e) {
+					throw new InvalidParameterException();
+				}
+			} else {
+				obj = clazz.newInstance();
+			}
+		} catch (Throwable t) {
+			throw new NoSuchAlgorithmException();
+		}
+
+		return obj;
 	}
 
 	public boolean supportsParameter(Object parameter) {
-		return internalService.supportsParameter(parameter);
+		try {
+			Class clazz = providingBundle.loadClass(getClassName());
+			clazz.getDeclaredConstructor(new Class[] {parameter.getClass()});
+		} catch (Throwable t) {
+			return false;
+		}
+		return true;
 	}
 
-	public String toString() {
-		return internalService.toString();
-	}
-
-	//TODO: this can't be exposed
-	public ProviderServiceInternal getInternalService() {
-		return internalService;
-	}
 }
