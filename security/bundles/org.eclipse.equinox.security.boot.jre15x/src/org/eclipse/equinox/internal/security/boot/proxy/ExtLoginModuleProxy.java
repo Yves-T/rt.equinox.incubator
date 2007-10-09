@@ -17,7 +17,6 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
-import org.eclipse.equinox.internal.security.boot.MessageAccess;
 
 public class ExtLoginModuleProxy extends AbstractProxy implements LoginModule {
 

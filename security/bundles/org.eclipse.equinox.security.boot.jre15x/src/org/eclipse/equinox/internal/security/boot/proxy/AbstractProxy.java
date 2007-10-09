@@ -12,7 +12,6 @@ package org.eclipse.equinox.internal.security.boot.proxy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import org.eclipse.equinox.internal.security.boot.MessageAccess;
 
 public abstract class AbstractProxy implements InvocationHandler {
 

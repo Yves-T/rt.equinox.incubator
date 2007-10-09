@@ -48,10 +48,6 @@ public class EquinoxProvider extends Provider {
 		removeService(new ProviderService(service));
 	}
 
-	interface Foo {
-		void voidfoo();
-	}
-
 	private static class ProviderService extends Provider.Service {
 
 		private final IProviderService service;

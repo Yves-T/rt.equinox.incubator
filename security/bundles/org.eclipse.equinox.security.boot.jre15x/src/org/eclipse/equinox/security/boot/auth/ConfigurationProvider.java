@@ -12,7 +12,7 @@ package org.eclipse.equinox.security.boot.auth;
 
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
-import org.eclipse.equinox.internal.security.boot.MessageAccess;
+import org.eclipse.equinox.internal.security.boot.proxy.MessageAccess;
 
 public class ConfigurationProvider extends Configuration {
 
