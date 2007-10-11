@@ -16,7 +16,6 @@ import javax.security.auth.Subject;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.equinox.security.auth.SecurePlatform;
-import org.eclipse.equinox.security.auth.service.ILoginContextService;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -37,9 +36,8 @@ public class AuthApplication implements IApplication {
 		final Display display = PlatformUI.createDisplay();
 		try {
 			if (SecurePlatform.isEnabled()) {
-				ILoginContextService loginContext = SecurePlatform.getLoginContext();
-				loginContext.login();
-				result = (Integer) Subject.doAs(loginContext.getSubject(), getRunAction(display));
+				SecurePlatform.login();
+				result = (Integer) Subject.doAs(SecurePlatform.getSubject(), getRunAction(display));
 			} else
 				result = (Integer) getRunAction(display).run();
 		} finally {
@@ -49,8 +47,7 @@ public class AuthApplication implements IApplication {
 
 		if (result != null && PlatformUI.RETURN_RESTART == result.intValue())
 			return EXIT_RESTART;
-		else
-			return EXIT_OK;
+		return EXIT_OK;
 	}
 
 	public void stop() {
