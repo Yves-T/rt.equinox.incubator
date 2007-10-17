@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+	<extension id="application" point="org.eclipse.core.runtime.applications"> 
+      <application> 
+         <run class="org.eclipse.equinox.internal.p2.repositoryoptimizer.Application"/> 
+      </application> 
+   </extension>
+
+	<extension id="Pack200Packer" point="org.eclipse.equinox.p2.artifact.repository.processingSteps">
+		<step class="org.eclipse.equinox.internal.p2.repositoryoptimizer.Pack200Step"/>
+	</extension>
+</plugin>
