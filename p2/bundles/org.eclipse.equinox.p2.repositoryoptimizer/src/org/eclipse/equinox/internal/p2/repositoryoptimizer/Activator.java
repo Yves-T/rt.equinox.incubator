@@ -13,12 +13,13 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator {
+	public static final String ID = "org.eclipse.equinox.p2.repositoryoptimizer"; //$NON-NLS-1$
 	private static BundleContext context = null;
-	
+
 	public static BundleContext getContext() {
 		return context;
 	}
-	
+
 	public void start(BundleContext context) throws Exception {
 		Activator.context = context;
 	}

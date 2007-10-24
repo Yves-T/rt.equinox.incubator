@@ -12,6 +12,7 @@
 package org.eclipse.equinox.internal.p2.repositoryoptimizer;
 
 import java.io.*;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.p2.artifact.repository.processing.ProcessingStep;
 import org.eclipse.equinox.p2.core.helpers.FileUtils;
@@ -63,25 +64,28 @@ public class Pack200Step extends ProcessingStep {
 			// unpack
 			Options options = new Options();
 			options.pack = true;
-			options.processAll = true;
+			// TODO use false here assuming that all content is conditioned.  Need to revise this
+			options.processAll = false;
 			options.input = source;
 			options.outputDir = workDir.getPath();
+			options.verbose = true;
 			new JarProcessorExecutor().runJarProcessor(options);
 
 			// now write the packed content to our destination
-			String sourceFileName = source.getName();
-			resultFile = new File(workDir, sourceFileName + PACKED_SUFFIX);
-			resultStream = new BufferedInputStream(new FileInputStream(resultFile));
-			FileUtils.copyStream(resultStream, true, destination, false);
+			resultFile = new File(workDir, source.getName() + PACKED_SUFFIX);
+			if (resultFile.length() > 0) {
+				resultStream = new BufferedInputStream(new FileInputStream(resultFile));
+				FileUtils.copyStream(resultStream, true, destination, false);
+			} else {
+				status = new Status(IStatus.ERROR, Activator.ID, "Empty file packed: " + resultFile);
+			}
 		} finally {
 			if (source != null)
 				source.delete();
-			if (resultStream != null)
-				resultStream.close();
 			if (resultFile != null)
 				resultFile.delete();
 			if (workDir != null)
-				workDir.delete();
+				FileUtils.deleteAll(workDir);
 		}
 	}
 
