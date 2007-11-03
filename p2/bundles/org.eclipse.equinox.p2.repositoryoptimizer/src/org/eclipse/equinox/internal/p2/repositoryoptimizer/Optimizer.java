@@ -65,7 +65,7 @@ public class Optimizer {
 					repositoryStream.close();
 					// TODO need to figure out how to get our processing steps linked into the repositoryStream
 					// so that the close() picks up any status issues.
-					IStatus status = ProcessingStepHandler.validateSteps(repositoryStream);
+					IStatus status = ProcessingStepHandler.checkStatus(repositoryStream);
 					if (!status.isOK()) {
 						System.out.println("Skipping optimization of: " + descriptor.getArtifactKey());
 						System.out.println(status.toString());
