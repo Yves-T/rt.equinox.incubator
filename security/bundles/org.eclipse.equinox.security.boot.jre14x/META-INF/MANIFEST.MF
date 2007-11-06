@@ -4,9 +4,9 @@ Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.equinox.security.boot.jre14x;singleton:=true
 Bundle-Version: 0.0.1.qualifier
 Bundle-Vendor: %providerName
+Bundle-Localization: plugin
 Fragment-Host: system.bundle; extension:="extclasspath"
-Export-Package: org.eclipse.equinox.internal.security.boot;x-friends:="org.eclipse.equinox.security.provider,org.eclipse.equinox.security.auth",
- org.eclipse.equinox.internal.security.boot.proxy;x-friends:="org.eclipse.equinox.security.provider,org.eclipse.equinox.security.auth",
+Export-Package: org.eclipse.equinox.internal.security.boot.proxy;x-friends:="org.eclipse.equinox.security.provider,org.eclipse.equinox.security.auth",
  org.eclipse.equinox.security.boot,
  org.eclipse.equinox.security.boot.auth
 Bundle-RequiredExecutionEnvironment: J2SE-1.4

@@ -13,7 +13,20 @@ package org.eclipse.equinox.security.boot;
 import java.security.Provider;
 import org.eclipse.equinox.internal.security.boot.proxy.*;
 
+/**
+ * The Equinox security provider.  This provider implementation sits a layer below the Framework
+ * and allows provider services to be registered by the Framework and other bundles installed
+ * in the Framework with {@link IProviderService} objects.
+ * 
+ * <p>
+ * Clients are not intended to create or use this class.
+ * </p>
+ */
+// TODO need to clean this javadoc up.
+// TODO Perhaps this class and IProviderService should be in separate packages to give a clear indication of API for clients.
 public class EquinoxProvider extends Provider {
+
+	private static final long serialVersionUID = -696520082946329858L;
 
 	private static class TypeStrToInt {
 		public String typeStr;
@@ -24,8 +37,6 @@ public class EquinoxProvider extends Provider {
 			this.typeInt = typeInt;
 		}
 	}
-
-	private static final long serialVersionUID = -696520082946329858L;
 
 	private static final int TYPE_INT_UNKNOWN = 0;
 	private static final int TYPE_INT_KEYSTORE = 1;
@@ -41,10 +52,17 @@ public class EquinoxProvider extends Provider {
 			new TypeStrToInt(TYPE_STR_KEYMANAGERFACTORY, TYPE_INT_KEYMANAGERFACTORY) // 
 	};
 
+	/**
+	 * Default constructor for the Equinox provider registry
+	 */
 	public EquinoxProvider() {
-		super("EQUINOX", 0.1, ""); //$NON-NLS-1$//$NON-NLS-2$
+		super("EQUINOX", 1.0, "Equinox OSGI Service Provider allows bundle-based implementations of JCA/JCE interfaces"); //$NON-NLS-1$//$NON-NLS-2$
 	}
 
+	/**
+	 * Registers a new provider service with the Equinox provider registry
+	 * @param service the provider service to register
+	 */
 	public void registerService(IProviderService service) {
 		String key = service.getType() + "." + service.getAlgorithm(); //$NON-NLS-1$
 
