@@ -19,6 +19,8 @@ import org.eclipse.ui.application.*;
 
 public class AuthWorkbenchAdvisor extends WorkbenchAdvisor {
 
+	private Action reloadAction;
+
 	public String getInitialWindowPerspectiveId() {
 		return "org.eclipse.equinox.security.sample.subjectPerspective"; //$NON-NLS-1$
 	}
@@ -40,6 +42,8 @@ public class AuthWorkbenchAdvisor extends WorkbenchAdvisor {
 	}
 
 	private void fillMenuBar(IWorkbenchWindow window, IActionBarConfigurer configurer) {
+		reloadAction = new ReloadAction("Reload");
+
 		IMenuManager menuBar = configurer.getMenuManager();
 		menuBar.add(createFileMenu(window));
 	}
@@ -53,6 +57,7 @@ public class AuthWorkbenchAdvisor extends WorkbenchAdvisor {
 		menu.add(new GroupMarker("logoutActions"));
 		menu.add(new Separator());
 		menu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+		menu.add(reloadAction);
 		menu.add(ActionFactory.PREFERENCES.create(window));
 		menu.add(ActionFactory.QUIT.create(window));
 		menu.add(new GroupMarker(IWorkbenchActionConstants.FILE_END));
