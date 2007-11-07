@@ -11,7 +11,7 @@
 
 package org.eclipse.equinox.security.sample;
 
-import org.eclipse.osgi.internal.provisional.verifier.CertificateTrustAuthority;
+//import org.eclipse.osgi.internal.provisional.verifier.CertificateTrustAuthority;
 import org.eclipse.osgi.service.resolver.PlatformAdmin;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -55,13 +55,13 @@ public class AuthAppPlugin implements BundleActivator {
 		return (PlatformAdmin) platformAdminTracker.getService();
 	}
 
-	public static CertificateTrustAuthority getCertTrustAuthority() {
-		if (null == certTrustAuthorityTracker) {
-			certTrustAuthorityTracker = new ServiceTracker(bundleContext, CertificateTrustAuthority.class.getName(), null);
-			certTrustAuthorityTracker.open();
-		}
-		return (CertificateTrustAuthority) certTrustAuthorityTracker.getService();
-	}
+	//	public static CertificateTrustAuthority getCertTrustAuthority() {
+	//		if (null == certTrustAuthorityTracker) {
+	//			certTrustAuthorityTracker = new ServiceTracker(bundleContext, CertificateTrustAuthority.class.getName(), null);
+	//			certTrustAuthorityTracker.open();
+	//		}
+	//		return (CertificateTrustAuthority) certTrustAuthorityTracker.getService();
+	//	}
 
 	public static PackageAdmin getPackageAdmin() {
 		if (null == packageAdminTracker) {
