@@ -40,7 +40,7 @@ public class DisabledView extends ViewPart {
 		State state = plaformAdmin.getState(false);
 
 		// iterate through each bundle in the state and check
-		BundleDescription[] bds = plaformAdmin.getState().getDisabledBundles();
+		BundleDescription[] bds = plaformAdmin.getState(false).getDisabledBundles();
 		List disableBundles = new LinkedList();
 		for (int i = 0; i < bds.length; i++) {
 			disableBundles.add(bds[i]);
