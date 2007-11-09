@@ -58,6 +58,11 @@
         category="org.eclipse.equinox.security.sample.subjectCategory"
         class="org.eclipse.equinox.security.sample.SubjectView">
       </view>
+      <view
+            class="org.eclipse.equinox.security.view.DisabledView"
+            id="org.eclipse.equinox.security.sample.diabledView"
+            name="Disable Bundle View">
+      </view>
       
    </extension>
    
