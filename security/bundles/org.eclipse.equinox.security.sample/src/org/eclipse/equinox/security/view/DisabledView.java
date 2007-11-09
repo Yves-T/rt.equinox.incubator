@@ -36,12 +36,6 @@ public class DisabledView extends ViewPart {
 		column3.setText("Message");
 		column3.setWidth(200);
 
-		viewer.setContentProvider(new DisabledTableContentProvider());
-		viewer.setLabelProvider(new DisabledTableLabelProvider());
-		viewer.setInput(getDisabledBundles());
-	}
-
-	public List getDisabledBundles() {
 		PlatformAdmin plaformAdmin = AuthAppPlugin.getPlatformAdmin();
 		State state = plaformAdmin.getState(false);
 
@@ -52,8 +46,24 @@ public class DisabledView extends ViewPart {
 			disableBundles.add(bds[i]);
 		}
 
-		return disableBundles;
+		viewer.setContentProvider(new DisabledTableContentProvider(state));
+		viewer.setLabelProvider(new DisabledTableLabelProvider());
+		viewer.setInput(disableBundles);
 	}
+
+	//	public List getDisabledBundles() {
+	//		PlatformAdmin plaformAdmin = AuthAppPlugin.getPlatformAdmin();
+	//		State state = plaformAdmin.getState(false);
+	//
+	//		// iterate through each bundle in the state and check
+	//		BundleDescription[] bds = plaformAdmin.getState().getDisabledBundles();
+	//		List disableBundles = new LinkedList();
+	//		for (int i = 0; i < bds.length; i++) {
+	//			disableBundles.add(bds[i]);
+	//		}
+	//
+	//		return disableBundles;
+	//	}
 
 	public void setFocus() {
 
@@ -61,9 +71,15 @@ public class DisabledView extends ViewPart {
 
 	class DisabledTableContentProvider implements ITreeContentProvider {
 
+		private State state;
+
+		public DisabledTableContentProvider(State state) {
+			this.state = state;
+		}
+
 		public Object[] getChildren(Object parentElement) {
 			if (parentElement instanceof BundleDescription) {
-				DisabledInfo disabledInfo[] = AuthAppPlugin.getPlatformAdmin().getState().getDisabledInfos((BundleDescription) parentElement);
+				DisabledInfo disabledInfo[] = state.getDisabledInfos((BundleDescription) parentElement);
 				return disabledInfo;
 			}
 			return null;
@@ -106,7 +122,6 @@ public class DisabledView extends ViewPart {
 						return bd.getSymbolicName();
 				}
 			}
-
 			return null;
 		}
 
