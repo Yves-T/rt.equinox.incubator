@@ -59,6 +59,10 @@ public class AuthWorkbenchAdvisor extends WorkbenchAdvisor {
 		menu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 		menu.add(reloadAction);
 		menu.add(ActionFactory.PREFERENCES.create(window));
+		menu.add(new Separator());
+		menu.add(ActionFactory.IMPORT.create(window));
+		menu.add(ActionFactory.EXPORT.create(window));
+		menu.add(new Separator());
 		menu.add(ActionFactory.QUIT.create(window));
 		menu.add(new GroupMarker(IWorkbenchActionConstants.FILE_END));
 		return menu;
