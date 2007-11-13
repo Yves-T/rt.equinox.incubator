@@ -26,10 +26,8 @@ import org.eclipse.ui.PlatformUI;
 public class AuthApplication implements IApplication {
 
 	public Object start(IApplicationContext context) throws Exception {
-		// Set the login provider so that we can potentially use the XML provider, and 
-		// set the jaas_config.xml as an available config
-		Security.setProperty("login.configuration.provider", "org.eclipse.equinox.security.boot.auth.ConfigurationProvider");
-		Security.setProperty("login.config.url.1", AuthAppPlugin.getBundleContext().getBundle().getEntry("data/jaas_config.xml").toExternalForm());
+		// specifies location of the login configuration file 
+		Security.setProperty("login.config.url.1", AuthAppPlugin.getBundleContext().getBundle().getEntry("data/jaas_config.txt").toExternalForm());
 		//Security.setProperty( "keystore.url", AuthAppPlugin.getDefault( ).getBundle( ).getEntry( "data/test_user.jks").toExternalForm( ));
 
 		Integer result = null;
