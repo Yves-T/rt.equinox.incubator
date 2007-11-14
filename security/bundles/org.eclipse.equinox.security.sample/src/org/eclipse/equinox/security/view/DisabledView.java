@@ -12,7 +12,6 @@ import org.eclipse.ui.part.ViewPart;
 
 /**
  * This view would list all the disabled bundle in the system.
- * @author eric
  *
  */
 public class DisabledView extends ViewPart {
@@ -26,21 +25,24 @@ public class DisabledView extends ViewPart {
 
 		Tree tree = viewer.getTree();
 		tree.setHeaderVisible(true);
-		TreeColumn column1 = new TreeColumn(tree, SWT.LEFT);
-		column1.setText("Bundle");
-		column1.setWidth(200);
-		TreeColumn column2 = new TreeColumn(tree, SWT.CENTER);
-		column2.setText("Policy");
-		column2.setWidth(200);
-		TreeColumn column3 = new TreeColumn(tree, SWT.RIGHT);
-		column3.setText("Message");
-		column3.setWidth(200);
+
+		TreeColumn bundleCol = new TreeColumn(tree, SWT.LEFT);
+		bundleCol.setText("Bundle");
+		bundleCol.setWidth(200);
+
+		TreeColumn policyCol = new TreeColumn(tree, SWT.CENTER);
+		policyCol.setText("Policy");
+		policyCol.setWidth(200);
+
+		TreeColumn msgCol = new TreeColumn(tree, SWT.RIGHT);
+		msgCol.setText("Message");
+		msgCol.setWidth(200);
 
 		PlatformAdmin plaformAdmin = AuthAppPlugin.getPlatformAdmin();
 		State state = plaformAdmin.getState(false);
 
 		// iterate through each bundle in the state and check
-		BundleDescription[] bds = plaformAdmin.getState(false).getDisabledBundles();
+		BundleDescription[] bds = state.getDisabledBundles();
 		List disableBundles = new LinkedList();
 		for (int i = 0; i < bds.length; i++) {
 			disableBundles.add(bds[i]);
@@ -50,20 +52,6 @@ public class DisabledView extends ViewPart {
 		viewer.setLabelProvider(new DisabledTableLabelProvider());
 		viewer.setInput(disableBundles);
 	}
-
-	//	public List getDisabledBundles() {
-	//		PlatformAdmin plaformAdmin = AuthAppPlugin.getPlatformAdmin();
-	//		State state = plaformAdmin.getState(false);
-	//
-	//		// iterate through each bundle in the state and check
-	//		BundleDescription[] bds = plaformAdmin.getState().getDisabledBundles();
-	//		List disableBundles = new LinkedList();
-	//		for (int i = 0; i < bds.length; i++) {
-	//			disableBundles.add(bds[i]);
-	//		}
-	//
-	//		return disableBundles;
-	//	}
 
 	public void setFocus() {
 
@@ -97,6 +85,8 @@ public class DisabledView extends ViewPart {
 			if (inputElement instanceof List) {
 				List disabledBundles = (List) inputElement;
 				return disabledBundles.toArray(new BundleDescription[disabledBundles.size()]);
+			} else if (inputElement instanceof DisabledInfo[]) {
+				return (DisabledInfo[]) inputElement;
 			}
 			return null;
 		}
@@ -120,6 +110,16 @@ public class DisabledView extends ViewPart {
 				switch (columnIndex) {
 					case 0 :
 						return bd.getSymbolicName();
+				}
+			} else {
+				if (element instanceof DisabledInfo) {
+					DisabledInfo disabledInf = (DisabledInfo) element;
+					switch (columnIndex) {
+						case 1 :
+							return disabledInf.getPolicyName();
+						case 2 :
+							return disabledInf.getMessage();
+					}
 				}
 			}
 			return null;
