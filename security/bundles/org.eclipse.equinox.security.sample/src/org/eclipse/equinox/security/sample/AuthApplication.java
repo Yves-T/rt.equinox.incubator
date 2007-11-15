@@ -11,7 +11,6 @@
 package org.eclipse.equinox.security.sample;
 
 import java.security.PrivilegedAction;
-import java.security.Security;
 import javax.security.auth.Subject;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -25,15 +24,34 @@ import org.eclipse.ui.PlatformUI;
  */
 public class AuthApplication implements IApplication {
 
+	// TBD this string should be an API on the provider - auth bundle
+	/**
+	 * The name of the KeyStore configuration
+	 */
+	private static final String CONFIG_NAME_KEYSTORE = "KeyStore"; //$NON-NLS-1$
+
+	/**
+	 * The name of the "native" configuration described in this application's config file
+	 */
+	private static final String CONFIG_NAME_WIN32 = "Win32"; //$NON-NLS-1$
+
+	/**
+	 * Specifies location of the login configuration file for this application
+	 */
+	private static final String JAAS_CONFIG_FILE = "data/jaas_config.txt"; //$NON-NLS-1$
+
 	public Object start(IApplicationContext context) throws Exception {
-		// specifies location of the login configuration file 
-		Security.setProperty("login.config.url.1", AuthAppPlugin.getBundleContext().getBundle().getEntry("data/jaas_config.txt").toExternalForm());
+		if (true) // two test cases: {KeyStore & hardcoded config} or {native & config from a file}
+			SecurePlatform.start(CONFIG_NAME_KEYSTORE, null);
+		else
+			SecurePlatform.start(CONFIG_NAME_WIN32, AuthAppPlugin.getBundleContext().getBundle().getEntry(JAAS_CONFIG_FILE));
+
 		//Security.setProperty( "keystore.url", AuthAppPlugin.getDefault( ).getBundle( ).getEntry( "data/test_user.jks").toExternalForm( ));
 
 		Integer result = null;
 		final Display display = PlatformUI.createDisplay();
 		try {
-			if (SecurePlatform.isEnabled()) {
+			if (SecurePlatform.isRunning()) { // TBD this check is not needed; remove it later 
 				SecurePlatform.login();
 				result = (Integer) Subject.doAs(SecurePlatform.getSubject(), getRunAction(display));
 			} else
@@ -43,6 +61,7 @@ public class AuthApplication implements IApplication {
 		}
 		// TBD handle javax.security.auth.login.LoginException
 
+		SecurePlatform.stop(); // optional
 		if (result != null && PlatformUI.RETURN_RESTART == result.intValue())
 			return EXIT_RESTART;
 		return EXIT_OK;

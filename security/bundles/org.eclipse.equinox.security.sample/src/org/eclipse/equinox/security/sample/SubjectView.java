@@ -32,7 +32,7 @@ public class SubjectView extends ViewPart {
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 
-		subject = SecurePlatform.isEnabled() ? Subject.getSubject(AccessController.getContext()) : null;
+		subject = SecurePlatform.isRunning() ? Subject.getSubject(AccessController.getContext()) : null;
 
 		/* OR: */
 		//SecurePlatform.getSubject( );
