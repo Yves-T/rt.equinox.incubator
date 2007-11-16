@@ -1,5 +1,5 @@
 Win32 {
-	org.eclipse.equinox.internal.security.boot.proxy.ExtLoginModuleProxy required
+	org.eclipse.equinox.security.auth.ExtensionLoginModule required
 		debug="true"
-		modulePoint="org.eclipse.equinox.security.sample.ntLoginModule";
+		extensionId="org.eclipse.equinox.security.sample.ntLoginModule";
 };

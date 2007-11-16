@@ -25,6 +25,7 @@ import java.util.ResourceBundle;
  */
 public class MessageAccess {
 
+	// XXX this class is not used at present; consider removing
 	private static final String BUNDLE_NAME = "org.eclipse.equinox.internal.security.boot.proxy.messages"; //$NON-NLS-1$
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
