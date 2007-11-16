@@ -23,6 +23,13 @@ public class SecurityIcon extends ContributionItem {
 
 	public void fill(Composite parent) {
 		Button securityBt = new Button(parent, SWT.NONE);
-		securityBt.setText("Security!");
+		securityBt.setText("TODO");
 	}
+
+	//if there are disabled bundles that need attention, show a warning overlay
+	//register a listener for bundles being disabled due to security policy
+	//animate a change in color when a bundle does not meet signature requirements
+
+	//if double-clicked and there are disabled bundles, open a dialog for managing them
+	//if right-clicked, show a menu for security related stuff (e.g.: Preferences...)
 }

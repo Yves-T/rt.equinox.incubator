@@ -1,5 +1,6 @@
 package org.eclipse.equinox.security.sample;
 
+import org.eclipse.equinox.security.view.SecurityIcon;
 import org.eclipse.jface.action.*;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -46,5 +47,9 @@ public class AuthActionBarAdvisor extends ActionBarAdvisor {
 		menu.add(quitAction);
 		menu.add(new GroupMarker(IWorkbenchActionConstants.FILE_END));
 		return menu;
+	}
+
+	protected void fillStatusLine(IStatusLineManager manager) {
+		manager.add(new SecurityIcon("1"));
 	}
 }

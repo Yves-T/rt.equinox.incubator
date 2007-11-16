@@ -19,7 +19,7 @@ public class AuthWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		this.getWindowConfigurer().setShowMenuBar(true);
 		this.getWindowConfigurer().setInitialSize(new Point(640, 480));
 		this.getWindowConfigurer().setShowCoolBar(false);
-		this.getWindowConfigurer().setShowStatusLine(false);
+		this.getWindowConfigurer().setShowStatusLine(true);
 		this.getWindowConfigurer().setTitle("Authenticated Application");
 	}
 }
