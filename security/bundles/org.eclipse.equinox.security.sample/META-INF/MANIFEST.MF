@@ -7,7 +7,9 @@ Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.equinox.security.auth,
  org.eclipse.core.runtime,
- org.eclipse.ui
+ org.eclipse.ui,
+ org.eclipse.ui.console,
+ org.eclipse.pde.runtime
 Eclipse-LazyStart: true
 Bundle-Activator: org.eclipse.equinox.security.sample.AuthAppPlugin
 Export-Package: org.eclipse.equinox.security.sample;x-internal:=true
