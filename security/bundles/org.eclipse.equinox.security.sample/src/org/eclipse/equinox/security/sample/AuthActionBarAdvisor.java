@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.equinox.security.sample;
 
-import org.eclipse.equinox.security.view.SecurityIcon;
+import org.eclipse.equinox.security.ui.SecurityStatusControl;
 import org.eclipse.jface.action.*;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -60,6 +60,6 @@ public class AuthActionBarAdvisor extends ActionBarAdvisor {
 	}
 
 	protected void fillStatusLine(IStatusLineManager manager) {
-		manager.add(new SecurityIcon("1"));
+		manager.add(new SecurityStatusControl("o"));
 	}
 }
