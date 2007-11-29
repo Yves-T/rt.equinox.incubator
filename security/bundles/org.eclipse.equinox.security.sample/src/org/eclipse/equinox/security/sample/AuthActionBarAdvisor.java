@@ -21,17 +21,19 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 public class AuthActionBarAdvisor extends ActionBarAdvisor {
 
 	private IAction reloadAction, importAction, exportAction, prefAction, quitAction;
+	private IWorkbenchWindow workbenchWindow;
 
 	public AuthActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
 	}
 
 	public void makeActions(IWorkbenchWindow window) {
+		this.workbenchWindow = window;
 		reloadAction = new ReloadAction("Reload");
-		importAction = ActionFactory.IMPORT.create(window);
-		exportAction = ActionFactory.EXPORT.create(window);
-		prefAction = ActionFactory.PREFERENCES.create(window);
-		quitAction = ActionFactory.QUIT.create(window);
+		importAction = ActionFactory.IMPORT.create(workbenchWindow);
+		exportAction = ActionFactory.EXPORT.create(workbenchWindow);
+		prefAction = ActionFactory.PREFERENCES.create(workbenchWindow);
+		quitAction = ActionFactory.QUIT.create(workbenchWindow);
 	}
 
 	protected void fillMenuBar(IMenuManager menuBar) {
@@ -60,6 +62,6 @@ public class AuthActionBarAdvisor extends ActionBarAdvisor {
 	}
 
 	protected void fillStatusLine(IStatusLineManager manager) {
-		manager.add(new SecurityStatusControl("o"));
+		manager.add(new SecurityStatusControl(workbenchWindow));
 	}
 }
