@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.eclipse.equinox.security.sample;singleton:=true
 Bundle-Version: 0.0.1.qualifier
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Require-Bundle: org.eclipse.equinox.security.auth,
+Require-Bundle: org.eclipse.equinox.security,
  org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ui.console,
