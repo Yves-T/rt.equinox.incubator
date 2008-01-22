@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.equinox.security.sample;
 
-import org.eclipse.equinox.security.ui.SecurityStatusControl;
+import org.eclipse.equinox.security.ui.SecurityContributionItemFactory;
 import org.eclipse.jface.action.*;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -20,7 +20,7 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 
 public class AuthActionBarAdvisor extends ActionBarAdvisor {
 
-	private IAction reloadAction, importAction, exportAction, prefAction, quitAction;
+	private IAction importAction, exportAction, prefAction, quitAction;
 	private IWorkbenchWindow workbenchWindow;
 
 	public AuthActionBarAdvisor(IActionBarConfigurer configurer) {
@@ -29,7 +29,6 @@ public class AuthActionBarAdvisor extends ActionBarAdvisor {
 
 	public void makeActions(IWorkbenchWindow window) {
 		this.workbenchWindow = window;
-		reloadAction = new ReloadAction("Reload");
 		importAction = ActionFactory.IMPORT.create(workbenchWindow);
 		exportAction = ActionFactory.EXPORT.create(workbenchWindow);
 		prefAction = ActionFactory.PREFERENCES.create(workbenchWindow);
@@ -50,7 +49,6 @@ public class AuthActionBarAdvisor extends ActionBarAdvisor {
 		menu.add(new GroupMarker("logoutActions"));
 		menu.add(new Separator());
 		menu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-		menu.add(reloadAction);
 		menu.add(prefAction);
 		menu.add(new Separator());
 		menu.add(importAction);
@@ -62,6 +60,6 @@ public class AuthActionBarAdvisor extends ActionBarAdvisor {
 	}
 
 	protected void fillStatusLine(IStatusLineManager manager) {
-		manager.add(new SecurityStatusControl(workbenchWindow));
+		manager.add(SecurityContributionItemFactory.SECURITY_STATUS.create(workbenchWindow));
 	}
 }
