@@ -52,6 +52,7 @@ public class EquinoxProvider extends Provider {
 
 		private final IProviderService service;
 
+		@SuppressWarnings("unchecked")
 		public ProviderService(IProviderService service) {
 			super(service.getProvider(), service.getType(), service.getAlgorithm(), service.getClassName(), service.getAliases(), service.getAttributes());
 			this.service = service;

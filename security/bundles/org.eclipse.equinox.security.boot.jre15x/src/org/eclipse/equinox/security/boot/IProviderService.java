@@ -47,12 +47,14 @@ public interface IProviderService {
 	 * Returns a {@link List} of aliases or <code>null</code> if algorithm has no aliases
 	 * @return a {@link List} of aliases or <code>null</code> if algorithm has no aliases
 	 */
+	@SuppressWarnings("unchecked")
 	public List getAliases();
 
 	/**
 	 * Returns a {@link Map} of attributes or <code>null</code> if this implementation has no attributes
 	 * @return a {@link Map} of attributes or <code>null</code> if this implementation has no attributes
 	 */
+	@SuppressWarnings("unchecked")
 	public Map getAttributes();
 
 	/**
