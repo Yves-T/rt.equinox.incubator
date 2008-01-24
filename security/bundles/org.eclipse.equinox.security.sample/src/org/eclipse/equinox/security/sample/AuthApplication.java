@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2007 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,12 @@
  *******************************************************************************/
 package org.eclipse.equinox.security.sample;
 
+import java.net.URL;
 import java.security.PrivilegedAction;
 import javax.security.auth.Subject;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.equinox.security.auth.ISecureContext;
 import org.eclipse.equinox.security.auth.SecurePlatform;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
@@ -41,27 +43,29 @@ public class AuthApplication implements IApplication {
 	private static final String JAAS_CONFIG_FILE = "data/jaas_config.txt"; //$NON-NLS-1$
 
 	public Object start(IApplicationContext context) throws Exception {
-		if (true) // two test cases: {KeyStore & hardcoded config} or {native & config from a file}
-			SecurePlatform.start(CONFIG_NAME_KEYSTORE, null);
-		else
-			SecurePlatform.start(CONFIG_NAME_WIN32, AuthAppPlugin.getBundleContext().getBundle().getEntry(JAAS_CONFIG_FILE));
+		ISecureContext secureContext;
+
+		if (false) { // two test cases: {KeyStore & hardcoded config} or {native & config from a file}
+			secureContext = SecurePlatform.createContext(CONFIG_NAME_KEYSTORE);
+		} else {
+			URL configFile = AuthAppPlugin.getBundleContext().getBundle().getEntry(JAAS_CONFIG_FILE);
+			secureContext = SecurePlatform.createContext(CONFIG_NAME_WIN32, configFile);
+		}
+
+		secureContext.registerListener(new ProgressMonitorListener());
 
 		//Security.setProperty( "keystore.url", AuthAppPlugin.getDefault( ).getBundle( ).getEntry( "data/test_user.jks").toExternalForm( ));
 
 		Integer result = null;
 		final Display display = PlatformUI.createDisplay();
 		try {
-			if (SecurePlatform.isRunning()) { // TBD this check is not needed; remove it later 
-				SecurePlatform.login();
-				result = (Integer) Subject.doAs(SecurePlatform.getSubject(), getRunAction(display));
-			} else
-				result = (Integer) getRunAction(display).run();
+			result = (Integer) Subject.doAs(secureContext.getSubject(), getRunAction(display));
 		} finally {
 			display.dispose();
+			secureContext.logout();
 		}
 		// TBD handle javax.security.auth.login.LoginException
 
-		SecurePlatform.stop(); // optional
 		if (result != null && PlatformUI.RETURN_RESTART == result.intValue())
 			return EXIT_RESTART;
 		return EXIT_OK;

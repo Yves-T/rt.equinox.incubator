@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2007 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ import java.security.AccessController;
 import java.security.Principal;
 import java.util.Set;
 import javax.security.auth.Subject;
-import org.eclipse.equinox.security.auth.SecurePlatform;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -32,7 +31,7 @@ public class SubjectView extends ViewPart {
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 
-		subject = SecurePlatform.isRunning() ? Subject.getSubject(AccessController.getContext()) : null;
+		subject = Subject.getSubject(AccessController.getContext());
 
 		/* OR: */
 		//SecurePlatform.getSubject( );
