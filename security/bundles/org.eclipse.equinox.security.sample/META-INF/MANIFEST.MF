@@ -10,7 +10,7 @@ Require-Bundle: org.eclipse.equinox.security,
  org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.pde.runtime,
- org.eclipse.equinox.security.ui.default
+ org.eclipse.equinox.security.ui
 Eclipse-LazyStart: true
 Bundle-Activator: org.eclipse.equinox.security.sample.AuthAppPlugin
 Export-Package: org.eclipse.equinox.security.sample;x-internal:=true
