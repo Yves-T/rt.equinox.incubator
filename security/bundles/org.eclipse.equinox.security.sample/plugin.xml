@@ -58,12 +58,6 @@
         category="org.eclipse.equinox.security.sample.subjectCategory"
         class="org.eclipse.equinox.security.sample.SubjectView">
       </view>
-      <view
-            class="org.eclipse.equinox.security.view.DisabledView"
-            id="org.eclipse.equinox.security.sample.diabledView"
-            name="Disable Bundle View">
-      </view>
-      
    </extension>
    
    <!-- The windows loginmodule for sun JRE -->
@@ -95,7 +89,6 @@
          <!-- an action to load the signed bundle -->
          <action
                class="org.eclipse.equinox.security.sample.InstallSignedAction"
-               icon="icons/sample.gif"
                id="org.eclipse.equinox.security.sample.InstallSignedAction"
                label="&amp;Install and start 'Signed' Bundle"
                menubarPath="sampleMenu/sampleGroup"
@@ -103,9 +96,4 @@
          </action>
       </actionSet>
    </extension>
-     
-   
-   
-   
-   
 </plugin>

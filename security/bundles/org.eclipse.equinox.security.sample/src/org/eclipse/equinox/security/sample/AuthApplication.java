@@ -45,7 +45,7 @@ public class AuthApplication implements IApplication {
 	public Object start(IApplicationContext context) throws Exception {
 		ISecureContext secureContext;
 
-		if (false) { // two test cases: {KeyStore & hardcoded config} or {native & config from a file}
+		if (true) { // two test cases: {KeyStore & hardcoded config} or {native & config from a file}
 			secureContext = SecurePlatform.createContext(CONFIG_NAME_KEYSTORE);
 		} else {
 			URL configFile = AuthAppPlugin.getBundleContext().getBundle().getEntry(JAAS_CONFIG_FILE);

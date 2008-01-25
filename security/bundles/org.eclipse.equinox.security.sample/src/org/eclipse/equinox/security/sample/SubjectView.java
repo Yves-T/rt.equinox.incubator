@@ -21,7 +21,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class SubjectView extends ViewPart {
 
-	private TreeViewer viewer;
+	private TreeViewer subjectViewer;
 	private Subject subject;
 
 	public SubjectView() {
@@ -29,25 +29,25 @@ public class SubjectView extends ViewPart {
 	}
 
 	public void createPartControl(Composite parent) {
-		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		subjectViewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 
 		subject = Subject.getSubject(AccessController.getContext());
 
 		/* OR: */
 		//SecurePlatform.getSubject( );
-		viewer.setContentProvider(new SubjectContentProvider());
-		viewer.setLabelProvider(new SubjectLabelProvider());
-		viewer.setInput(subject);
+		subjectViewer.setContentProvider(new SubjectContentProvider());
+		subjectViewer.setLabelProvider(new SubjectLabelProvider());
+		subjectViewer.setInput(subject);
 	}
 
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
 	public void setFocus() {
-		viewer.getControl().setFocus();
+		subjectViewer.getControl().setFocus();
 	}
 
-	private class SubjectLabelProvider extends LabelProvider {
+	class SubjectLabelProvider extends LabelProvider {
 
 		public String getText(Object object) {
 			if (object == subject)
@@ -64,7 +64,7 @@ public class SubjectView extends ViewPart {
 		}
 	}
 
-	private class SubjectContentProvider implements ITreeContentProvider {
+	class SubjectContentProvider implements ITreeContentProvider {
 
 		public Object[] getElements(Object inputElement) {
 			if (inputElement instanceof Subject)

@@ -20,6 +20,11 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 
 public class AuthActionBarAdvisor extends ActionBarAdvisor {
 
+	private static final String FILE = "File"; //$NON-NLS-1$
+
+	private static final String LOGOUT_ACTIONS = "logoutActions"; //$NON-NLS-1$
+	private static final String LOGIN_ACTIONS = "loginActions"; //$NON-NLS-1$
+
 	private IAction importAction, exportAction, prefAction, quitAction;
 	private IWorkbenchWindow workbenchWindow;
 
@@ -42,11 +47,11 @@ public class AuthActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createFileMenu() {
 
-		MenuManager menu = new MenuManager("File", IWorkbenchActionConstants.M_FILE);
+		MenuManager menu = new MenuManager(FILE, IWorkbenchActionConstants.M_FILE);
 		menu.add(new GroupMarker(IWorkbenchActionConstants.FILE_START));
 		menu.add(new Separator());
-		menu.add(new GroupMarker("loginActions"));
-		menu.add(new GroupMarker("logoutActions"));
+		menu.add(new GroupMarker(LOGIN_ACTIONS));
+		menu.add(new GroupMarker(LOGOUT_ACTIONS));
 		menu.add(new Separator());
 		menu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 		menu.add(prefAction);

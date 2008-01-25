@@ -15,6 +15,8 @@ import org.eclipse.ui.application.*;
 
 public class AuthWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
+	private static final String AUTHENTICATED_APPLICATION = "Authenticated Application"; //$NON-NLS-1$
+
 	public AuthWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
 		super(configurer);
 		// TODO Auto-generated constructor stub
@@ -30,6 +32,6 @@ public class AuthWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		this.getWindowConfigurer().setInitialSize(new Point(640, 480));
 		this.getWindowConfigurer().setShowCoolBar(false);
 		this.getWindowConfigurer().setShowStatusLine(true);
-		this.getWindowConfigurer().setTitle("Authenticated Application");
+		this.getWindowConfigurer().setTitle(AUTHENTICATED_APPLICATION);
 	}
 }

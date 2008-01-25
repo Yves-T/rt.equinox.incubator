@@ -19,14 +19,15 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.osgi.framework.Bundle;
 
 public class InstallSignedAction implements IWorkbenchWindowActionDelegate {
-	private IWorkbenchWindow window;
+	private IWorkbenchWindow workbenchWindow;
 
-	private static final String BUNDLE_URL = "data/org.eclipse.test.signedcontent.signed_1.0.0.jar";
+	private static final String BUNDLE_URL = "data/org.eclipse.test.signedcontent.signed_1.0.0.jar"; //$NON-NLS-1$
 
 	/**
 	 * The constructor.
 	 */
 	public InstallSignedAction() {
+		//nothing here
 	}
 
 	/**
@@ -41,7 +42,7 @@ public class InstallSignedAction implements IWorkbenchWindowActionDelegate {
 			Bundle bundle = AuthAppPlugin.getBundleContext().installBundle(BUNDLE_URL, bundleURL.openStream());
 			bundle.start();
 
-			MessageDialog.openInformation(window.getShell(), "Equinox Security Sample", "Installed and started bundle '" + bundle.getSymbolicName() + "'");
+			MessageDialog.openInformation(workbenchWindow.getShell(), "Equinox Security Sample", "Installed and started bundle '" + bundle.getSymbolicName() + "'");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -56,6 +57,7 @@ public class InstallSignedAction implements IWorkbenchWindowActionDelegate {
 	 * @see IWorkbenchWindowActionDelegate#selectionChanged
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
+		//nothing here
 	}
 
 	/**
@@ -64,6 +66,7 @@ public class InstallSignedAction implements IWorkbenchWindowActionDelegate {
 	 * @see IWorkbenchWindowActionDelegate#dispose
 	 */
 	public void dispose() {
+		//nothing here
 	}
 
 	/**
@@ -72,6 +75,6 @@ public class InstallSignedAction implements IWorkbenchWindowActionDelegate {
 	 * @see IWorkbenchWindowActionDelegate#init
 	 */
 	public void init(IWorkbenchWindow window) {
-		this.window = window;
+		this.workbenchWindow = window;
 	}
 }

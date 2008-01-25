@@ -18,10 +18,10 @@ public class SubjectPerspective implements IPerspectiveFactory {
 	public void createInitialLayout(IPageLayout layout) {
 		layout.setEditorAreaVisible(false);
 		//		layout.addStandaloneView("org.eclipse.equinox.security.sample.subjectView", false, IPageLayout.TOP, IPageLayout.RATIO_MAX, IPageLayout.ID_EDITOR_AREA);
-		layout.addView("org.eclipse.equinox.security.sample.subjectView", IPageLayout.LEFT, 0.5f, IPageLayout.ID_EDITOR_AREA);
-		layout.addView("org.eclipse.pde.runtime.RegistryBrowser", IPageLayout.RIGHT, 0.5f, IPageLayout.ID_OUTLINE);
+		layout.addView("org.eclipse.equinox.security.sample.subjectView", IPageLayout.LEFT, 0.5f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
+		layout.addView("org.eclipse.pde.runtime.RegistryBrowser", IPageLayout.RIGHT, 0.5f, IPageLayout.ID_OUTLINE); //$NON-NLS-1$
 		//layout.addView("org.eclipse.ui.console.ConsoleView", IPageLayout.BOTTOM, 0.25f, IPageLayout.ID_PROBLEM_VIEW);
-		layout.addPerspectiveShortcut("org.eclipse.equinox.security.sample.subjectPerspective");
-		layout.addShowViewShortcut("org.eclipse.equinox.security.sample.subjectView");
+		layout.addPerspectiveShortcut("org.eclipse.equinox.security.sample.subjectPerspective"); //$NON-NLS-1$
+		layout.addShowViewShortcut("org.eclipse.equinox.security.sample.subjectView"); //$NON-NLS-1$
 	}
 }
