@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.equinox.security.sample;
 
-import org.eclipse.equinox.security.ui.SecurityContributionItemFactory;
+import org.eclipse.equinox.security.ui.actions.SecurityContributionItemFactory;
 import org.eclipse.jface.action.*;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
