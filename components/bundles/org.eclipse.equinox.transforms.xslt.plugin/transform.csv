@@ -1,2 +1,3 @@
 #Bundle ID regex, Resource Path regex, resource path
 org\.eclipse\.team\.ui,plugin\.xml,/actionSetDefault.xslt
+org\.eclipse\.team\.ui,about\.html,/about_html.xslt

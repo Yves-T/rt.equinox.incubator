@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,43 +18,67 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.eclipse.equinox.transforms.CSVTransformingBundleFile;
 import org.eclipse.equinox.transforms.ProcessPipeInputStream;
-import org.eclipse.osgi.baseadaptor.BaseData;
-import org.eclipse.osgi.baseadaptor.bundlefile.BundleFile;
+import org.eclipse.osgi.framework.log.FrameworkLog;
+import org.eclipse.osgi.framework.log.FrameworkLogEntry;
 import org.eclipse.osgi.service.urlconversion.URLConverter;
-import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkEvent;
 import org.osgi.util.tracker.ServiceTracker;
 
-public class SedBundleFile extends CSVTransformingBundleFile {
+public class SEDTransformer {
 
-	private ServiceTracker urlServiceTracker;
+	private ServiceTracker urlService;
+	private ServiceTracker logTracker;
 
-	public SedBundleFile(BundleContext context, BaseData data,
-			BundleFile delegate, TransformList transformList,
-			ServiceTracker urlServiceTracker) throws IOException {
-		super(context, data, delegate, transformList);
-		this.urlServiceTracker = urlServiceTracker;
+	public SEDTransformer(ServiceTracker urlConverterServiceTracker,
+			ServiceTracker logTracker) {
+		this.urlService = urlConverterServiceTracker;
+		this.logTracker = logTracker;
 	}
 
-	protected InputStream getInputStream(InputStream inputStream,
+	public InputStream getInputStream(InputStream inputStream,
 			URL transformerUrl) throws IOException {
 
-		URLConverter converter = (URLConverter) urlServiceTracker.getService();
+		URLConverter converter = (URLConverter) urlService.getService();
 		if (converter == null)
 			return null;
 
 		try {
 			URL convertedURL = converter.toFileURL(transformerUrl);
-			URI convertedURI = new URI(convertedURL.toExternalForm());
+			URI convertedURI = new URI(convertedURL.getProtocol(), convertedURL
+					.getUserInfo(), convertedURL.getHost(), convertedURL
+					.getPort(), convertedURL.getPath(),
+					convertedURL.getQuery(), convertedURL.getRef());
 			File commandFile = new File(convertedURI);
 
 			return new SedInputStream(inputStream, commandFile);
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+
+			FrameworkLog log = (FrameworkLog) logTracker.getService();
+			if (log == null) {
+				if (e != null)
+					e.printStackTrace();
+			} else {
+				FrameworkLogEntry entry = new FrameworkLogEntry(
+						"org.eclipse.equinox.transforms.xslt",
+						FrameworkEvent.ERROR, 0, "Could not convert URL", 0, e,
+						null);
+				log.log(entry);
+			}
+
 		}
 
 		return null;
+	}
+
+	public static boolean isSedAvailable() {
+		try {
+			Process process = Runtime.getRuntime().exec("sed", null, null);
+			process.destroy();
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
 	}
 }
 

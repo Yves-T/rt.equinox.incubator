@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,10 @@
 
 package org.eclipse.equinox.transforms.sed.manifest;
 
-import org.eclipse.equinox.transforms.CSVTransformingBundleFile;
-import org.eclipse.equinox.transforms.sed.SedTransformingBundleFileWrapperFactoryHook;
+import java.net.URL;
+import java.util.Properties;
+
+import org.eclipse.equinox.transforms.sed.SEDTransformer;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -27,9 +29,13 @@ public class Activator implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
-		registration = CSVTransformingBundleFile.register(context, context
-				.getBundle().getEntry("/transform.csv"),
-				SedTransformingBundleFileWrapperFactoryHook.class.getName());
+		Properties properties = new Properties();
+		properties.put("transformerType", SEDTransformer.class
+				.getName());
+		registration = context.registerService(
+				URL.class.getName(),
+				context.getBundle()
+				.getEntry("/transform.csv"), properties);
 	}
 
 	/*

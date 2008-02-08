@@ -11,8 +11,10 @@
 
 package org.eclipse.equinox.transforms.xslt.plugin;
 
-import org.eclipse.equinox.transforms.CSVTransformingBundleFile;
-import org.eclipse.equinox.transforms.xslt.XSLTTransformingBundleFileWrapperFactoryHook;
+import java.net.URL;
+import java.util.Properties;
+
+import org.eclipse.equinox.transforms.xslt.XSLTStreamTransformer;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -27,9 +29,13 @@ public class Activator implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
-		registration = CSVTransformingBundleFile.register(context, context
-				.getBundle().getEntry("/transform.csv"),
-				XSLTTransformingBundleFileWrapperFactoryHook.class.getName());
+		Properties properties = new Properties();
+		properties.put("transformerType", XSLTStreamTransformer.class
+				.getName());
+		registration = context.registerService(
+				URL.class.getName(),
+				context.getBundle()
+				.getEntry("/transform.csv"), properties);
 	}
 
 	/*
