@@ -1,5 +1,5 @@
 Win32 {
-	org.eclipse.equinox.security.auth.ExtensionLoginModule required
+	org.eclipse.equinox.security.auth.module.ExtensionLoginModule required
 		debug="true"
 		extensionId="org.eclipse.equinox.security.sample.ntLoginModule";
 };
