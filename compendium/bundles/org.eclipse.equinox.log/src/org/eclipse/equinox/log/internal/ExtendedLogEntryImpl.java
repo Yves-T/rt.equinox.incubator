@@ -18,17 +18,17 @@ public class ExtendedLogEntryImpl implements ExtendedLogEntry {
 
 	private static int nextThreadID = 1;
 	private static long nextSequenceNumber = 1;
-	private static Map threadIDs = new WeakHashMap();
+	private static final Map threadIDs = new WeakHashMap();
 
-	private String loggerName;
-	private Bundle bundle;
-	private int level;
-	private String message;
-	private Throwable throwable;
-	private Object contextObject;
-	private long time;
-	private long threadID;
-	private long sequenceNumber;
+	private final String loggerName;
+	private final Bundle bundle;
+	private final int level;
+	private final String message;
+	private final Throwable throwable;
+	private final Object contextObject;
+	private final long time;
+	private final long threadID;
+	private final long sequenceNumber;
 
 	private static synchronized int getID(Thread thread) {
 		Integer threadID = (Integer) threadIDs.get(thread);
@@ -38,7 +38,10 @@ public class ExtendedLogEntryImpl implements ExtendedLogEntry {
 		}
 		return threadID.intValue();
 	}
-		public ExtendedLogEntryImpl(Bundle bundle, String loggerName, Object contextObject, int level, String message, Throwable throwable) {
+
+	public ExtendedLogEntryImpl(Bundle bundle, String loggerName,
+			Object contextObject, int level, String message, Throwable throwable) {
+		this.time = System.currentTimeMillis();
 		this.loggerName = loggerName;
 		this.bundle = bundle;
 		this.level = level;
