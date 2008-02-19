@@ -9,6 +9,7 @@ package org.eclipse.equinox.http.helper;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -181,6 +182,17 @@ public class ContextPathServletAdaptor implements Servlet {
 
 		public void setAttribute(String arg0, Object arg1) {
 			delegate.setAttribute(arg0, arg1);
+		}
+
+		// Added in Servlet 2.5
+		public String getContextPath() {
+			try {
+				Method getContextPathMethod = delegate.getClass().getMethod("getContextPath", null); //$NON-NLS-1$
+				return (String) getContextPathMethod.invoke(delegate, null);
+			} catch (Exception e) {
+				// ignore
+			}
+			return null;
 		}
 	}
 
