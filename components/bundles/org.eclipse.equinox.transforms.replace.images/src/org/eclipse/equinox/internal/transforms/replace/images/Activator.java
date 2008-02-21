@@ -9,12 +9,12 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.equinox.transforms.replace.images;
+package org.eclipse.equinox.internal.transforms.replace.images;
 
 import java.net.URL;
 import java.util.Properties;
 
-import org.eclipse.equinox.transforms.replace.ReplaceTransformer;
+import org.eclipse.equinox.internal.transforms.replace.provisional.ReplaceTransformer;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -30,12 +30,8 @@ public class Activator implements BundleActivator {
 	 */
 	public void start(BundleContext context) throws Exception {
 		Properties properties = new Properties();
-		properties.put("transformerType", ReplaceTransformer.class
-				.getName());
-		registration = context.registerService(
-				URL.class.getName(),
-				context.getBundle()
-				.getEntry("/transform.csv"), properties);
+		properties.put("transformerType", ReplaceTransformer.class.getName());
+		registration = context.registerService(URL.class.getName(), context.getBundle().getEntry("/transform.csv"), properties);
 	}
 
 	/*

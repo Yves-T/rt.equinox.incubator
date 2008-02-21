@@ -9,10 +9,11 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.equinox.transforms.sed;
+package org.eclipse.equinox.internal.transforms.sed;
 
 import java.util.Properties;
 
+import org.eclipse.equinox.internal.transforms.sed.provisional.SEDTransformer;
 import org.eclipse.osgi.framework.log.FrameworkLog;
 import org.eclipse.osgi.framework.log.FrameworkLogEntry;
 import org.eclipse.osgi.service.urlconversion.URLConverter;
@@ -32,24 +33,18 @@ public class Activator implements BundleActivator {
 	private ServiceTracker logTracker;
 
 	public void start(BundleContext context) throws Exception {
-		logTracker = new ServiceTracker(context, FrameworkLog.class.getName(),
-				null);
+		logTracker = new ServiceTracker(context, FrameworkLog.class.getName(), null);
 		logTracker.open();
 		if (!SEDTransformer.isSedAvailable()) {
-			log(
-					FrameworkEvent.WARNING,
-					"Sed application cannot be launched.  Sed transforms have been disabled.",
-					null);
+			log(FrameworkEvent.WARNING, "Sed application cannot be launched.  Sed transforms have been disabled.", null);
 			return;
 		}
 
 		Filter filter;
 
 		try {
-			filter = context.createFilter("(objectClass="
-					+ URLConverter.class.getName() + ")");
-			urlConverterServiceTracker = new ServiceTracker(context, filter,
-					null);
+			filter = context.createFilter("(objectClass=" + URLConverter.class.getName() + ")");
+			urlConverterServiceTracker = new ServiceTracker(context, filter, null);
 			urlConverterServiceTracker.open();
 		} catch (InvalidSyntaxException e1) {
 			log(FrameworkEvent.ERROR, "Cannot aquire URLConverter service.", e1);
@@ -60,8 +55,7 @@ public class Activator implements BundleActivator {
 		properties.put("isStreamTransformer", "true");
 
 		Object transformer = new SEDTransformer(urlConverterServiceTracker, logTracker);
-		registration = context.registerService(Object.class.getName(),
-				transformer, properties);
+		registration = context.registerService(Object.class.getName(), transformer, properties);
 
 	}
 
@@ -75,9 +69,7 @@ public class Activator implements BundleActivator {
 			return;
 		}
 
-		FrameworkLogEntry entry = new FrameworkLogEntry(
-				"org.eclipse.equinox.transforms.xslt", severity, 0, msg, 0, t,
-				null);
+		FrameworkLogEntry entry = new FrameworkLogEntry("org.eclipse.equinox.transforms.xslt", severity, 0, msg, 0, t, null);
 		log.log(entry);
 	}
 

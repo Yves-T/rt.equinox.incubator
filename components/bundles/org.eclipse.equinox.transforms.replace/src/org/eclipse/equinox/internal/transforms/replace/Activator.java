@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,12 +9,11 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.equinox.transforms.xslt.plugin;
+package org.eclipse.equinox.internal.transforms.replace;
 
-import java.net.URL;
 import java.util.Properties;
 
-import org.eclipse.equinox.transforms.xslt.XSLTStreamTransformer;
+import org.eclipse.equinox.internal.transforms.replace.provisional.ReplaceTransformer;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -23,28 +22,18 @@ public class Activator implements BundleActivator {
 
 	private ServiceRegistration registration;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
-	 */
 	public void start(BundleContext context) throws Exception {
 		Properties properties = new Properties();
-		properties.put("transformerType", XSLTStreamTransformer.class
-				.getName());
-		registration = context.registerService(
-				URL.class.getName(),
-				context.getBundle()
-				.getEntry("/transform.csv"), properties);
+		properties.put("isStreamTransformer", "true");
+
+		Object transformer = new ReplaceTransformer();
+		registration = context.registerService(Object.class.getName(), transformer, properties);
+
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
-	 */
 	public void stop(BundleContext context) throws Exception {
 		if (registration != null)
 			registration.unregister();
+		context = null;
 	}
 }

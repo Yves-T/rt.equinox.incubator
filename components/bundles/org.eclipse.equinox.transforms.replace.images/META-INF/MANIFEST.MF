@@ -5,9 +5,10 @@ Bundle-Vendor: %providerName
 Bundle-SymbolicName: org.eclipse.equinox.transforms.replace.images
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: J2SE-1.4
-Bundle-Activator: org.eclipse.equinox.transforms.replace.images.Activator
+Bundle-Activator: org.eclipse.equinox.internal.transforms.replace.images.Activator
 Import-Package: org.osgi.framework;version="1.3.0"
 Eclipse-LazyStart: true
 Bundle-Localization: bundle
 Require-Bundle: org.eclipse.equinox.transforms.replace,
  system.bundle
+Export-Package: org.eclipse.equinox.internal.transforms.replace.images;x-internal:=true

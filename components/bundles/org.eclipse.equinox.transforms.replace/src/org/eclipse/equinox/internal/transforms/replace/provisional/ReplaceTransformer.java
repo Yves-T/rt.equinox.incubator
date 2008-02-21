@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.equinox.transforms.replace;
+package org.eclipse.equinox.internal.transforms.replace.provisional;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,10 +17,9 @@ import java.net.URL;
 
 public class ReplaceTransformer {
 
-	public InputStream getInputStream(InputStream inputStream,
-			final URL transformerUrl) throws IOException {
+	public InputStream getInputStream(InputStream inputStream, final URL transformerUrl) throws IOException {
 
 		return transformerUrl.openStream();
 	}
-	
+
 }

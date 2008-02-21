@@ -9,15 +9,10 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.equinox.transforms.sed;
+package org.eclipse.equinox.internal.transforms.sed.provisional;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-
+import java.io.*;
+import java.net.*;
 import org.eclipse.equinox.transforms.ProcessPipeInputStream;
 import org.eclipse.osgi.framework.log.FrameworkLog;
 import org.eclipse.osgi.framework.log.FrameworkLogEntry;
@@ -30,14 +25,12 @@ public class SEDTransformer {
 	private ServiceTracker urlService;
 	private ServiceTracker logTracker;
 
-	public SEDTransformer(ServiceTracker urlConverterServiceTracker,
-			ServiceTracker logTracker) {
+	public SEDTransformer(ServiceTracker urlConverterServiceTracker, ServiceTracker logTracker) {
 		this.urlService = urlConverterServiceTracker;
 		this.logTracker = logTracker;
 	}
 
-	public InputStream getInputStream(InputStream inputStream,
-			URL transformerUrl) throws IOException {
+	public InputStream getInputStream(InputStream inputStream, URL transformerUrl) throws IOException {
 
 		URLConverter converter = (URLConverter) urlService.getService();
 		if (converter == null)
@@ -45,13 +38,10 @@ public class SEDTransformer {
 
 		try {
 			URL convertedURL = converter.toFileURL(transformerUrl);
-			URI convertedURI = new URI(convertedURL.getProtocol(), convertedURL
-					.getUserInfo(), convertedURL.getHost(), convertedURL
-					.getPort(), convertedURL.getPath(),
-					convertedURL.getQuery(), convertedURL.getRef());
+			URI convertedURI = new URI(convertedURL.getProtocol(), convertedURL.getUserInfo(), convertedURL.getHost(), convertedURL.getPort(), convertedURL.getPath(), convertedURL.getQuery(), convertedURL.getRef());
 			File commandFile = new File(convertedURI);
 
-			return new SedInputStream(inputStream, commandFile);
+			return new ProcessPipeInputStream(inputStream, "sed -f " + commandFile.getName(), null, commandFile.getParentFile()); //$NON-NLS-1$
 		} catch (URISyntaxException e) {
 
 			FrameworkLog log = (FrameworkLog) logTracker.getService();
@@ -59,10 +49,7 @@ public class SEDTransformer {
 				if (e != null)
 					e.printStackTrace();
 			} else {
-				FrameworkLogEntry entry = new FrameworkLogEntry(
-						"org.eclipse.equinox.transforms.xslt",
-						FrameworkEvent.ERROR, 0, "Could not convert URL", 0, e,
-						null);
+				FrameworkLogEntry entry = new FrameworkLogEntry("org.eclipse.equinox.transforms.sed", FrameworkEvent.ERROR, 0, "Could not convert URL", 0, e, null); //$NON-NLS-1$ //$NON-NLS-2$
 				log.log(entry);
 			}
 
@@ -73,30 +60,11 @@ public class SEDTransformer {
 
 	public static boolean isSedAvailable() {
 		try {
-			Process process = Runtime.getRuntime().exec("sed", null, null);
+			Process process = Runtime.getRuntime().exec("sed", null, null); //$NON-NLS-1$
 			process.destroy();
 			return true;
 		} catch (IOException e) {
 			return false;
 		}
 	}
-}
-
-class SedInputStream extends ProcessPipeInputStream {
-
-	private File commandFile;
-
-	public SedInputStream(InputStream original, File commandFile) {
-		super(original);
-		this.commandFile = commandFile;
-	}
-
-	protected String getCommandString() {
-		return "sed -f " + commandFile.getName();
-	}
-
-	protected File getWorkingDirectory() {
-		return commandFile.getParentFile();
-	}
-
 }
