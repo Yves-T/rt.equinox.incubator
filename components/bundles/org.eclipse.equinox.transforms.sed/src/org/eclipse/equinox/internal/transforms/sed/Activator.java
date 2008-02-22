@@ -12,17 +12,11 @@
 package org.eclipse.equinox.internal.transforms.sed;
 
 import java.util.Properties;
-
 import org.eclipse.equinox.internal.transforms.sed.provisional.SEDTransformer;
 import org.eclipse.osgi.framework.log.FrameworkLog;
 import org.eclipse.osgi.framework.log.FrameworkLogEntry;
 import org.eclipse.osgi.service.urlconversion.URLConverter;
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Filter;
-import org.osgi.framework.FrameworkEvent;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.*;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class Activator implements BundleActivator {
@@ -52,7 +46,7 @@ public class Activator implements BundleActivator {
 		}
 
 		Properties properties = new Properties();
-		properties.put("isStreamTransformer", "true");
+		properties.put("equinox.transformerType", "sed"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		Object transformer = new SEDTransformer(urlConverterServiceTracker, logTracker);
 		registration = context.registerService(Object.class.getName(), transformer, properties);

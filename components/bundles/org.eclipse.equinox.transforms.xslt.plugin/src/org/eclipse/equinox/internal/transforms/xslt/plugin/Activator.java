@@ -13,11 +13,7 @@ package org.eclipse.equinox.internal.transforms.xslt.plugin;
 
 import java.net.URL;
 import java.util.Properties;
-
-import org.eclipse.equinox.internal.transforms.xslt.provisional.XSLTStreamTransformer;
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.*;
 
 public class Activator implements BundleActivator {
 
@@ -30,8 +26,8 @@ public class Activator implements BundleActivator {
 	 */
 	public void start(BundleContext context) throws Exception {
 		Properties properties = new Properties();
-		properties.put("transformerType", XSLTStreamTransformer.class.getName());
-		registration = context.registerService(URL.class.getName(), context.getBundle().getEntry("/transform.csv"), properties);
+		properties.put("equinox.transformerType", "xslt"); //$NON-NLS-1$ //$NON-NLS-2$
+		registration = context.registerService(URL.class.getName(), context.getBundle().getEntry("/transform.csv"), properties); //$NON-NLS-1$
 	}
 
 	/*
