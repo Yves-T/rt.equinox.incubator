@@ -96,4 +96,41 @@
          </action>
       </actionSet>
    </extension>
+   
+   
+   <!-- KeyStore sample functionality -->
+   <extension
+     id="ksConfigurationProvider"
+     name="Default Configuration Provider for KeyStore"
+     point="org.eclipse.equinox.security.loginConfigurationProvider">
+      <loginConfigurationProvider class="org.eclipse.equinox.security.sample.keystore.KSConfigurationProvider"/>
+   </extension>
+
+   <extension
+     id="keystoreLoginModule"
+     name="KeyStore LoginModule"
+     point="org.eclipse.equinox.security.loginModule">
+      <loginModule
+        class="org.eclipse.equinox.security.sample.keystore.KeyStoreLoginModule"
+        description="LoginModule for KeyStore"/>
+   </extension>
+   
+   <!-- The default CallbackHandler for gathering KeyStore information -->  
+   <extension id="defaultKeyStoreCallbackHandler"
+              name="Default CallbackHandler for KeyStore Login Configuration"
+              point="org.eclipse.equinox.security.callbackHandler">
+       <callbackHandler class="org.eclipse.equinox.security.sample.keystore.ui.KeyStoreLoginDialog"/>
+    </extension>
+ 
+   <!-- Specifies the CallbackHandler mapping to use for the built-in KeyStore JAAS configuration. -->
+   <extension
+         name="KeyStore CallbackHandler Mapping"
+         point="org.eclipse.equinox.security.callbackHandlerMapping">
+      <callbackHandlerMapping
+            callbackHandlerId="org.eclipse.equinox.security.sample.defaultKeyStoreCallbackHandler"
+            configName="KeyStore"/>
+   </extension>
+   
+  
+   
 </plugin>

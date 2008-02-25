@@ -20,6 +20,11 @@ import org.osgi.util.tracker.ServiceTracker;
 
 public class AuthAppPlugin implements BundleActivator {
 
+	/**
+	 * The unique identifier constant of this plug-in.
+	 */
+	public static final String PI_AUTH = "org.eclipse.equinox.security.sample"; //$NON-NLS-1$
+
 	private static BundleContext bundleContext;
 
 	private static ServiceTracker platformAdminTracker;
