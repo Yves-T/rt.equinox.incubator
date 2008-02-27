@@ -12,7 +12,7 @@ package org.eclipse.equinox.security.sample;
 
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
-import org.eclipse.equinox.security.auth.events.ILoginListener;
+import org.eclipse.equinox.security.auth.event.ILoginListener;
 import org.eclipse.swt.widgets.Display;
 
 // Copied from AbstractLoginDialog
