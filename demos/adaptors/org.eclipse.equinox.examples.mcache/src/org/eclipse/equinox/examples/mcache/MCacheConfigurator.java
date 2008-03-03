@@ -12,6 +12,7 @@ package org.eclipse.equinox.examples.mcache;
 
 import org.eclipse.osgi.baseadaptor.HookConfigurator;
 import org.eclipse.osgi.baseadaptor.HookRegistry;
+import org.eclipse.osgi.framework.debug.FrameworkDebugOptions;
 
 /**
  * A hook configurator that enables a search miss cache.  A seach miss 
@@ -20,6 +21,21 @@ import org.eclipse.osgi.baseadaptor.HookRegistry;
  * the same resource is searched.
  */
 public class MCacheConfigurator implements HookConfigurator {
+	// the name of the folder to store the mcache
+	final static String MCACHE_NAME = "org.eclipse.equinox.examples.mcache"; //$NON-NLS-1$
+	// the name of the mcache file
+	final static String MCACHE_FILE = "mcache.txt"; //$NON-NLS-1$
+
+	static final boolean DEBUG;
+	private static final String OPTION_DEBUG = MCacheConfigurator.MCACHE_NAME + "/debug"; //$NON-NLS-1$
+	static {
+		FrameworkDebugOptions options = FrameworkDebugOptions.getDefault();
+		// may be null if debugging is not enabled
+		if (options == null)
+			DEBUG = false;
+		else
+			DEBUG = options.getBooleanOption(OPTION_DEBUG, false);
+	}
 
 	public void addHooks(HookRegistry hookRegistry) {
 		// the mcache adaptor hook is used to load the mcache at framework startup

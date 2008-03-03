@@ -25,10 +25,6 @@ import org.osgi.framework.BundleContext;
  * the mcache at framework shutdown.
  */
 public class MCacheAdaptorHook implements AdaptorHook {
-	// the name of the folder to store the mcache
-	private final static String MCACHE_NAME = "org.eclipse.equinox.examples.mcache"; //$NON-NLS-1$
-	// the name of the mcache file
-	private final static String MCACHE_FILE = "mcache.txt"; //$NON-NLS-1$
 	// the set of resource paths that are missing
 	private final Set cache = new HashSet();
 	// indicates that the mcach is dirty and should be persisted at shutdown
@@ -77,10 +73,10 @@ public class MCacheAdaptorHook implements AdaptorHook {
 	 * @return the mcache file.
 	 */
 	private File getCacheFile() {
-		File cacheDir = LocationManager.getConfigurationFile(MCACHE_NAME);
+		File cacheDir = LocationManager.getConfigurationFile(MCacheConfigurator.MCACHE_NAME);
 		if (!cacheDir.exists())
 			cacheDir.mkdirs();
-		File cacheFile = new File(cacheDir, MCACHE_FILE);
+		File cacheFile = new File(cacheDir, MCacheConfigurator.MCACHE_FILE);
 		return cacheFile;
 	}
 
@@ -99,11 +95,14 @@ public class MCacheAdaptorHook implements AdaptorHook {
 		File cacheFile = getCacheFile();
 		try {
 			if (cacheFile.exists()) {
+				if (MCacheConfigurator.DEBUG)
+					System.out.println("Loading mcache: " + cacheFile.getAbsolutePath()); //$NON-NLS-1$
 				BufferedReader reader = new BufferedReader(new FileReader(cacheFile));
 				synchronized (cache) {
 					for (String line = reader.readLine(); line != null; line = reader.readLine()) {
 						cache.add(line);
-						System.out.println(line);
+						if (MCacheConfigurator.DEBUG)
+							System.out.println(line);
 					}
 				}
 			}
@@ -186,6 +185,8 @@ public class MCacheAdaptorHook implements AdaptorHook {
 		// use a path of cacheIndex + path
 		path = cacheBundleFile.getCacheIndex() + path;
 		synchronized (cache) {
+			if (MCacheConfigurator.DEBUG && cache.contains(path))
+				System.out.println("Found in mcache: " + path); //$NON-NLS-1$
 			// if the path is in the cache return null; otherwise return the cache path
 			return cache.contains(path) ? null : path;
 		}
@@ -197,6 +198,8 @@ public class MCacheAdaptorHook implements AdaptorHook {
 	 */
 	private void addToMCache(String path) {
 		synchronized (cache) {
+			if (MCacheConfigurator.DEBUG)
+				System.out.println("Add to mcache: " + path); //$NON-NLS-1$
 			cache.add(path);
 			dirty = true;
 		}

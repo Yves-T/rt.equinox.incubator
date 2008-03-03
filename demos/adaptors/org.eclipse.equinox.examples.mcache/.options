@@ -1,0 +1,4 @@
+#### Debugging options for org.eclipse.equinox.examples.mcache
+
+# Turn on general debugging
+org.eclipse.equinox.examples.mcache/debug=false
