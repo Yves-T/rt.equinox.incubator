@@ -112,10 +112,12 @@ public class MCacheAdaptorHook implements AdaptorHook {
 	}
 
 	public URLConnection mapLocationToURLConnection(String location) {
+		// do nothing;
 		return null;
 	}
 
 	public boolean matchDNChain(String pattern, String[] dnChain) {
+		// do nothing;
 		return false;
 	}
 
