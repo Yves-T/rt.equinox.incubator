@@ -70,10 +70,15 @@ public class PFBundleFile extends BundleFile {
 		BundleFile[] patchFiles = getPatches();
 		if (patchFiles == null) // none available just use the wrapped content
 			return wrapped.getEntry(path);
+		if ("META-INF/MANIFEST.MF".equals(path)) //$NON-NLS-1$
+			return wrapped.getEntry(path); // don't patch manifest
 		for (int i = 0; i < patchFiles.length; i++) {
 			BundleEntry entry = patchFiles[i].getEntry(path);
-			if (entry != null) // found patched content; return it
+			if (entry != null) { // found patched content; return it
+				if (PFConfigurator.DEBUG)
+					System.out.println("Found patch for \"" + path + "\" in \"" + patchFiles[i] + "\""); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 				return entry;
+			}
 		}
 		// no patched content found for the path; use the wrapped content
 		return wrapped.getEntry(path);
@@ -139,6 +144,8 @@ public class PFBundleFile extends BundleFile {
 				// The PFStorageHook knows if this is a patch fragment
 				PFStorageHook storageHook = (PFStorageHook) fragmentData.getStorageHook(PFStorageHook.KEY);
 				if (storageHook.isPatchFragment()) {
+					if (PFConfigurator.DEBUG)
+						System.out.println("Found patch fragment: " + fragmentData.toString()); //$NON-NLS-1$
 					patchList.add(fragmentData.getBundleFile());
 					// need to listen to this fragment
 					bundlesToListen.add(fragment);
@@ -168,5 +175,9 @@ public class PFBundleFile extends BundleFile {
 		// reset the patches list so it will be re-computed.
 		processed = false;
 		patches = null;
+	}
+
+	public String toString() {
+		return patchedData.toString();
 	}
 }

@@ -12,6 +12,7 @@ package org.eclipse.equinox.examples.patchfragments;
 
 import org.eclipse.osgi.baseadaptor.HookConfigurator;
 import org.eclipse.osgi.baseadaptor.HookRegistry;
+import org.eclipse.osgi.framework.debug.FrameworkDebugOptions;
 
 /**
  * A hook configurator that enables patch fragments.  Patch fragments
@@ -32,6 +33,17 @@ import org.eclipse.osgi.baseadaptor.HookRegistry;
  * </p>
  */
 public class PFConfigurator implements HookConfigurator {
+	static final boolean DEBUG;
+	private static final String PF_NAME = "org.eclipse.equinox.examples.patchfragments"; //$NON-NLS-1$
+	private static final String OPTION_DEBUG = PFConfigurator.PF_NAME + "/debug"; //$NON-NLS-1$
+	static {
+		FrameworkDebugOptions options = FrameworkDebugOptions.getDefault();
+		// may be null if debugging is not enabled
+		if (options == null)
+			DEBUG = false;
+		else
+			DEBUG = options.getBooleanOption(OPTION_DEBUG, false);
+	}
 
 	public void addHooks(HookRegistry hookRegistry) {
 		// this is where you add the needed hooks
