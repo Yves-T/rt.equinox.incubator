@@ -63,4 +63,8 @@ public class MCacheBundleFile extends BundleFile {
 	String getCacheIndex() {
 		return cacheIndex;
 	}
+
+	public String toString() {
+		return bundleFile.toString();
+	}
 }
