@@ -52,6 +52,8 @@ public class PFBundleFile extends BundleFile {
 	private BundleFile[] patches;
 
 	public PFBundleFile(BundleFile wrapped, BaseData patchedData, PFAdaptorHook pfAdaptorHook) {
+		// use the base file from the wrapped bundle file
+		super(wrapped.getBaseFile());
 		this.wrapped = wrapped;
 		this.patchedData = patchedData;
 		this.pfAdaptorHook = pfAdaptorHook;
@@ -106,10 +108,6 @@ public class PFBundleFile extends BundleFile {
 
 	public void open() throws IOException {
 		wrapped.open();
-	}
-
-	public File getBaseFile() {
-		return wrapped.getBaseFile();
 	}
 
 	private synchronized BundleFile[] getPatches() {

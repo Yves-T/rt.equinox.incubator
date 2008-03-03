@@ -16,48 +16,71 @@ import java.util.Enumeration;
 import org.eclipse.osgi.baseadaptor.bundlefile.BundleEntry;
 import org.eclipse.osgi.baseadaptor.bundlefile.BundleFile;
 
+/**
+ * A bundle file that wraps the content of another bundle file.
+ * If a cache miss is detected for a path then it is recorded.  
+ * If the same path is searched again then the search is short
+ * circuited and the wrapped BundleFile is not searched again for 
+ * that path.
+ */
 public class MCacheBundleFile extends BundleFile {
-
-	private final BundleFile bundleFile;
+	/**
+	 * The wrapped bundle file that is being patched
+	 */
+	private final BundleFile wrapped;
+	/**
+	 * A unique cache index for the wrapped bundle file.  This is based
+	 * on the bundle ID and the hash code of the bundle file canonical path.
+	 */
 	private final String cacheIndex;
+	/**
+	 * The MCache adaptor hook
+	 */
 	private final MCacheAdaptorHook cacheAdaptorHook;
 
 	public MCacheBundleFile(BundleFile bundleFile, long bundleID, int hashCode, MCacheAdaptorHook cacheAdaptorHook) {
-		this.bundleFile = bundleFile;
+		// use the base file from the wrapped bundle file
+		super(bundleFile.getBaseFile());
+		this.wrapped = bundleFile;
 		this.cacheIndex = String.valueOf(bundleID) + '/' + String.valueOf(Math.abs(hashCode)) + '/';
 		this.cacheAdaptorHook = cacheAdaptorHook;
 	}
 
 	public void close() throws IOException {
-		bundleFile.close();
+		wrapped.close();
 	}
 
+	/**
+	 * Checks the MCache for the directory.
+	 */
 	public boolean containsDir(String dir) {
 		return cacheAdaptorHook.containsDir(dir, this);
 	}
 
+	/**
+	 * Checks the MCache for the path.
+	 */
 	public BundleEntry getEntry(String path) {
 		return cacheAdaptorHook.getEntry(path, this);
 	}
 
+	/**
+	 * Checks the MCache for the path.
+	 */
 	public Enumeration getEntryPaths(String path) {
 		return cacheAdaptorHook.getEntryPaths(path, this);
 	}
 
 	public File getFile(String path, boolean nativeCode) {
-		return bundleFile.getFile(path, nativeCode);
+		return wrapped.getFile(path, nativeCode);
 	}
 
 	public void open() throws IOException {
-		bundleFile.open();
-	}
-
-	public File getBaseFile() {
-		return bundleFile.getBaseFile();
+		wrapped.open();
 	}
 
 	BundleFile getBundleFile() {
-		return bundleFile;
+		return wrapped;
 	}
 
 	String getCacheIndex() {
@@ -65,6 +88,6 @@ public class MCacheBundleFile extends BundleFile {
 	}
 
 	public String toString() {
-		return bundleFile.toString();
+		return wrapped.toString();
 	}
 }
