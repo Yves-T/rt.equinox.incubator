@@ -123,7 +123,10 @@ public class MCacheAdaptorHook implements AdaptorHook {
 
 	/**
 	 * Checks the mcache to see if the directory for the bundle file 
-	 * is in the mcache
+	 * is in the mcache.  If the path is in the MCache then false returned;
+	 * otherwise the wrapped bundle file is searched.  If the wrapped 
+	 * bundle file does not contain the path then the path is added to 
+	 * the MCache and false is returned; otherwise true is returned.
 	 * @param path the path to the directory
 	 * @param mCacheBundleFile the bundle file that is being searched
 	 * @return true if the bundle file contains the directory
@@ -133,7 +136,7 @@ public class MCacheAdaptorHook implements AdaptorHook {
 		if (cachePath == null) // checkPath is null if there was a miss
 			return false; // in the mcache; return false
 		// now check the actual bundle file
-		boolean result = mCacheBundleFile.getBundleFile().containsDir(path);
+		boolean result = mCacheBundleFile.getWrappedBundleFile().containsDir(path);
 		if (!result) // did not find the path; add to mcache
 			addToMCache(cachePath);
 		return result;
@@ -141,7 +144,11 @@ public class MCacheAdaptorHook implements AdaptorHook {
 
 	/**
 	 * Checks the mcache to see if the entry path for the bundle file 
-	 * is in the mcache
+	 * is in the mcache. If the path is in the MCache then null returned;
+	 * otherwise the wrapped bundle file is searched.  If the wrapped 
+	 * bundle file does not contain the path then the path is added to 
+	 * the MCache and null is returned; otherwise entry from the 
+	 * wrapped bundle file is returned.
 	 * @param path the entry path
 	 * @param mCacheBundleFile the bundle file that is being searched
 	 * @return the entry for the path.
@@ -150,19 +157,30 @@ public class MCacheAdaptorHook implements AdaptorHook {
 		String cachePath = checkCachePath(path, mCacheBundleFile);
 		if (cachePath == null) // checkPath is null if there was a miss
 			return null; // in the mcache; return null
-		BundleEntry result = mCacheBundleFile.getBundleFile().getEntry(path);
+		BundleEntry result = mCacheBundleFile.getWrappedBundleFile().getEntry(path);
 		// now check the actual bundle file
 		if (result == null) // did not find the path; add to mcache
 			addToMCache(cachePath);
 		return result;
 	}
 
+	/**
+	 * Checks the mcache to see if the entry path for the bundle file 
+	 * is in the mcache.  If the path is in the MCache then null returned;
+	 * otherwise the wrapped bundle file is searched.  If the wrapped 
+	 * bundle file does not contain the path then the path is added to 
+	 * the MCache and null is returned; otherwise entry from the 
+	 * wrapped bundle file is returned.
+	 * @param path the entry path
+	 * @param mCacheBundleFile the bundle file that is being searched
+	 * @return the entry for the path.
+	 */
 	Enumeration getEntryPaths(String path, MCacheBundleFile mCacheBundleFile) {
 		String cachePath = checkCachePath(path, mCacheBundleFile);
 		if (cachePath == null) // checkPath is null if there was a miss
 			return null; // in the mcache; return null
 		// now check the actual bundle file
-		Enumeration result = mCacheBundleFile.getBundleFile().getEntryPaths(path);
+		Enumeration result = mCacheBundleFile.getWrappedBundleFile().getEntryPaths(path);
 		if (result == null) // did not find the path; add to mcache
 			addToMCache(cachePath);
 		return result;

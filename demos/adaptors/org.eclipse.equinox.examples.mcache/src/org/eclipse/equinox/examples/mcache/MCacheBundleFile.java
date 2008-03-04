@@ -79,10 +79,18 @@ public class MCacheBundleFile extends BundleFile {
 		wrapped.open();
 	}
 
-	BundleFile getBundleFile() {
+	/**
+	 * Returns the wrapped BundleFile
+	 * @return the wrapped BundleFile
+	 */
+	BundleFile getWrappedBundleFile() {
 		return wrapped;
 	}
 
+	/**
+	 * Returns the unique MCache index used for this BundleFile.
+	 * @return the unique MCache index.
+	 */
 	String getCacheIndex() {
 		return cacheIndex;
 	}

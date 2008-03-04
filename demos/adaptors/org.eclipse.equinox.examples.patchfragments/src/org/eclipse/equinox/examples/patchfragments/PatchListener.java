@@ -19,7 +19,7 @@ public class PatchListener implements SynchronousBundleListener {
 	private final HashMap patches = new HashMap();
 
 	public void bundleChanged(BundleEvent event) {
-		if ((event.getType() & (BundleEvent.RESOLVED | BundleEvent.UNINSTALLED | BundleEvent.UNRESOLVED)) == 0)
+		if ((event.getType() & (BundleEvent.UNINSTALLED | BundleEvent.UNRESOLVED)) == 0)
 			return; // only reset on resolved/unresolved and uninstalled events
 		synchronized (patches) {
 			for (Iterator entries = patches.entrySet().iterator(); entries.hasNext();) {
