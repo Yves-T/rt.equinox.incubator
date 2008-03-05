@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cheatsheet
+      title="Working with the MCache adaptor hook">
+   <intro>
+      <description>
+         This cheat sheet will walk through the MCache adaptor.  The MCache adaptor records search misses when searching for a class or resource within bundle content (i.e. Bundlefile).  The M in MCache stands for resource search Misses.  The MCache is then used to avoid searching bundle content when the same missed resource is requested again.
+      </description>
+   </intro>
+   <item
+         title="Import the MCache skeleton project into your workspace">
+      <description>
+         The skeleton project contains all the classes and files of the MCache adaptor.  Some of the method implementations have been commented out to illustrate developing the MCache adaptor.
+      </description>
+      <subitem
+            label="Select File-&gt;Import from the main menu and choose &quot;General-&gt;Existing Projects into Workspace&quot; in order to open the Import Projects dialog."
+            skip="false">
+         <command
+               required="false"
+               serialization="org.eclipse.ui.file.import(importWizardId=org.eclipse.ui.wizards.import.ExternalProject)"/>
+      </subitem>
+      <subitem
+            label="In &quot;Select archive file&quot; browse to the mcache.zip.  Click Finish">
+      </subitem>
+   </item>
+   <item
+         title="Open and develop the MCacheConfigurator class">
+      <description>
+         All classes of the MCache adaptor are contained in the org.eclipse.equinox.examples.mcache pakage.  Open the MCacheConfigurator class now.  The configurator class is used to register all the hook implementations needed by the MCache adaptor.  This class also contains some debug options that can be enabled to print trace information to System.out.
+      </description>
+      <subitem
+            label="Take a look at the addHooks method.  This method registers two hook implementations.  An AdaptorHook (MCacheAdaptorHook) and a BundleFileWrapperFactoryHook (MCacheBundleWrapper).">
+      </subitem>
+      <subitem
+            label="Uncomment the content of this method now and save the class.">
+      </subitem>
+   </item>
+   <item
+         title="Open and develop the MCacheAdaptorHook class">
+      <description>
+         Open the  MCacheAdaptorHook class now.  This class implements AdaptorHook.  An adaptor hook is used to hook into the lifecycle of the adaptor.  For the MCache adaptor we are only interested in hooking into the initialize and frameworkStop methods.
+      </description>
+      <subitem
+            label="Take a look at the initialize method.  This method uses the getCacheFile method to locate the persistent MCache file and load it into the cache Set.  The getCacheFile method finds the MCache file within the configuration area.">
+      </subitem>
+      <subitem
+            label="Uncomment the content of the initialize method now and save the class."
+            skip="false">
+      </subitem>
+      <subitem
+            label="Take a look at the frameworkStop method.  This method uses the getCacheFile method to locate the persistent MCache file and persists the cache to the file.  The cache is persisted with one path per line.  Each path in the MCache represents a path that was searched within a BundleFile but no entry was found.">
+      </subitem>
+      <subitem
+            label="Uncomment the content of the frameworkStop method now and save the class.">
+      </subitem>
+      <subitem
+            label="The other interesting methods in this class are containsDir, getEntry, getEntryPaths.  These methods will be explained later.">
+      </subitem>
+   </item>
+   <item
+         title="Open and develop the MCacheBundleWrapper class">
+      <description>
+         Open the MCacheBundleWrapper class now.  This class implements BundleFileWrapperFactoryHook.  This hook creates BundleFile objects that wrap other BundleFile objects.  This is useful for intercepting calls to the wrapped BundleFile and allows for the behavior of the wrapped BundleFile to be augmented.
+      </description>
+      <subitem
+            label="Take a look at the wrapBundleFile method.  This method is used to wrap a BundleFile object with another one.  In this case we wrap the BundleFile object with a MCacheBundleFile which records when path searches are missed.">
+      </subitem>
+      <subitem
+            label="Uncomment the content of the wrapBundleFile method now and save the class.">
+      </subitem>
+   </item>
+   <item
+         title="Open and develop the MCacheBundleFile class">
+      <description>
+         Open the MCacheBundleFile class now.  This class extends BundleFile.  An MCacheBundleFile wraps another BundleFile to intercept resource requests and records when a resource request is not found in the wrapped BundleFile.  This information is then used to avoid searching the wrapped BundleFile for the missing resource on future requests.
+      </description>
+      <subitem
+            label="Three methods are interesting for recording cache misses, getEntry, getEntryPaths and getFile.  Take a look at these three methods.  These methods delegate the the MCacheAdaptorHook to check the MCache.">
+      </subitem>
+      <subitem
+            label="The remaining methods delegate directly to the wrapped bundle file.">
+      </subitem>
+   </item>
+   <item
+         title="Look at the MCacheAdaptorHook class again">
+      <description>
+         Now we will take a closer look at the containsDir, getEntry, getEntryPaths methods of this class.  These methods check the MCache and delegate to the wrapped BundleFile when appropriate.
+      </description>
+      <subitem
+            label="All three of these methods use the same approach.  First the MCache is checked.  If the MCache indicates that the path is missing then the methods return without checking the wrapped BundleFile.  Otherwise the wrapped BundleFile is searched.  If the path cannot be found in the wrapped BundleFile then the path is recorded in the MCache.  Finally the result is returned.">
+      </subitem>
+      <subitem
+            label="Uncomment the content of the containsDir, getEntry, getEntryPaths methods now and save the class.">
+      </subitem>
+   </item>
+   <item
+         title="Create a launch configuration">
+      <description>
+         The launch configuration will be used to launch the Equinox Framework with the MCache adaptor hook configured in.
+      </description>
+      <subitem
+            label="Select &quot;Run-&gt;Run Configurations...&quot;">
+         <command
+               required="false"
+               serialization="org.eclipse.debug.ui.commands.OpenRunConfigurations"/>
+      </subitem>
+      <subitem
+            label="Select &quot;Eclipse Application&quot; and click the &quot;New launch configuration&quot; icon (hint it looks like a blank document with a little + sign in the upper right corner).">
+      </subitem>
+      <subitem
+            label="Name the new configuration &quot;MCacheHook&quot;.  Select the &quot;Arguments&quot; tab and add &quot;-Dosgi.framework.extensions=org.eclipse.equinox.examples.mcache&quot; to the VM arguments.">
+      </subitem>
+      <subitem
+            label="Click &quot;Run&quot;.  This should launch an instance of eclipse using the MCache adaptor hook.">
+      </subitem>
+      <subitem
+            label="Wow, that is not very interesting!  There is no way to tell that the MCache is working.  Close the instance of Eclipse which got launched.  We should enable the debug trace option for the MCache.  Select &quot;Run-&gt;Run Configurations...&quot;">
+         <command
+               required="false"
+               serialization="org.eclipse.debug.ui.commands.OpenRunConfigurations"/>
+      </subitem>
+      <subitem
+            label="Select the MCacheHook launch configuration that you created.  Go to the &quot;Tracing&quot; tab.  Select the &quot;Enable tracing&quot; option.  Now select the org.eclipse.equinox.examples.mcache from the list of bundles on the left and select the &quot;debug&quot; option from the right.">
+      </subitem>
+      <subitem
+            label="Click &quot;Run&quot;.  This should launch an instance of eclipse using the MCache adaptor hook with tracing enabled.  Now lots of information is printed to the console about loading the MCache and finding entries in the MCache.">
+      </subitem>
+   </item>
+</cheatsheet>

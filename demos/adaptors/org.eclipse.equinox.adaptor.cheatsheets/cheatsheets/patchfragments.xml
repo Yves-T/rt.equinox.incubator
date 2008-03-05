@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cheatsheet
+      title="Working with the PatchFragments adaptor hook">
+   <intro>
+      <description>
+         This cheat sheet will walk through the PatchFragments adaptor.  The PatchFragments adaptor enables fragments to patch content of host bundles.  A fragment bundle specifies that it is a patch fragment by using the Equinox-BundleType header with the &quot;patch.fragment&quot; value.  When a patch fragment is attached to a host bundle then its root content is prepended to the host content. This allows it to override files from the host bundle with patched content from the fragment.
+      </description>
+   </intro>
+   <item
+         title="Import the PatchFragments skeleton project into your workspace">
+      <description>
+         The skeleton project contains all the classes and files of the PatchFragments adaptor.  Some of the method implementations have been commented out to illustrate developing the PatchFragments adaptor.
+      </description>
+      <subitem
+            label="Select File-&gt;Import from the main menu and choose &quot;General-&gt;Existing Projects into Workspace&quot; in order to open the Import Projects dialog."
+            skip="false">
+         <command
+               required="false"
+               serialization="org.eclipse.ui.file.import(importWizardId=org.eclipse.ui.wizards.import.ExternalProject)"/>
+      </subitem>
+      <subitem
+            label="In &quot;Select archive file&quot; browse to the patchfragments.zip.  Click Finish">
+      </subitem>
+   </item>
+   <item
+         title="Open and develop the PFConfigurator class">
+      <description>
+         All classes of the PatchFragments adaptor are contained in the org.eclipse.equinox.examples.patchfragments package.  Open the PFConfigurator class now.  The configurator class is used to register all the hook implementations needed by the PFConfigurator adaptor.  This class also contains some debug options that can be enabled to print trace information to System.out.
+      </description>
+      <subitem
+            label="Take a look at the addHooks method.  This method registers three hook implementations.  An AdaptorHook (PFAdaptorHook) a StorageHook (PFStorageHook) and a BundleFileWrapperFactoryHook (PFBundleWrapper).">
+      </subitem>
+      <subitem
+            label="Uncomment the content of this method now and save the class.">
+      </subitem>
+   </item>
+   <item
+         title="Open and develop the PFAdaptorHook class">
+      <description>
+         Open the  PFAdaptorHook class now.  This class implements AdaptorHook.  An adaptor hook is used to hook into the lifecycle of the adaptor.  For the PatchFragments adaptor we are interested in hooking into the initialize, frameworkStart, and frameworkStop methods.
+      </description>
+      <subitem
+            label="Take a look at the initialize method.  This method simply keeps a reference of the BaseAdaptor.">
+      </subitem>
+      <subitem
+            label="Uncomment the content of the initialize method now and save the class."
+            skip="false">
+      </subitem>
+      <subitem
+            label="Take a look at the frameworkStart method.  The PatchFragments adaptor needs to use the PackageAdmin service to get fragment and host bundle information.  The frameworkStart method allows for us to open a ServiceTracker to access the PackageAdmin service.  The PatchFragments adaptor also needs to listen for when bundles become uninstalled or unresolved.  The frameworkStart method is a good place to add a BundleListener to listen for these types of events.">
+      </subitem>
+      <subitem
+            label="Uncomment the content of the frameworkStart method now and save the class.">
+      </subitem>
+      <subitem
+            label="Take a look at the frameworkStop method.  This method is called when the framework is stopped.  This is a good place to close our PackageAdmin service tracker and to remove our BundleListener.">
+      </subitem>
+      <subitem
+            label="Uncomment the content of the frameworkStop method now and save the class.">
+      </subitem>
+      <subitem
+            label="The getPackageAdmin method uses the service tracker to get a reference to the PackageAdmin service.">
+      </subitem>
+      <subitem
+            label="The createDevClasspathBundleFile method is used to create patch fragment development time bundle files.  These are needed when self-hosting eclipse with patch fragments from your workspace.  We will discuss this method more later.">
+      </subitem>
+   </item>
+   <item
+         title="Open and develop the PFBundleWrapper class">
+      <description>
+         Open the PFBundleWrapper class now.  This class implements BundleFileWrapperFactoryHook.  This hook creates BundleFile objects that wrap other BundleFile objects.  This is useful for intercepting calls to the wrapped BundleFile and allows for the behavior of the wrapped BundleFile to be augmented.
+      </description>
+      <subitem
+            label="Take a look at the wrapBundleFile method.  This method is used to wrap a BundleFile object with another one.  In this case we wrap the BundleFile object with a PFBundleFile which tracks patch fragments for the wrapped BundleFile object.">
+      </subitem>
+      <subitem
+            label="Uncomment the content of the wrapBundleFile method now and save the class.">
+      </subitem>
+   </item>
+   <item
+         title="Open and develop the PFBundleFile class">
+      <description>
+         Open the PFBundleFile class now.  This class extends BundleFile.  A PFBundleFile wraps another BundleFile to intercept resource requests and determines if there are any patch fragments for the wrapped BundleFile.  If there are then the patch fragments are searched before the wrapped BundleFile.
+      </description>
+      <subitem
+            label="Two methods are interesting for patch fragments, the getEntry and and getFile.  Take a look at these two methods.  These methods get a list of patch fragment BundleFiles and searches them before searching the wrapped BundleFile.">
+      </subitem>
+      <subitem
+            label="Uncomment the content of the getEntry and getFile methods now and save the classes.">
+      </subitem>
+      <subitem
+            label="The getPatches method discovers any patch fragments for the wrapped bundle file.  PackageAdmin is used to discover the fragment bundles for a host bundle and PFStorageHook is used to determine which fragments are patch fragments.  Once the patch fragment list has been determined the PFAdaptorHook is informed about the patch fragment bundles that the uninstalled and unresolved events  need to be listened for.  Finally this BundleFile is marked as processed so the discovery does not happen again the next time getPatches is called.">
+      </subitem>
+      <subitem
+            label="The resetPatches method is used by the PatchListener to reset the patches list.  This is done when an uninstalled or unresolved event occurs for one of the patch fragments or the host bundle for this BundleFile.  After this method is called the next time getPatches is called the patch fragments will be rediscovered.">
+      </subitem>
+      <subitem
+            label="The remaining methods delegate directly to the wrapped bundle file.">
+      </subitem>
+   </item>
+   <item
+         title="Open and develop the PFStorageHook class">
+      <description>
+         Open the PFStorageHook class now.  This class implements StorageHook.  A StorageHook is used to hook into the persistent storage of the BaseAdaptor.  This hook is useful for persisting metadata from the bundle manifest or any other metadata for the bundle.  The PFStorageHook persists if a bundle is a patch fragment or not.  This metadata is declared in the Equinox-BundleType header.
+      </description>
+      <subitem
+            label="One thing to note about StorageHooks is that they act in two modes, a factory mode and an instance mode.  The StorageHook object that is added to the HookRegistry acts in a factory mode.  This object has the create and load methods called to construct new StorageHook instances that are associated with a particular BaseData object.">
+      </subitem>
+      <subitem
+            label="A StorageHook implements a KeyedElement to allow for quick access to them from the BaseData and the BaseAdaptor classes.  By convention the key used by a StorageHook is the implementation class name of the StorageHook.   The three methods of the KeyedElement interface (getKeyHashCode, compare, and getKey) implemented in PFStorageHook illustrate this convention.">
+      </subitem>
+      <subitem
+            label="The interesting methods from StorageHook that are implemented in PFStorageHook are create, initialize, load and save.  Take a closer look at each of these methods.">
+      </subitem>
+      <subitem
+            label="The create method is a factory for constructing new instances of the PFStorageHook which will get associated with a particular BaseData object.">
+      </subitem>
+      <subitem
+            label="The initialize method is called when a bundle is being installed.  A bundle manifest dictionary is passed in to this method to allow manifest headers to be parsed.  Here we parse the Eclipse-BundleType header looking for a &quot;patch.fragment&quot; value.  We only look for this header if the Fragment-Host header is present.">
+      </subitem>
+      <subitem
+            label="Uncomment the content of the initialize method now and save the classes.">
+      </subitem>
+      <subitem
+            label="The load method creates a new PFStorageHook instance for the specified BaseData and loads any persistent data from the DataInputStream.  For PFStorageHook the data only consists of a boolean which indicates if the BaseData is for a patch fragment.">
+      </subitem>
+      <subitem
+            label="Uncomment the content of the load method now and save the classes.">
+      </subitem>
+      <subitem
+            label="The save method persists data to the specified DataOutputStream.  For the PFStorageHook only a boolean is persisted that indicates if the BaseData associated with this PFStorageHook is a patch fragment.">
+      </subitem>
+   </item>
+   <item
+         title="Open and develop the PatchListener class">
+      <description>
+         Open the PatchListener class now.  This class implements  SynchrounousBundleListener.  This listener is used to listen for UNINSTALLED and UNRESOLVED bundle events for patch fragment bundles.  When a patch fragment bundle or a host bundle with patch fragment bundles becomes UNINSTALLED or UNRESOLVED then the patches list of the host BundleFiles must be reset.
+      </description>
+      <subitem
+            label="The bundleChaged method is called by the framework when any bundle event occurs.  The PatchListener is only insterested in UNINSTALLED and UNRESOLVED events.  When one of these events occurs the patches are searched to see if the event applies to them.  For all patches that the event applies to the host PFBundleFile has the resetPatches method called.">
+      </subitem>
+      <subitem
+            label="Uncomment the content of the bundleChanged method now and save the classes.">
+      </subitem>
+      <subitem
+            label="The listenToPatches method is used to associate a set of Bundle objects with a PFBundleFile for a patched host.">
+      </subitem>
+   </item>
+   <item
+         title="Create a launch configuration">
+      <description>
+         The launch configuration will be used to launch the Equinox Framework with the PatchFragments adaptor hook configured in.
+      </description>
+      <subitem
+            label="Select &quot;Run-&gt;Run Configurations...&quot;">
+         <command
+               required="false"
+               serialization="org.eclipse.debug.ui.commands.OpenRunConfigurations"/>
+      </subitem>
+      <subitem
+            label="Select &quot;Eclipse Application&quot; and click the &quot;New launch configuration&quot; icon (hint it looks like a blank document with a little + sign in the upper right corner).">
+      </subitem>
+      <subitem
+            label="Name the new configuration &quot;PatchFragmentsHook&quot;.  Select the &quot;Arguments&quot; tab and add &quot;-Dosgi.framework.extensions=org.eclipse.equinox.examples.patchfragments&quot; to the VM arguments.  Also add the -console option to the Program arguments.">
+      </subitem>
+      <subitem
+            label="Click &quot;Run&quot;.  This should launch an instance of eclipse using the MCache adaptor hook.">
+      </subitem>
+      <subitem
+            label="Wow, that is not very interesting!  We need to create a host with a bug and a patch fragment to fix the bug.  Lets do that next but first close the Eclipse instance you just launched.">
+      </subitem>
+   </item>
+   <item
+         title="Create a patch fragment">
+      <description>
+         Now we will create a very simple bundle that has a bug and a patch fragment that fixes the bug.
+      </description>
+      <subitem
+            label="Create a new plug-in project.  Select &quot;File-&gt;New-&gt;Other...&quot; and choose &quot;Plug-in Development-&gt;Plug-in Project&quot; and click &quot;Next&quot;.">
+         <command
+               required="false"
+               serialization="org.eclipse.ui.newWizard(newWizardId=org.eclipse.pde.ui.NewProjectWizard)"/>
+      </subitem>
+      <subitem
+            label="For the &quot;Project name&quot; use &quot;test.bundle.x&quot;.  For &quot;Target Platform&quot; select &quot;an OSGi framework&quot; and keep &quot;Equinox&quot; as the framework.  Click &quot;Next&quot;.">
+      </subitem>
+      <subitem
+            label="Make sure &quot;Generate an activator&quot; is selected.  Click Next.">
+      </subitem>
+      <subitem
+            label="Select &quot;Hello OSGi Bundle&quot; from the available templates.  Click Finish.">
+      </subitem>
+      <subitem
+            label="Open the test.bundle.x.Activator class.  In the start method throw a new NullPointerException after the System.out.println call.  This will cause the bundle to fail to start.">
+      </subitem>
+      <subitem
+            label="Launch the &quot;PatchFragmentsHook&quot; configuration again.  At the console enter the the command &quot;start test.bundle.x&quot;.  This should attempt to start the bundle but fail with a NullPointerException.  Close the instance of Eclipse you just launched.">
+      </subitem>
+      <subitem
+            label="Create a new fragment project.  Select &quot;File-&gt;New-&gt;Other...&quot; and choose &quot;Plug-in Development-&gt;Fragment Project&quot; and click &quot;Next&quot;.">
+         <command
+               required="false"
+               serialization="org.eclipse.ui.newWizard(newWizardId=org.eclipse.pde.ui.NewFragmentWizard)"/>
+      </subitem>
+      <subitem
+            label="For the &quot;Project name&quot; use &quot;test.bundle.x.pf1&quot;.  For &quot;Target Platform&quot; select &quot;an OSGi framework&quot; and keep &quot;Equinox&quot; as the framework.  Click &quot;Next&quot;.">
+      </subitem>
+      <subitem
+            label="In the &quot;Host Plug-in&quot; section enter &quot;test.bundle.x&quot; as the &quot;Plug-in ID&quot; for the host. Click &quot;Finish&quot;.">
+      </subitem>
+      <subitem
+            label="Copy the test.bundle.x.Activator class from the test.bundle.x project into the src folder of the test.bundle.x.pf1 project.  Remove the NullPointerException from the copy of the Activator class in the fragment bundle.">
+      </subitem>
+      <subitem
+            label="Add the header &quot;Eclipse-BundleType: patch.fragment&quot; to the bundle manifest file (META-INF/MANIFEST.MF) of the test.bundle.x.pf1 project.">
+      </subitem>
+      <subitem
+            label="Launch the &quot;PatchFragmentsHook&quot; configuration again.  At the console enter the the command &quot;start test.bundle.x&quot;.  This should successfully start the bundle.">
+      </subitem>
+   </item>
+</cheatsheet>
