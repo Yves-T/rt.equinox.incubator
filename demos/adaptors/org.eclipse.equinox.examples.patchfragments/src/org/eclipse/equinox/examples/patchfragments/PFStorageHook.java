@@ -88,7 +88,7 @@ public class PFStorageHook implements StorageHook {
 	 * is a boolean to indicate if the storage hook is a patch fragment.
 	 */
 	public StorageHook load(BaseData bundledata, DataInputStream is) throws IOException {
-		// This method should always creat a new storage hook object to load the data into
+		// This method should always create a new storage hook object to load the data into
 		PFStorageHook loadHook = new PFStorageHook();
 		loadHook.patchFragment = is.readBoolean();
 		return loadHook;
