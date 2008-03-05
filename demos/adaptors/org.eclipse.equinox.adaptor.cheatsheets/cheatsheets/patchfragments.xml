@@ -116,7 +116,7 @@
             label="The create method is a factory for constructing new instances of the PFStorageHook which will get associated with a particular BaseData object.">
       </subitem>
       <subitem
-            label="The initialize method is called when a bundle is being installed.  A bundle manifest dictionary is passed in to this method to allow manifest headers to be parsed.  Here we parse the Eclipse-BundleType header looking for a &quot;patch.fragment&quot; value.  We only look for this header if the Fragment-Host header is present.">
+            label="The initialize method is called when a bundle is being installed.  A bundle manifest dictionary is passed in to this method to allow manifest headers to be parsed.  Here we parse the Equinox-BundleType header looking for a &quot;patch.fragment&quot; value.  We only look for this header if the Fragment-Host header is present.">
       </subitem>
       <subitem
             label="Uncomment the content of the initialize method now and save the classes.">
@@ -212,7 +212,7 @@
             label="Copy the test.bundle.x.Activator class from the test.bundle.x project into the src folder of the test.bundle.x.pf1 project.  Remove the NullPointerException from the copy of the Activator class in the fragment bundle.">
       </subitem>
       <subitem
-            label="Add the header &quot;Eclipse-BundleType: patch.fragment&quot; to the bundle manifest file (META-INF/MANIFEST.MF) of the test.bundle.x.pf1 project.">
+            label="Add the header &quot;Equinox-BundleType: patch.fragment&quot; to the bundle manifest file (META-INF/MANIFEST.MF) of the test.bundle.x.pf1 project.">
       </subitem>
       <subitem
             label="Launch the &quot;PatchFragmentsHook&quot; configuration again.  At the console enter the the command &quot;start test.bundle.x&quot;.  This should successfully start the bundle.">
