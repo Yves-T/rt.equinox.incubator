@@ -7,20 +7,10 @@
       </description>
    </intro>
    <item
-         title="Import the MCache skeleton project into your workspace">
+         title="Open the MCache project in your workspace">
       <description>
-         The skeleton project contains all the classes and files of the MCache adaptor.  Some of the method implementations have been commented out to illustrate developing the MCache adaptor.
+         The project org.eclipse.equinox.examples.mcache contains the MCache adaptor.  This project will contain a number of compile errors.  We will fix these in the following steps.
       </description>
-      <subitem
-            label="Select File-&gt;Import from the main menu and choose &quot;General-&gt;Existing Projects into Workspace&quot; in order to open the Import Projects dialog."
-            skip="false">
-         <command
-               required="false"
-               serialization="org.eclipse.ui.file.import(importWizardId=org.eclipse.ui.wizards.import.ExternalProject)"/>
-      </subitem>
-      <subitem
-            label="In &quot;Select archive file&quot; browse to the mcache.zip.  Click Finish">
-      </subitem>
    </item>
    <item
          title="Open and develop the MCacheConfigurator class">

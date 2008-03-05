@@ -7,20 +7,10 @@
       </description>
    </intro>
    <item
-         title="Import the PatchFragments skeleton project into your workspace">
+         title="Open the PatchFragments project in your workspace">
       <description>
-         The skeleton project contains all the classes and files of the PatchFragments adaptor.  Some of the method implementations have been commented out to illustrate developing the PatchFragments adaptor.
+         The project org.eclipse.equinox.examples.patchfragments contains the PatchFragments adaptor.  This project will contain a number of compile errors.  We will fix these in the following steps.
       </description>
-      <subitem
-            label="Select File-&gt;Import from the main menu and choose &quot;General-&gt;Existing Projects into Workspace&quot; in order to open the Import Projects dialog."
-            skip="false">
-         <command
-               required="false"
-               serialization="org.eclipse.ui.file.import(importWizardId=org.eclipse.ui.wizards.import.ExternalProject)"/>
-      </subitem>
-      <subitem
-            label="In &quot;Select archive file&quot; browse to the patchfragments.zip.  Click Finish">
-      </subitem>
    </item>
    <item
          title="Open and develop the PFConfigurator class">
