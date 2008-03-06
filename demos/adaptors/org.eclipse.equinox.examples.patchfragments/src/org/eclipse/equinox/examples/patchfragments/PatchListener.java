@@ -24,7 +24,7 @@ public class PatchListener implements SynchronousBundleListener {
 		synchronized (patches) {
 			for (Iterator entries = patches.entrySet().iterator(); entries.hasNext();) {
 				Map.Entry entry = (Entry) entries.next();
-				Collection bundles = (Set) entry.getValue();
+				Collection bundles = (Collection) entry.getValue();
 				if (bundles.contains(event.getBundle())) {
 					PFBundleFile bundleFile = (PFBundleFile) entry.getKey();
 					bundleFile.resetPatches();
