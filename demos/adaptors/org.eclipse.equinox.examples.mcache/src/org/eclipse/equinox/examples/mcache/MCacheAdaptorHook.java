@@ -93,11 +93,12 @@ public class MCacheAdaptorHook implements AdaptorHook {
 	 */
 	public void initialize(BaseAdaptor adaptor) {
 		File cacheFile = getCacheFile();
+		BufferedReader reader = null;
 		try {
 			if (cacheFile.exists()) {
 				if (MCacheConfigurator.DEBUG)
 					System.out.println("Loading mcache: " + cacheFile.getAbsolutePath()); //$NON-NLS-1$
-				BufferedReader reader = new BufferedReader(new FileReader(cacheFile));
+				reader = new BufferedReader(new FileReader(cacheFile));
 				synchronized (cache) {
 					for (String line = reader.readLine(); line != null; line = reader.readLine()) {
 						cache.add(line);
@@ -108,6 +109,13 @@ public class MCacheAdaptorHook implements AdaptorHook {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if (reader != null)
+				try {
+					reader.close();
+				} catch (IOException e) {
+					// ignore
+				}
 		}
 	}
 
