@@ -58,6 +58,11 @@
         category="org.eclipse.equinox.security.sample.subjectCategory"
         class="org.eclipse.equinox.security.sample.SubjectView">
       </view>
+      <view
+            class="org.eclipse.equinox.sample.password.view.UserCredentailView"
+            id="org.eclipse.equinox.security.sample.credentialView"
+            name="Credential View">
+      </view>
    </extension>
    
    <!-- The windows loginmodule for sun JRE -->

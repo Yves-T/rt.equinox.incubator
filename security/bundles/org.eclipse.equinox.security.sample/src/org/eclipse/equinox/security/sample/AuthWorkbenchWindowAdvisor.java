@@ -33,5 +33,18 @@ public class AuthWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		this.getWindowConfigurer().setShowCoolBar(false);
 		this.getWindowConfigurer().setShowStatusLine(true);
 		this.getWindowConfigurer().setTitle(AUTHENTICATED_APPLICATION);
+
+		//		Subject subject = Subject.getSubject(AccessController.getContext());
+		//		
+		//		if (subject != null) {
+		//			// really a hack to get the login credential
+		//			Set<Principal> principals = subject.getPrincipals();
+		//			Iterator<Principal> prinIter = principals.iterator();
+		//			while (prinIter.hasNext()) {
+		//				Principal principal = prinIter.next();
+		//				configurer.setTitle(principal.getName());
+		//				break;
+		//			}
+		//		}
 	}
 }

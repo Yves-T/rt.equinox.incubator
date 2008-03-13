@@ -12,6 +12,14 @@
 package org.eclipse.equinox.security.sample;
 
 //import org.eclipse.osgi.internal.provisional.verifier.CertificateTrustAuthority;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
+import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
+import org.eclipse.equinox.security.storage.provider.IProviderHints;
 import org.eclipse.osgi.service.resolver.PlatformAdmin;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -30,6 +38,10 @@ public class AuthAppPlugin implements BundleActivator {
 	private static ServiceTracker platformAdminTracker;
 	private static ServiceTracker certTrustAuthorityTracker;
 	private static ServiceTracker packageAdminTracker;
+
+	private static ISecurePreferences passStorePreference;
+
+	private static final File WINDOWS_PASSWORD_FILE = new File("c:/mypassword.txt");
 
 	public void start(BundleContext context) throws Exception {
 		bundleContext = context;
@@ -74,5 +86,36 @@ public class AuthAppPlugin implements BundleActivator {
 			packageAdminTracker.open();
 		}
 		return (PackageAdmin) packageAdminTracker.getService();
+	}
+
+	public static ISecurePreferences getSecurePreference() {
+		return SecurePreferencesFactory.getDefault().node("org.eclipse.app.keypass");
+	}
+
+	public static ISecurePreferences getPassStoreSecurePreference() {
+		if (passStorePreference == null) {
+			if (!WINDOWS_PASSWORD_FILE.exists()) {
+				try {
+					WINDOWS_PASSWORD_FILE.createNewFile();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+			Map options = new HashMap();
+			options.put(IProviderHints.REQUIRED_MODULE_ID, "org.eclipse.equinox.security.ui.DefaultPasswordProvider");
+			try {
+				passStorePreference = SecurePreferencesFactory.open(WINDOWS_PASSWORD_FILE.toURL(), options).node("org.eclipse.app.keypass");
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return passStorePreference;
 	}
 }
