@@ -15,18 +15,25 @@ package org.eclipse.equinox.security.sample;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import org.eclipse.equinox.security.sample.engine.MyTrustEngine;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.provider.IProviderHints;
 import org.eclipse.osgi.service.resolver.PlatformAdmin;
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
+import org.eclipse.osgi.service.security.TrustEngine;
+import org.osgi.framework.*;
 import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class AuthAppPlugin implements BundleActivator {
+
+	//	private static char[] PASSWORD_DEFAULT = {'c', 'h', 'a', 'n', 'g', 'e', 'i', 't'};
+	//	private static String TYPE_DEFAULT = "JKS"; //$NON-NLS-1$
+	private static final String MY_KEYSTORE_JKS = "data/keystore.jks"; //$NON-NLS-1$
+	private static ServiceRegistration systemTrustEngineReg;
+	private static final char[] PASSWORD_DEFAULT = {'c', 'h', 'a', 'n', 'g', 'e', 'i', 't'};
+	private static final String TYPE_DEFAULT = "jks";
 
 	/**
 	 * The unique identifier constant of this plug-in.
@@ -58,6 +65,9 @@ public class AuthAppPlugin implements BundleActivator {
 
 		if (null != packageAdminTracker)
 			packageAdminTracker.close();
+
+		if (null != systemTrustEngineReg)
+			systemTrustEngineReg.unregister();
 	}
 
 	public static BundleContext getBundleContext() {
@@ -88,10 +98,6 @@ public class AuthAppPlugin implements BundleActivator {
 		return (PackageAdmin) packageAdminTracker.getService();
 	}
 
-	public static ISecurePreferences getSecurePreference() {
-		return SecurePreferencesFactory.getDefault().node("org.eclipse.app.keypass");
-	}
-
 	public static ISecurePreferences getPassStoreSecurePreference() {
 		if (passStorePreference == null) {
 			if (!WINDOWS_PASSWORD_FILE.exists()) {
@@ -107,7 +113,7 @@ public class AuthAppPlugin implements BundleActivator {
 			Map options = new HashMap();
 			options.put(IProviderHints.REQUIRED_MODULE_ID, "org.eclipse.equinox.security.ui.DefaultPasswordProvider");
 			try {
-				passStorePreference = SecurePreferencesFactory.open(WINDOWS_PASSWORD_FILE.toURL(), options).node("org.eclipse.app.keypass");
+				passStorePreference = SecurePreferencesFactory.open(WINDOWS_PASSWORD_FILE.toURL(), options).node("org.eclipse.equinox.sample.password");
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -117,5 +123,18 @@ public class AuthAppPlugin implements BundleActivator {
 			}
 		}
 		return passStorePreference;
+	}
+
+	public static boolean InstallTrustEngine() {
+		if (null == systemTrustEngineReg) {
+			MyTrustEngine myTrustEngine = new MyTrustEngine(bundleContext.getBundle().getEntry(MY_KEYSTORE_JKS), PASSWORD_DEFAULT, TYPE_DEFAULT, "MyKeyStoreEngine");
+
+			Hashtable properties = new Hashtable(7);
+			properties.put(Constants.SERVICE_RANKING, new Integer(Integer.MAX_VALUE));
+			//		properties.put(SignedContentConstants.TRUST_ENGINE, SignedContentConstants.DEFAULT_TRUST_ENGINE);
+			//		KeyStoreTrustEngine systemTrustEngine = new KeyStoreTrustEngine(CACERTS_PATH, CACERTS_TYPE, null, "System"); //$NON-NLS-1$
+			systemTrustEngineReg = bundleContext.registerService(TrustEngine.class.getName(), myTrustEngine, properties);
+		}
+		return true;
 	}
 }

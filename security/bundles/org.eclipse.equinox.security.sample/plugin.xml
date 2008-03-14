@@ -90,7 +90,13 @@
                   name="sampleGroup">
             </separator>
          </menu>
-         
+              <menu
+               id="sampleMenu1"
+               label="Engine">
+            <separator
+                  name="sampleGroup1">
+            </separator>
+         </menu>
          <!-- an action to load the signed bundle -->
          <action
                class="org.eclipse.equinox.security.sample.InstallSignedAction"
@@ -99,7 +105,15 @@
                menubarPath="sampleMenu/sampleGroup"
                toolbarPath="sampleGroup">
          </action>
+         <action
+               class="org.eclipse.equinox.security.sample.InstallMyTrustEngine"
+               id="org.eclipse.equinox.security.sample.InstallMyTrustEngine"
+               label="&amp;Install Engine"
+               menubarPath="sampleMenu1/sampleGroup1"
+               toolbarPath="Engine">
+         </action>
       </actionSet>
+    
    </extension>
    
    
