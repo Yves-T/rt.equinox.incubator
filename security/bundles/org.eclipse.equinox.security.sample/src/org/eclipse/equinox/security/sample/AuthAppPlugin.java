@@ -45,6 +45,7 @@ public class AuthAppPlugin implements BundleActivator {
 	private static ServiceTracker platformAdminTracker;
 	private static ServiceTracker certTrustAuthorityTracker;
 	private static ServiceTracker packageAdminTracker;
+	private static ServiceTracker engineTracker;
 
 	private static ISecurePreferences passStorePreference;
 
@@ -89,6 +90,17 @@ public class AuthAppPlugin implements BundleActivator {
 	//		}
 	//		return (CertificateTrustAuthority) certTrustAuthorityTracker.getService();
 	//	}
+
+	public static TrustEngine[] getTrustEngines() {
+		if (null == engineTracker) {
+			engineTracker = new ServiceTracker(bundleContext, TrustEngine.class.getName(), null);
+			engineTracker.open();
+		}
+		Object objs[] = engineTracker.getServices();
+		TrustEngine[] result = new TrustEngine[objs.length];
+		System.arraycopy(objs, 0, result, 0, objs.length);
+		return result;
+	}
 
 	public static PackageAdmin getPackageAdmin() {
 		if (null == packageAdminTracker) {

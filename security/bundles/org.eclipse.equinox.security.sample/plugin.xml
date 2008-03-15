@@ -112,6 +112,19 @@
                menubarPath="sampleMenu1/sampleGroup1"
                toolbarPath="Engine">
          </action>
+         <menu
+               id="sslMenu"
+               label="SSL">
+            <separator
+                  name="sampleSSLSeparator">
+            </separator>
+         </menu>
+         <action
+               class="org.eclipse.equinox.security.sample.ssl.ConnectSSLAction"
+               id="org.eclipse.equinox.security.sample.SSLAction"
+               label="&amp;Connect to"
+               menubarPath="sslMenu/sampleSSLSeparator">
+         </action>
       </actionSet>
     
    </extension>
