@@ -11,48 +11,46 @@
 
 package org.eclipse.equinox.security.sample;
 
-//import org.eclipse.osgi.internal.provisional.verifier.CertificateTrustAuthority;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.*;
-import org.eclipse.equinox.security.sample.engine.MyTrustEngine;
+import java.util.HashMap;
+import java.util.Map;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.provider.IProviderHints;
 import org.eclipse.osgi.service.resolver.PlatformAdmin;
 import org.eclipse.osgi.service.security.TrustEngine;
-import org.osgi.framework.*;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class AuthAppPlugin implements BundleActivator {
 
-	//	private static char[] PASSWORD_DEFAULT = {'c', 'h', 'a', 'n', 'g', 'e', 'i', 't'};
-	//	private static String TYPE_DEFAULT = "JKS"; //$NON-NLS-1$
-	private static final String MY_KEYSTORE_JKS = "data/keystore.jks"; //$NON-NLS-1$
-	private static ServiceRegistration systemTrustEngineReg;
-	private static final char[] PASSWORD_DEFAULT = {'c', 'h', 'a', 'n', 'g', 'e', 'i', 't'};
-	private static final String TYPE_DEFAULT = "jks";
-
 	/**
 	 * The unique identifier constant of this plug-in.
 	 */
-	public static final String PI_AUTH = "org.eclipse.equinox.security.sample"; //$NON-NLS-1$
-
+	public static final String BUNDLE_ID = "org.eclipse.equinox.security.sample"; //$NON-NLS-1$
 	private static BundleContext bundleContext;
 
 	private static ServiceTracker platformAdminTracker;
-	private static ServiceTracker certTrustAuthorityTracker;
 	private static ServiceTracker packageAdminTracker;
 	private static ServiceTracker engineTracker;
 
-	private static ISecurePreferences passStorePreference;
+	/* stuff for the login configuration */
+	private static final String CONFIG_PREF = "loginConfiguration"; //$NON-NLS-1$
+	private static final String CONFIG_DEFAULT = "other"; //$NON-NLS-1$
 
-	private static final File WINDOWS_PASSWORD_FILE = new File("c:/mypassword.txt");
+	/* stuff for secure preferences */
+	private static final String SECURE_PREFS_PROVIDER_ID = "org.eclipse.equinox.security.sample.SubjectPasswordProvider"; //$NON-NLS-1$
+	private static final String SECURE_PREFS_FILENAME = "secureprefs.properties"; //$NON-NLS-1$
+	private static File securePreferencesFile;
+	private static ISecurePreferences securePreferences;
 
 	public void start(BundleContext context) throws Exception {
 		bundleContext = context;
+		securePreferencesFile = AuthAppPlugin.getBundleContext().getDataFile(SECURE_PREFS_FILENAME);
 	}
 
 	public void stop(BundleContext context) throws Exception {
@@ -61,14 +59,8 @@ public class AuthAppPlugin implements BundleActivator {
 		if (null != platformAdminTracker)
 			platformAdminTracker.close();
 
-		if (null != certTrustAuthorityTracker)
-			certTrustAuthorityTracker.close();
-
 		if (null != packageAdminTracker)
 			packageAdminTracker.close();
-
-		if (null != systemTrustEngineReg)
-			systemTrustEngineReg.unregister();
 	}
 
 	public static BundleContext getBundleContext() {
@@ -83,13 +75,13 @@ public class AuthAppPlugin implements BundleActivator {
 		return (PlatformAdmin) platformAdminTracker.getService();
 	}
 
-	//	public static CertificateTrustAuthority getCertTrustAuthority() {
-	//		if (null == certTrustAuthorityTracker) {
-	//			certTrustAuthorityTracker = new ServiceTracker(bundleContext, CertificateTrustAuthority.class.getName(), null);
-	//			certTrustAuthorityTracker.open();
-	//		}
-	//		return (CertificateTrustAuthority) certTrustAuthorityTracker.getService();
-	//	}
+	public static PackageAdmin getPackageAdmin() {
+		if (null == packageAdminTracker) {
+			packageAdminTracker = new ServiceTracker(bundleContext, PackageAdmin.class.getName(), null);
+			packageAdminTracker.open();
+		}
+		return (PackageAdmin) packageAdminTracker.getService();
+	}
 
 	public static TrustEngine[] getTrustEngines() {
 		if (null == engineTracker) {
@@ -102,51 +94,20 @@ public class AuthAppPlugin implements BundleActivator {
 		return result;
 	}
 
-	public static PackageAdmin getPackageAdmin() {
-		if (null == packageAdminTracker) {
-			packageAdminTracker = new ServiceTracker(bundleContext, PackageAdmin.class.getName(), null);
-			packageAdminTracker.open();
-		}
-		return (PackageAdmin) packageAdminTracker.getService();
-	}
-
-	public static ISecurePreferences getPassStoreSecurePreference() {
-		if (passStorePreference == null) {
-			if (!WINDOWS_PASSWORD_FILE.exists()) {
-				try {
-					WINDOWS_PASSWORD_FILE.createNewFile();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					return null;
-				}
-			}
-
+	public static ISecurePreferences getSecurePreferences() {
+		if (null == securePreferences) {
 			Map options = new HashMap();
-			options.put(IProviderHints.REQUIRED_MODULE_ID, "org.eclipse.equinox.security.ui.DefaultPasswordProvider");
+			options.put(IProviderHints.REQUIRED_MODULE_ID, SECURE_PREFS_PROVIDER_ID);
 			try {
-				passStorePreference = SecurePreferencesFactory.open(WINDOWS_PASSWORD_FILE.toURL(), options).node("org.eclipse.equinox.sample.password");
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				securePreferences = SecurePreferencesFactory.open(securePreferencesFile.toURL(), options).node(BUNDLE_ID);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		return passStorePreference;
+		return securePreferences;
 	}
 
-	public static boolean InstallTrustEngine() {
-		if (null == systemTrustEngineReg) {
-			MyTrustEngine myTrustEngine = new MyTrustEngine(bundleContext.getBundle().getEntry(MY_KEYSTORE_JKS), PASSWORD_DEFAULT, TYPE_DEFAULT, "MyKeyStoreEngine");
-
-			Hashtable properties = new Hashtable(7);
-			properties.put(Constants.SERVICE_RANKING, new Integer(Integer.MAX_VALUE));
-			//		properties.put(SignedContentConstants.TRUST_ENGINE, SignedContentConstants.DEFAULT_TRUST_ENGINE);
-			//		KeyStoreTrustEngine systemTrustEngine = new KeyStoreTrustEngine(CACERTS_PATH, CACERTS_TYPE, null, "System"); //$NON-NLS-1$
-			systemTrustEngineReg = bundleContext.registerService(TrustEngine.class.getName(), myTrustEngine, properties);
-		}
-		return true;
+	public static String getConfigurationName() {
+		return new DefaultScope().getNode(BUNDLE_ID).get(CONFIG_PREF, CONFIG_DEFAULT);
 	}
 }

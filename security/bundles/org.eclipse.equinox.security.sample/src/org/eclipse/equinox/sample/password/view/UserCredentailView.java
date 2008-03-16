@@ -163,7 +163,7 @@ public class UserCredentailView extends ViewPart {
 		UserCredential ucs[] = null;
 		try {
 			//			ISecurePreferences seurePref = Activator.getSecurePreference();
-			ISecurePreferences seurePref = AuthAppPlugin.getPassStoreSecurePreference();
+			ISecurePreferences seurePref = AuthAppPlugin.getSecurePreferences();
 			String[] keys = seurePref.keys();
 
 			// create objects

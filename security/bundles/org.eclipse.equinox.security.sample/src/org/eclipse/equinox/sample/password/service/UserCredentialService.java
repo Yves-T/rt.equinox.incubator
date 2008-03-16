@@ -18,7 +18,7 @@ public class UserCredentialService implements IUserCredentialService {
 
 	public boolean addCredential(UserCredential userCredential) {
 		try {
-			AuthAppPlugin.getPassStoreSecurePreference().put(userCredential.getUsername() + "::" + userCredential.getServerURL(), userCredential.getPassword(), true);
+			AuthAppPlugin.getSecurePreferences().put(userCredential.getUsername() + "::" + userCredential.getServerURL(), userCredential.getPassword(), true);
 			return true;
 		} catch (StorageException e) {
 			// TODO Auto-generated catch block
@@ -28,7 +28,7 @@ public class UserCredentialService implements IUserCredentialService {
 	}
 
 	public boolean removeCredential(UserCredential userCredential) {
-		AuthAppPlugin.getPassStoreSecurePreference().remove(userCredential.getUsername() + "::" + userCredential.getServerURL());
+		AuthAppPlugin.getSecurePreferences().remove(userCredential.getUsername() + "::" + userCredential.getServerURL());
 		return true;
 	}
 

@@ -56,7 +56,7 @@ public class KSConfigurationProvider extends Configuration {
 	private URL getKeyStoreURL() {
 		URL result = KeyStoreManager.getKeyStoreUrl();
 		if (result == null) {
-			Bundle bundle = Platform.getBundle(AuthAppPlugin.PI_AUTH);
+			Bundle bundle = Platform.getBundle(AuthAppPlugin.BUNDLE_ID);
 			IPath path = Platform.getStateLocation(bundle).append(KEYSTORE_FILE_EXTENSION);
 			try {
 				result = path.toFile().toURL();

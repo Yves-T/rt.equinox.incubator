@@ -58,7 +58,7 @@ public class KeyStoreManagerInternal {
 					throw new IllegalArgumentException(SampleMessages.invalidKeystore);
 				}
 			} else {
-				Bundle bundle = Platform.getBundle(AuthAppPlugin.PI_AUTH);
+				Bundle bundle = Platform.getBundle(AuthAppPlugin.BUNDLE_ID);
 				IPath path = Platform.getStateLocation(bundle).append(".keystore"); //$NON-NLS-1$
 				try {
 					keyStoreUrl = path.toFile().toURL();

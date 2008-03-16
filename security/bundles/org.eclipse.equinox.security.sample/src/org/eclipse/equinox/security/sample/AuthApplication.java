@@ -26,35 +26,18 @@ import org.eclipse.ui.PlatformUI;
  */
 public class AuthApplication implements IApplication {
 
-	// TBD this string should be an API on the provider - auth bundle
-	/**
-	 * The name of the KeyStore configuration
-	 */
-	private static final String CONFIG_NAME_KEYSTORE = "KeyStore"; //$NON-NLS-1$
-
-	/**
-	 * The name of the "native" configuration described in this application's config file
-	 */
-	private static final String CONFIG_NAME_WIN32 = "Win32"; //$NON-NLS-1$
-
 	/**
 	 * Specifies location of the login configuration file for this application
 	 */
 	private static final String JAAS_CONFIG_FILE = "data/jaas_config.txt"; //$NON-NLS-1$
 
 	public Object start(IApplicationContext context) throws Exception {
-		ISecureContext secureContext;
 
-		if (false) { // two test cases: {KeyStore & hardcoded config} or {native & config from a file}
-			secureContext = SecurePlatform.createContext(CONFIG_NAME_KEYSTORE);
-		} else {
-			URL configFile = AuthAppPlugin.getBundleContext().getBundle().getEntry(JAAS_CONFIG_FILE);
-			secureContext = SecurePlatform.createContext(CONFIG_NAME_WIN32, configFile);
-		}
+		String configName = AuthAppPlugin.getConfigurationName();
+		URL configUrl = AuthAppPlugin.getBundleContext().getBundle().getEntry(JAAS_CONFIG_FILE);
+		ISecureContext secureContext = SecurePlatform.createContext(configName, configUrl);
 
 		secureContext.registerListener(new ProgressMonitorListener());
-
-		//Security.setProperty( "keystore.url", AuthAppPlugin.getDefault( ).getBundle( ).getEntry( "data/test_user.jks").toExternalForm( ));
 
 		Integer result = null;
 		final Display display = PlatformUI.createDisplay();

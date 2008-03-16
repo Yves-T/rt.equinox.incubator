@@ -162,7 +162,67 @@
             callbackHandlerId="org.eclipse.equinox.security.sample.defaultKeyStoreCallbackHandler"
             configName="KeyStore"/>
    </extension>
+
+   <extension
+         id="ldapLoginModule"
+         name="LDAP LoginModule"
+         point="org.eclipse.equinox.security.loginModule">
+      <loginModule
+            class="com.sun.security.auth.module.JndiLoginModule"
+            description="LoginModule for LDAP">
+      </loginModule>
+   </extension>
    
+      <extension
+         id="storageLoginModule"
+         name="SecureStorage PasswordProvider LoginModule"
+         point="org.eclipse.equinox.security.loginModule">
+      <loginModule
+            class="org.eclipse.equinox.security.sample.module.PasswordProviderModule"
+            description="LoginModule for SecureStorage">
+      </loginModule>
+   </extension>
+      <extension
+            id="subjectPasswordProvider"
+            point="org.eclipse.equinox.security.secureStorage">
+         <provider
+               class="org.eclipse.equinox.security.sample.module.SubjectPasswordProvider"
+               priority="1">
+         </provider>
+      </extension>
+      <extension
+            id="trustLoginModule"
+            name="TrustEngine LoginModule"
+            point="org.eclipse.equinox.security.loginModule">
+         <loginModule
+               class="org.eclipse.equinox.security.sample.module.TrustEngineLoginModule"
+               description="TrustEngine LoginModule">
+         </loginModule>
+      </extension>
+      <extension
+            id="basicAuthDialog"
+            name="Basic Authentication Dialog"
+            point="org.eclipse.equinox.security.callbackHandler">
+         <callbackHandler
+               class="org.eclipse.equinox.security.sample.callback.BasicAuthHandler">
+         </callbackHandler>
+      </extension>
+      
+      <extension
+            point="org.eclipse.equinox.security.callbackHandlerMapping">
+         <callbackHandlerMapping
+               callbackHandlerId="org.eclipse.equinox.security.sample.basicAuthDialog"
+               configName="LDAP">
+         </callbackHandlerMapping>
+      </extension>
+   
+      <extension
+            point="org.eclipse.equinox.security.callbackHandlerMapping">
+         <callbackHandlerMapping
+               callbackHandlerId="org.eclipse.equinox.security.sample.basicAuthDialog"
+               configName="LDAP-TE">
+         </callbackHandlerMapping>
+      </extension>
   
    
 </plugin>
