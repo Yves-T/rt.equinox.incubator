@@ -25,7 +25,7 @@ public class AuthActionBarAdvisor extends ActionBarAdvisor {
 	private static final String LOGOUT_ACTIONS = "logoutActions"; //$NON-NLS-1$
 	private static final String LOGIN_ACTIONS = "loginActions"; //$NON-NLS-1$
 
-	private IAction importAction, exportAction, prefAction, quitAction;
+	private IAction perspectiveAction, importAction, exportAction, prefAction, quitAction;
 	private IWorkbenchWindow workbenchWindow;
 
 	public AuthActionBarAdvisor(IActionBarConfigurer configurer) {
@@ -34,6 +34,7 @@ public class AuthActionBarAdvisor extends ActionBarAdvisor {
 
 	public void makeActions(IWorkbenchWindow window) {
 		this.workbenchWindow = window;
+		perspectiveAction = ActionFactory.OPEN_PERSPECTIVE_DIALOG.create(workbenchWindow);
 		importAction = ActionFactory.IMPORT.create(workbenchWindow);
 		exportAction = ActionFactory.EXPORT.create(workbenchWindow);
 		prefAction = ActionFactory.PREFERENCES.create(workbenchWindow);
@@ -50,6 +51,7 @@ public class AuthActionBarAdvisor extends ActionBarAdvisor {
 		MenuManager menu = new MenuManager(FILE, IWorkbenchActionConstants.M_FILE);
 		menu.add(new GroupMarker(IWorkbenchActionConstants.FILE_START));
 		menu.add(new Separator());
+		menu.add(perspectiveAction);
 		menu.add(new GroupMarker(LOGIN_ACTIONS));
 		menu.add(new GroupMarker(LOGOUT_ACTIONS));
 		menu.add(new Separator());

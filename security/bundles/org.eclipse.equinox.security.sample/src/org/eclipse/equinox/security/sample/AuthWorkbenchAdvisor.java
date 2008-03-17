@@ -15,7 +15,7 @@ import org.eclipse.ui.application.*;
 public class AuthWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	public String getInitialWindowPerspectiveId() {
-		return "org.eclipse.equinox.security.sample.subjectPerspective"; //$NON-NLS-1$
+		return "org.eclipse.equinox.security.sample.storagePerspective"; //$NON-NLS-1$
 	}
 
 	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {

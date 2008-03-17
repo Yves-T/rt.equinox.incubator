@@ -42,17 +42,18 @@ public class AddCredentialDialog extends TitleAreaDialog {
 		// create the ui components
 		Label serverLabel = new Label(composite, SWT.None);
 		serverLabel.setText("Server:");
-		serverText = new Text(composite, SWT.None);
+		serverText = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		GridDataFactory.swtDefaults().hint(150, SWT.DEFAULT).applyTo(serverText);
 
 		Label userNameLabel = new Label(composite, SWT.None);
 		userNameLabel.setText("UserName:");
-		userNameText = new Text(composite, SWT.None);
+		userNameText = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		GridDataFactory.swtDefaults().hint(150, SWT.DEFAULT).applyTo(userNameText);
 
 		Label passwordLabel = new Label(composite, SWT.None);
 		passwordLabel.setText("Password:");
-		passwordText = new Text(composite, SWT.None);
+		passwordText = new Text(composite, SWT.SINGLE | SWT.BORDER);
+		passwordText.setEchoChar('*');
 		GridDataFactory.swtDefaults().hint(150, SWT.DEFAULT).applyTo(passwordText);
 
 		return composite;
