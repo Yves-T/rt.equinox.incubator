@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.equinox.security.sample.module;
+package org.eclipse.equinox.security.sample.trustengine;
 
 import java.io.*;
 import java.net.URL;
@@ -247,7 +247,7 @@ public class KeyStoreTrustEngine extends TrustEngine {
 	private OutputStream getOutputStream() throws IOException {
 
 		if ("file".equals(getUrl().getProtocol())) {
-			File file = new File(getUrl().toExternalForm());
+			File file = new File(getUrl().getPath());
 			if (!file.exists())
 				file.createNewFile();
 
@@ -259,9 +259,9 @@ public class KeyStoreTrustEngine extends TrustEngine {
 
 	public boolean isReadOnly() {
 		if ("file".equals(getUrl().getProtocol())) {
-			return getPassword() == null || !(new File(getUrl().toExternalForm()).canWrite());
+			return getPassword() == null || !(new File(getUrl().getPath()).canWrite());
 		} else {
-			return false;
+			return true;
 		}
 	}
 

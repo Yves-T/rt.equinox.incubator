@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.equinox.security.sample.module;
+package org.eclipse.equinox.security.sample.securestorage;
 
 import java.util.Map;
 import javax.crypto.spec.PBEKeySpec;

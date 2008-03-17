@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.equinox.security.sample.module;
+package org.eclipse.equinox.security.sample.securestorage;
 
 import java.security.AccessControlContext;
 import java.security.AccessController;
@@ -26,6 +26,8 @@ public class SubjectPasswordProvider extends PasswordProvider {
 
 		AccessControlContext context = AccessController.getContext();
 		Subject subject = Subject.getSubject(context);
+
+		//AuthAppPlugin.getLoginContext().getSubject();
 
 		Set set = subject.getPrivateCredentials(IPrivateCredential.class);
 

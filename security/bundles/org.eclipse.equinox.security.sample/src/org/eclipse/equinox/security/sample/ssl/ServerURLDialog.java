@@ -48,7 +48,7 @@ public class ServerURLDialog extends TitleAreaDialog {
 		super.okPressed();
 	}
 
-	public String getSeverURL() {
+	public String getServerURL() {
 		return serverURL;
 	}
 }

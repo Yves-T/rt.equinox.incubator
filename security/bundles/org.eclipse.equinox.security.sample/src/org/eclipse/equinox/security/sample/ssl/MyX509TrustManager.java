@@ -18,6 +18,10 @@ import org.eclipse.osgi.service.security.TrustEngine;
 
 public class MyX509TrustManager implements X509TrustManager {
 
+	public MyX509TrustManager() {
+		System.out.println("<<init>>");
+	}
+
 	public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 		throw new UnsupportedOperationException();
 	}
@@ -25,6 +29,7 @@ public class MyX509TrustManager implements X509TrustManager {
 	public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 		// use the trust engines certs
 		TrustEngine[] engines = AuthAppPlugin.getTrustEngines();
+		System.out.println("obtained " + engines.length + " trustengines");
 		Certificate foundCert = null;
 		for (int i = 0; i < chain.length; i++) {
 			try {

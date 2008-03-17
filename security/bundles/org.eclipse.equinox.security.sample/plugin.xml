@@ -178,27 +178,30 @@
          name="SecureStorage PasswordProvider LoginModule"
          point="org.eclipse.equinox.security.loginModule">
       <loginModule
-            class="org.eclipse.equinox.security.sample.module.PasswordProviderModule"
+            class="org.eclipse.equinox.security.sample.securestorage.PasswordProviderModule"
             description="LoginModule for SecureStorage">
       </loginModule>
    </extension>
+      
       <extension
             id="subjectPasswordProvider"
             point="org.eclipse.equinox.security.secureStorage">
          <provider
-               class="org.eclipse.equinox.security.sample.module.SubjectPasswordProvider"
+               class="org.eclipse.equinox.security.sample.securestorage.SubjectPasswordProvider"
                priority="1">
          </provider>
       </extension>
+      
       <extension
             id="trustLoginModule"
             name="TrustEngine LoginModule"
             point="org.eclipse.equinox.security.loginModule">
          <loginModule
-               class="org.eclipse.equinox.security.sample.module.TrustEngineLoginModule"
+               class="org.eclipse.equinox.security.sample.trustengine.TrustEngineLoginModule"
                description="TrustEngine LoginModule">
          </loginModule>
       </extension>
+      
       <extension
             id="basicAuthDialog"
             name="Basic Authentication Dialog"
