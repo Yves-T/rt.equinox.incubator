@@ -31,7 +31,7 @@ public class MyX509TrustManager implements X509TrustManager {
 		TrustEngine[] engines = AuthAppPlugin.getTrustEngines();
 		System.out.println("obtained " + engines.length + " trustengines");
 		Certificate foundCert = null;
-		for (int i = 0; i < chain.length; i++) {
+		for (int i = 0; i < engines.length; i++) {
 			try {
 				foundCert = engines[i].findTrustAnchor(chain);
 				if (null != foundCert)

@@ -13,8 +13,7 @@ package org.eclipse.equinox.security.sample;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
@@ -89,10 +88,7 @@ public class AuthAppPlugin implements BundleActivator {
 			engineTracker = new ServiceTracker(bundleContext, TrustEngine.class.getName(), null);
 			engineTracker.open();
 		}
-		Object objs[] = engineTracker.getServices();
-		TrustEngine[] result = new TrustEngine[objs.length];
-		System.arraycopy(objs, 0, result, 0, objs.length);
-		return result;
+		return (TrustEngine[]) Arrays.asList(engineTracker.getServices()).toArray(new TrustEngine[] {});
 	}
 
 	public static ISecurePreferences getSecurePreferences() {
