@@ -18,7 +18,7 @@ public class StoragePerspective implements IPerspectiveFactory {
 	public void createInitialLayout(IPageLayout layout) {
 		layout.setEditorAreaVisible(false);
 		//		layout.addStandaloneView("org.eclipse.equinox.security.sample.subjectView", false, IPageLayout.TOP, IPageLayout.RATIO_MAX, IPageLayout.ID_EDITOR_AREA);
-		layout.addView("org.eclipse.equinox.security.sample.credentialView", IPageLayout.LEFT, 0.3f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
+		layout.addView("org.eclipse.equinox.security.views.storage", IPageLayout.LEFT, 0.3f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
 		//layout.addView("org.eclipse.pde.runtime.RegistryBrowser", IPageLayout.RIGHT, 0.3f, IPageLayout.ID_OUTLINE); //$NON-NLS-1$
 
 		//layout.addView(UserCredentailView.ID, IPageLayout.RIGHT, 0.4f, IPageLayout.ID_EDITOR_AREA);
