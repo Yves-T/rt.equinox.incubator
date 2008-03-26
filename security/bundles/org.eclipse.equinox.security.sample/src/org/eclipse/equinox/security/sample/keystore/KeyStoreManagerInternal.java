@@ -21,8 +21,8 @@ import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.equinox.security.auth.ISecureContext;
-import org.eclipse.equinox.security.auth.SecurePlatform;
+import org.eclipse.equinox.security.auth.ILoginContext;
+import org.eclipse.equinox.security.auth.LoginContextFactory;
 import org.eclipse.equinox.security.sample.AuthAppPlugin;
 import org.eclipse.equinox.security.sample.keystore.nls.SampleMessages;
 import org.osgi.framework.Bundle;
@@ -38,7 +38,7 @@ public class KeyStoreManagerInternal {
 	private URL keyStoreUrl;
 	private KeyStore keyStore;
 
-	private ISecureContext secureContext = null;
+	private ILoginContext secureContext = null;
 
 	private KeyStoreManagerInternal() {
 		// hides default constructor
@@ -102,9 +102,9 @@ public class KeyStoreManagerInternal {
 		return keyStore;
 	}
 
-	public ISecureContext getSecureContext() {
+	public ILoginContext getSecureContext() {
 		if (secureContext == null)
-			secureContext = SecurePlatform.createContext(CONFIG_NAME_KEYSTORE);
+			secureContext = LoginContextFactory.createContext(CONFIG_NAME_KEYSTORE);
 		return secureContext;
 	}
 

@@ -15,8 +15,8 @@ import java.security.PrivilegedAction;
 import javax.security.auth.Subject;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.equinox.security.auth.ISecureContext;
-import org.eclipse.equinox.security.auth.SecurePlatform;
+import org.eclipse.equinox.security.auth.ILoginContext;
+import org.eclipse.equinox.security.auth.LoginContextFactory;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -35,7 +35,7 @@ public class AuthApplication implements IApplication {
 
 		String configName = AuthAppPlugin.getConfigurationName();
 		URL configUrl = AuthAppPlugin.getBundleContext().getBundle().getEntry(JAAS_CONFIG_FILE);
-		ISecureContext secureContext = SecurePlatform.createContext(configName, configUrl);
+		ILoginContext secureContext = LoginContextFactory.createContext(configName, configUrl);
 
 		secureContext.registerListener(new ProgressMonitorListener());
 

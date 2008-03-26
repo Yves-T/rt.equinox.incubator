@@ -12,11 +12,11 @@ package org.eclipse.equinox.security.sample;
 
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
-import org.eclipse.equinox.security.auth.event.ILoginListener;
+import org.eclipse.equinox.security.auth.ILoginContextListener;
 import org.eclipse.swt.widgets.Display;
 
 // Copied from AbstractLoginDialog
-public class ProgressMonitorListener implements ILoginListener {
+public class ProgressMonitorListener implements ILoginContextListener {
 
 	public void onLoginStart(Subject subject) {
 		final Display display = Display.getDefault();
@@ -56,5 +56,15 @@ public class ProgressMonitorListener implements ILoginListener {
 				//				}
 			}
 		});
+	}
+
+	public void onLogoutFinish(Subject subject, LoginException logoutException) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void onLogoutStart(Subject subject) {
+		// TODO Auto-generated method stub
+
 	}
 }
