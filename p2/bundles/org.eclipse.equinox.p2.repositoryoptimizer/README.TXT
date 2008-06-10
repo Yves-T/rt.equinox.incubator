@@ -1,1 +1,0 @@
-This project is obsolete. Work has moved to /cvsroot/eclipse/org.eclipse.equinox/p2/.

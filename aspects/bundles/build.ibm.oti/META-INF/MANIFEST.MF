@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Shared Classes Plug-in (Incubation)
-Bundle-SymbolicName: build.ibm.oti
-Bundle-Version: 1.0.0
-Bundle-Localization: plugin
-Export-Package: com.ibm.oti.shared
