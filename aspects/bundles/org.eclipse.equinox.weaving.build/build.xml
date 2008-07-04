@@ -1,0 +1,124 @@
+<?xml version="1.0" ?>
+<project name="AOSGi Build" default="all" basedir=".">
+	
+	<target name="all" depends="upload.update, upload.archive, upload.demos">
+	</target>
+	
+	<target name="clean">
+		
+		<delete dir="${basedir}/temp"/>
+			
+	</target>
+	
+	<target name="copy" depends="clean">
+		<mkdir dir="${basedir}/temp/projects"/>
+
+		<copy todir="${basedir}/temp/projects">
+			<fileset dir="${basedir}/../">			
+				<include name="demo.*/**"/>
+				<exclude name="*/bin/**"/>
+				<exclude name="**/*.class"/>
+				<exclude name="demo.eclipse.workbench.explorer/**"/>
+				<exclude name="demo.hello.management/**"/>
+				<exclude name="demo.swing*/**"/>
+			</fileset>
+		</copy>
+			
+	</target>
+	
+	<target name="copy.archive" depends="clean">
+		<mkdir dir="${basedir}/temp/site"/>
+
+		<copy todir="${basedir}/temp/site">
+			<fileset dir="${basedir}/../org.eclipse.equinox.weaving.site">			
+				<include name="**/*.jar"/>
+				<include name="**/readme.txt"/>
+			</fileset>
+		</copy>
+			
+	</target>
+
+	<property name="demos.jar" value="demo.aspectj.osgi_archive.zip"/>
+	
+	<target name="package" depends="copy">
+
+		<mkdir dir="${basedir}/temp/lib"/>
+
+		<zip
+			destfile="${basedir}/temp/lib/${demos.jar}"
+		>
+			<fileset dir="${basedir}/temp/projects">
+			</fileset>
+		
+		</zip>	
+	</target>
+
+	<property name="archive.zip" value="org.eclipse.equinox.weaving-incubation-1.0.0.200807042039-archive.zip"/>
+	<property name="feature.name" value="org.eclipse.equinox.weaving.feature_1.0.0.200807042039"/>
+	
+	<target name="package.archive" depends="copy.archive">
+
+		<!-- copy update site contents -->
+		<mkdir dir="${basedir}/temp/update"/>
+		
+		<copy todir="${basedir}/temp/update">
+			<fileset dir="${basedir}/temp/site"/>
+		</copy>
+		
+		<!-- generate download zip -->
+		<mkdir dir="${basedir}/temp/update/features/${feature.name}"/>
+
+		<unzip dest="${basedir}/temp/update/features/${feature.name}">
+			<fileset dir="${basedir}/temp/site/features">
+				<include name="*.jar"/>
+			</fileset>
+		</unzip>
+			
+		<delete dir="${basedir}/temp/update/features/${feature.name}/META-INF"/>
+		<delete>
+			<fileset dir="${basedir}/temp/update/features">
+				<include name="*.jar"/>
+			</fileset>
+		</delete>
+
+		<zip
+			destfile="${basedir}/temp/update/${archive.zip}"
+		>
+			<fileset dir="${basedir}/temp/update">
+			</fileset>
+		
+		</zip>	
+	</target>
+	
+	<property name="update.dir" value="/home/data/httpd/download.eclipse.org/tools/aspectj/dev/update"/>
+	
+	<property name="known_hosts" location="${basedir}/known_hosts.txt" />
+	<property name="psftp.properties" value="psftp.properties"/>
+	<property file="${basedir}/${psftp.properties}"/>
+	
+	<target name="upload.demos" depends="package">
+		<scp file="${basedir}/temp/lib/${demos.jar}" todir="${ftp.userid}:${ftp.password}@download1.eclipse.org:${update.dir}" knownhosts="${known_hosts}" /> 
+
+	</target>
+	
+	<target name="upload.update">
+		<scp file="${basedir}/../org.aspectj.osgi.site/site.xml" todir="${ftp.userid}:${ftp.password}@download1.eclipse.org:${update.dir}" knownhosts="${known_hosts}"/> 
+
+		<scp todir="${ftp.userid}:${ftp.password}@download1.eclipse.org:${update.dir}/features" knownhosts="${known_hosts}"> 
+			<fileset dir="${basedir}/../org.aspectj.osgi.site/features"> 
+				<include name="*.jar"/>
+			</fileset>
+		</scp> 
+
+		<scp todir="${ftp.userid}:${ftp.password}@download1.eclipse.org:${update.dir}/plugins" knownhosts="${known_hosts}"> 
+			<fileset dir="${basedir}/../org.aspectj.osgi.site/plugins"> 
+				<include name="*.jar"/>
+			</fileset>
+		</scp> 
+	</target>
+	
+	<target name="upload.archive"  depends="package.archive">
+		<scp file="${basedir}/temp/update/${archive.zip}" todir="${ftp.userid}:${ftp.password}@download1.eclipse.org:${update.dir}" knownhosts="${known_hosts}"/> 
+	</target>
+	
+</project>
