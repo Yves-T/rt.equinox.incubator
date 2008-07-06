@@ -1,0 +1,11 @@
+<aspectj>
+<!--
+	<aspects>
+		<aspect name="org.aspectj.test.performance.Aspect"/>
+	</aspects>
+-->	
+<!--
+	<weaver options="-verbose -showWeaveInfo  -XmessageHandlerClass:org.aspectj.test.performance.PerformanceMessageHandler -Xset:bcelRepositoryCaching=false"/>
+-->	
+	<weaver options="-XmessageHandlerClass:org.aspectj.test.performance.PerformanceMessageHandler"/>
+</aspectj>

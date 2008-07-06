@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<aspectj>
+    <aspects>
+        <!-- see here nested class with ".", "$" is accepted as well -->
+        <aspect name="org.eclipse.osgi.aspectj.tests.bundles.aspectWeaving3.AnotherFlagSetterImpl"/>
+    </aspects>
+</aspectj>

@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: RemoteAspect Plug-in (Incubation)
+Bundle-SymbolicName: org.eclipse.equinox.weaving.tests.remoteAspect
+Bundle-Version: 1.0.0
+Bundle-Localization: plugin
+Export-Package: org.eclipse.osgi.aspectj.tests.remoteAspect
+Require-Bundle: org.aspectj.runtime

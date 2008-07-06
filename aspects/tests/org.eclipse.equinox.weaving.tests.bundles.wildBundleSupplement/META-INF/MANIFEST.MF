@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: WildBundleSupplement Plug-in (Incubation)
+Bundle-SymbolicName: org.eclipse.equinox.weaving.tests.bundles.wildBundleSupplement
+Bundle-Version: 1.0.0
+Bundle-Localization: plugin
+Eclipse-SupplementBundle: org.eclipse.equinox.weaving.test*
+Export-Package: org.eclipse.osgi.aspectj.tests.bundles.wildBundleSupplement

@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: BundleSupplementWithRequire Plug-in (Incubation)
+Bundle-SymbolicName: org.eclipse.equinox.weaving.tests.bundles.bundleSupplementWithRequire
+Bundle-Version: 1.0.0
+Export-Package: org.eclipse.osgi.aspectj.tests.bundles.bundleSupplementWithRequire
+Require-Bundle: org.eclipse.equinox.weaving.tests
+Eclipse-SupplementBundle: org.eclipse.equinox.weaving.tests

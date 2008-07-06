@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: AspectWeavingLT Plug-in (Incubation)
+Bundle-SymbolicName: org.eclipse.equinox.weaving.tests.bundles.aspectWeavingLT
+Bundle-Version: 1.0.0
+Bundle-Localization: plugin
+Require-Bundle: org.aspectj.runtime
+Export-Package: org.eclipse.osgi.aspectj.tests.bundles.aspectWeavingLT 
+Import-Package: org.eclipse.osgi.aspectj.tests.bundles.spareBundle
+xEclipse-SupplementBundle: org.eclipse.osgi.aspectj.tests

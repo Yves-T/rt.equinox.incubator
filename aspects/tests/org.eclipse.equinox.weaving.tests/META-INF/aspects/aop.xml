@@ -1,0 +1,8 @@
+<aspectj>
+<!--
+	<weaver options="-showWeaveInfo" />
+-->	
+	<aspects>
+		<aspect name="org.eclipse.osgi.aspectj.tests.aspectWeaving.FlagSetterImpl" />
+	</aspects>
+</aspectj>

@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Class Visibility tester (Incubation)
+Bundle-SymbolicName: org.eclipse.equinox.weaving.tests
+Bundle-Version: 1.0.0
+Bundle-Localization: plugin
+Require-Bundle: org.junit,
+ org.aspectj.runtime,
+ org.eclipse.equinox.weaving.tests.bundles.aspectWeavingLT,
+ org.eclipse.equinox.weaving.tests.bundles.aspectWeavingLT2,
+ org.eclipse.equinox.weaving.tests.aunit,
+ system.bundle
+Import-Package: org.eclipse.core.runtime,
+ org.eclipse.osgi.aspectj.tests.bundles.aspectWeaving,
+ org.eclipse.osgi.aspectj.tests.bundles.extraSpareBundle,
+ org.eclipse.osgi.aspectj.tests.bundles.spareBundle,
+ resource.pkg
+Export-Package: org.eclipse.osgi.aspectj.tests.exportedPackage
+Bundle-Activator: org.eclipse.osgi.aspectj.tests.TestsActivator
+Eclipse-LazyStart: true
+Eclipse-AspectContext: META-INF/aspects/aop.xml
