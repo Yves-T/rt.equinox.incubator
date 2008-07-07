@@ -39,11 +39,6 @@
         fixed="false">
       </perspective>
       <perspective
-            class="org.eclipse.equinox.security.sample.StoragePerspective"
-            id="org.eclipse.equinox.security.sample.storagePerspective"
-            name="Secure Storage">
-      </perspective>
-      <perspective
             class="org.eclipse.equinox.security.sample.BundlesPerspective"
             id="org.eclipse.equinox.security.sample.bundlePerspective"
             name="Bundles Perspective">
