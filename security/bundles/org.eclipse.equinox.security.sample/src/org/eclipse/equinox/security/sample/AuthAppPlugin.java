@@ -42,8 +42,8 @@ public class AuthAppPlugin implements BundleActivator {
 	private static final String CONFIG_DEFAULT = "other"; //$NON-NLS-1$
 
 	/* stuff for secure preferences */
-	private static final String SECURE_PREFS_DEFAULT_ID = "org.eclipse.equinox.security.ui.defaultpasswordprovider"; //$NON-NLS-1$
-	//private static final String SECURE_PREFS_PROVIDER_ID = "org.eclipse.equinox.security.sample.SubjectPasswordProvider"; //$NON-NLS-1$
+	//private static final String SECURE_PREFS_DEFAULT_ID = "org.eclipse.equinox.security.ui.defaultpasswordprovider"; //$NON-NLS-1$
+	private static final String SECURE_PREFS_PROVIDER_ID = "org.eclipse.equinox.security.sample.SubjectPasswordProvider"; //$NON-NLS-1$
 	private static final String SECURE_PREFS_FILENAME = "secureprefs.properties"; //$NON-NLS-1$
 	private static File securePreferencesFile;
 	private static ISecurePreferences securePreferences;
@@ -94,7 +94,7 @@ public class AuthAppPlugin implements BundleActivator {
 	public static ISecurePreferences getSecurePreferences() {
 		if (null == securePreferences) {
 			Map options = new HashMap();
-			options.put(IProviderHints.REQUIRED_MODULE_ID, SECURE_PREFS_DEFAULT_ID);
+			options.put(IProviderHints.REQUIRED_MODULE_ID, SECURE_PREFS_PROVIDER_ID);
 			try {
 				securePreferences = SecurePreferencesFactory.open(securePreferencesFile.toURL(), options).node(BUNDLE_ID);
 			} catch (IOException e) {

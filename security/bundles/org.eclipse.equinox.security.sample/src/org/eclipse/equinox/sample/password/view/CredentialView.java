@@ -32,7 +32,7 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
 
-public class UserCredentailView extends ViewPart {
+public class CredentialView extends ViewPart {
 	public static final String ID = "org.eclipse.equinox.security.sample.credentialView";
 	private Action addCredAction;
 	private Action removeCredAction;

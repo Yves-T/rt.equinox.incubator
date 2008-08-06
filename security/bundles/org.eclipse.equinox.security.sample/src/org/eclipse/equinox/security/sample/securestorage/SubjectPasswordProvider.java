@@ -34,7 +34,8 @@ public class SubjectPasswordProvider extends PasswordProvider {
 		for (Iterator it = set.iterator(); it.hasNext();) {
 			IPrivateCredential cred = (IPrivateCredential) it.next();
 			if (SubjectPasswordProvider.class.getName().equals(cred.getProviderID()))
-				return cred.getPrivateKey();
+				System.out.println("Returned password for Provider");
+			return cred.getPrivateKey();
 		}
 		return null;
 	}
