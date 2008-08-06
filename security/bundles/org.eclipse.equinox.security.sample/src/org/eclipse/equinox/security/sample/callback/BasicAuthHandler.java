@@ -41,6 +41,11 @@ public class BasicAuthHandler extends AbstractLoginDialog {
 		return new Point(350, 250);
 	}
 
+	protected void configureShell(Shell newShell) {
+		super.configureShell(newShell);
+		newShell.setText("Enter your LDAP password");
+	}
+
 	protected Control createContents(Composite parent) {
 		Control composite = super.createContents(parent);
 		Button cancel = getButton(IDialogConstants.CANCEL_ID);
