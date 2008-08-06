@@ -231,6 +231,15 @@
                configName="LDAP-TE">
          </callbackHandlerMapping>
       </extension>
+      
+      <extension
+            point="org.eclipse.ui.importWizards">
+         <wizard
+               class="org.eclipse.equinox.security.sample.wizard.CertificateImportWizard"
+               id="certificateImport"
+               name="Certificate File">
+         </wizard>
+      </extension>
   
    
 </plugin>

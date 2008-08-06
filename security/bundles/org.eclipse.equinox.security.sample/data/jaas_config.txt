@@ -8,16 +8,16 @@ LDAP {
 	org.eclipse.equinox.security.auth.module.ExtensionLoginModule required
 		extensionId="org.eclipse.equinox.security.sample.ldapLoginModule"
 		debug=true
-		user.provider.url="ldap://localhost:10389/ou=Users,dc=example,dc=com"
-		group.provider.url="ldap://localhost:10389/ou=Groups,dc=example,dc=com";
+		user.provider.url="ldap://hydrogen.notesdev.ibm.com:10389/ou=Users,dc=example,dc=com"
+		group.provider.url="ldap://hydrogen.notesdev.ibm.com:10389/ou=Groups,dc=example,dc=com";
 };
 
 LDAP-SS {
 	org.eclipse.equinox.security.auth.module.ExtensionLoginModule required
 		extensionId="org.eclipse.equinox.security.sample.ldapLoginModule"
 		debug=true
-		user.provider.url="ldap://localhost:10389/ou=Users,dc=example,dc=com"
-		group.provider.url="ldap://localhost:10389/ou=Groups,dc=example,dc=com"
+		user.provider.url="ldap://hydrogen.notesdev.ibm.com:10389/ou=Users,dc=example,dc=com"
+		group.provider.url="ldap://hydrogen.notesdev.ibm.com:10389/ou=Groups,dc=example,dc=com"
 		storePass=true;
 		
 	org.eclipse.equinox.security.auth.module.ExtensionLoginModule optional
@@ -28,8 +28,8 @@ LDAP-TE {
 	org.eclipse.equinox.security.auth.module.ExtensionLoginModule required
 		extensionId="org.eclipse.equinox.security.sample.ldapLoginModule"
 		debug=true
-		user.provider.url="ldap://localhost:10389/ou=Users,dc=example,dc=com"
-		group.provider.url="ldap://localhost:10389/ou=Groups,dc=example,dc=com"
+		user.provider.url="ldap://hydrogen.notesdev.ibm.com:10389/ou=Users,dc=example,dc=com"
+		group.provider.url="ldap://hydrogen.notesdev.ibm.com:10389/ou=Groups,dc=example,dc=com"
 		storePass=true;
 
 	org.eclipse.equinox.security.auth.module.ExtensionLoginModule optional
