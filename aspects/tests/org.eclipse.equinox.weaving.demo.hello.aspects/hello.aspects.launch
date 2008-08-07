@@ -17,7 +17,7 @@
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${system_property:java.io.tmpdir}"/>
 <stringAttribute key="pde.version" value="3.3"/>
 <booleanAttribute key="show_selected_only" value="false"/>
-<stringAttribute key="target_bundles" value="org.aspectj.weaver@default:default,org.eclipse.equinox.weaving.aspectj@default:default,org.eclipse.osgi@:,org.eclipse.equinox.weaving.hook@default:false,org.aspectj.runtime@default:default"/>
+<stringAttribute key="target_bundles" value="org.eclipse.osgi@:,org.eclipse.equinox.weaving.aspectj@default:default,org.aspectj.runtime@default:default,org.aspectj.weaver@default:default,org.eclipse.equinox.weaving.hook@default:false"/>
 <booleanAttribute key="tracing" value="false"/>
 <booleanAttribute key="useDefaultConfigArea" value="true"/>
 <stringAttribute key="workspace_bundles" value="org.eclipse.equinox.weaving.demo.hello@default:default,org.eclipse.equinox.weaving.demo.hello.aspects@default:default"/>
