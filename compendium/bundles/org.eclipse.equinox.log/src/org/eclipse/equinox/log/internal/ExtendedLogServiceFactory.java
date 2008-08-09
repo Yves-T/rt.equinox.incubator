@@ -1,20 +1,17 @@
 /*******************************************************************************
- * Copyright (c) 2006 Cognos Incorporated.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * Copyright (c) 2006, 2008 Cognos Incorporated, IBM Corporation and others
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *******************************************************************************/
+ ******************************************************************************/
 package org.eclipse.equinox.log.internal;
 
-import org.eclipse.equinox.log.Logger;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceFactory;
-import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.*;
 
 public class ExtendedLogServiceFactory implements ServiceFactory {
-	private ExtendedLogReaderServiceFactory logReaderServiceFactory;
-	
+	private final ExtendedLogReaderServiceFactory logReaderServiceFactory;
+
 	public ExtendedLogServiceFactory(ExtendedLogReaderServiceFactory logReaderServiceFactory) {
 		this.logReaderServiceFactory = logReaderServiceFactory;
 	}
@@ -24,11 +21,7 @@ public class ExtendedLogServiceFactory implements ServiceFactory {
 	}
 
 	public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
-		// do nothing
-	}
-
-	public Logger getLogger(Bundle bundle, String name) {
-		return new LoggerImpl(this, bundle, name);
+		((ExtendedLogServiceImpl) service).shutdown();
 	}
 
 	public boolean isLoggable(Bundle bundle, String name, int level) {
@@ -36,6 +29,6 @@ public class ExtendedLogServiceFactory implements ServiceFactory {
 	}
 
 	public void log(Bundle bundle, String name, Object context, int level, String message, Throwable exception) {
-		logReaderServiceFactory.log(bundle, name, context, level, message, exception);		
+		logReaderServiceFactory.log(bundle, name, context, level, message, exception);
 	}
 }

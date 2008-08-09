@@ -1,15 +1,14 @@
 /*******************************************************************************
- * Copyright (c) 2006 Cognos Incorporated.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * Copyright (c) 2006, 2008 Cognos Incorporated, IBM Corporation and others
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *******************************************************************************/
+ ******************************************************************************/
 package org.eclipse.equinox.log.internal;
 
 import java.util.Map;
 import java.util.WeakHashMap;
-
 import org.eclipse.equinox.log.ExtendedLogEntry;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
@@ -39,8 +38,7 @@ public class ExtendedLogEntryImpl implements ExtendedLogEntry {
 		return threadID.intValue();
 	}
 
-	public ExtendedLogEntryImpl(Bundle bundle, String loggerName,
-			Object contextObject, int level, String message, Throwable throwable) {
+	public ExtendedLogEntryImpl(Bundle bundle, String loggerName, Object contextObject, int level, String message, Throwable throwable) {
 		this.time = System.currentTimeMillis();
 		this.loggerName = loggerName;
 		this.bundle = bundle;
