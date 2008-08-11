@@ -117,7 +117,7 @@ public class ExtendedLogReaderServiceFactory implements ServiceFactory {
 		try {
 			for (Iterator it = listeners.entrySet().iterator(); it.hasNext();) {
 				Entry entry = (Entry) it.next();
-				Object[] listenerObjects = (Object[]) it.next();
+				Object[] listenerObjects = (Object[]) entry.getValue();
 				LogFilter filter = (LogFilter) listenerObjects[0];
 				if (safeIsLoggable(filter, bundle, name, level)) {
 					LogListener listener = (LogListener) entry.getKey();
