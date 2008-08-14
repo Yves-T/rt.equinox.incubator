@@ -15,9 +15,9 @@ import org.osgi.framework.ServiceReference;
 
 public class ExtendedLogEntryImpl implements ExtendedLogEntry {
 
-	private static int nextThreadID = 1;
-	private static long nextSequenceNumber = 1;
-	private static final Map threadIDs = new WeakHashMap();
+	private static long nextSequenceNumber = 1L;
+	private static long nextThreadId = 1L;
+	private static final Map threadIds = createThreadIdMap();
 
 	private final String loggerName;
 	private final Bundle bundle;
@@ -26,16 +26,29 @@ public class ExtendedLogEntryImpl implements ExtendedLogEntry {
 	private final Throwable throwable;
 	private final Object contextObject;
 	private final long time;
-	private final long threadID;
+	private final long threadId;
+	private final String threadName;
 	private final long sequenceNumber;
 
-	private static synchronized int getID(Thread thread) {
-		Integer threadID = (Integer) threadIDs.get(thread);
-		if (threadID == null) {
-			threadID = new Integer(nextThreadID++);
-			threadIDs.put(thread, threadID);
+	private static Map createThreadIdMap() {
+		try {
+			Thread.class.getMethod("getId", null); //$NON-NLS-1$
+		} catch (NoSuchMethodException e) {
+			return new WeakHashMap();
 		}
-		return threadID.intValue();
+		return null;
+	}
+
+	private static long getId(Thread thread) {
+		if (threadIds == null)
+			return thread.getId();
+
+		Long threadId = (Long) threadIds.get(thread);
+		if (threadId == null) {
+			threadId = new Long(nextThreadId++);
+			threadIds.put(thread, threadId);
+		}
+		return threadId.longValue();
 	}
 
 	public ExtendedLogEntryImpl(Bundle bundle, String loggerName, Object contextObject, int level, String message, Throwable throwable) {
@@ -47,9 +60,12 @@ public class ExtendedLogEntryImpl implements ExtendedLogEntry {
 		this.throwable = throwable;
 		this.contextObject = contextObject;
 
+		Thread currentThread = Thread.currentThread();
+		this.threadName = currentThread.getName();
+
 		synchronized (ExtendedLogEntryImpl.class) {
+			this.threadId = getId(currentThread);
 			this.sequenceNumber = nextSequenceNumber++;
-			this.threadID = getID(Thread.currentThread());
 		}
 	}
 
@@ -61,8 +77,12 @@ public class ExtendedLogEntryImpl implements ExtendedLogEntry {
 		return sequenceNumber;
 	}
 
-	public long getThreadID() {
-		return threadID;
+	public long getThreadId() {
+		return threadId;
+	}
+
+	public String getThreadName() {
+		return threadName;
 	}
 
 	public Bundle getBundle() {
@@ -94,5 +114,15 @@ public class ExtendedLogEntryImpl implements ExtendedLogEntry {
 
 	public Object getContext() {
 		return contextObject;
+	}
+
+	/**
+	 *  @deprecated
+	 *  this will be removed very soon!!!
+	 *  use getThreadId() instead
+	 *  
+	 */
+	public long getThreadID() {
+		return threadId;
 	}
 }

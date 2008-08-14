@@ -14,7 +14,16 @@ public interface ExtendedLogEntry extends LogEntry {
 
 	Object getContext();
 
-	long getThreadID();
+	long getThreadId();
+
+	String getThreadName();
 
 	long getSequenceNumber();
+
+	/**
+	 *  @deprecated
+	 *  This will be removed shortly
+	 *  use getThreadId() instead
+	 */
+	long getThreadID();
 }
