@@ -74,4 +74,20 @@ public class LogReaderServiceTest extends TestCase {
 			listener.wait();
 		}
 	}
+
+	public void testLogEntry() throws Exception {
+		TestListener listener = new TestListener();
+		reader.addLogListener(listener);
+		long timeBeforeLog = System.currentTimeMillis();
+		synchronized (listener) {
+			log.log(logReference, LogService.LOG_INFO, "info", new Throwable("test"));
+			listener.wait();
+		}
+		assertTrue(listener.getEntry().getBundle() == Activator.getBundleContext().getBundle());
+		assertTrue(listener.getEntry().getMessage().equals("info"));
+		assertTrue(listener.getEntry().getException().getMessage().equals("test"));
+		assertTrue(listener.getEntry().getServiceReference() == logReference);
+		assertTrue(listener.getEntry().getTime() >= timeBeforeLog);
+		assertTrue(listener.getEntry().getLevel() == LogService.LOG_INFO);
+	}
 }
