@@ -7,6 +7,7 @@ public class AllExtendedLogServiceTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test extended log service"); //$NON-NLS-1$
 		suite.addTestSuite(ExtendedLogServiceTest.class);
+		suite.addTestSuite(ExtendedLogReaderServiceTest.class);
 		return suite;
 	}
 }

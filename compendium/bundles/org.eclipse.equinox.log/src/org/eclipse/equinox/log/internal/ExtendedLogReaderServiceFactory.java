@@ -7,6 +7,7 @@
  ******************************************************************************/
 package org.eclipse.equinox.log.internal;
 
+import java.io.PrintStream;
 import java.util.*;
 import java.util.Map.Entry;
 import org.eclipse.equinox.log.LogFilter;
@@ -43,11 +44,13 @@ public class ExtendedLogReaderServiceFactory implements ServiceFactory {
 
 	static final LogFilter NULL_LOGGER_FILTER = new LogFilter() {
 		public boolean isLoggable(Bundle b, String loggerName, int logLevel) {
-			return (loggerName == null);
+			return true;
 		}
 	};
 
 	private static final LogFilter[] ALWAYS_LOG = new LogFilter[0];
+
+	private static PrintStream errorStream;
 
 	private Map listeners = new HashMap();
 	private LogFilter[] filters = null;
@@ -60,14 +63,25 @@ public class ExtendedLogReaderServiceFactory implements ServiceFactory {
 		} catch (RuntimeException e) {
 			// "listener.logged" calls user code and might throw an unchecked exception
 			// we catch the error here to gather information on where the problem occurred.
-			System.err.println("LogFilter.isLoggable threw a non-fatal unchecked exception as follows:");
-			e.printStackTrace(System.err);
+			getErrorStream().println("LogFilter.isLoggable threw a non-fatal unchecked exception as follows:");
+			e.printStackTrace(getErrorStream());
 		} catch (LinkageError e) {
 			// Catch linkage errors as these are generally recoverable but let other Errors propagate (see bug 222001)
-			System.err.println("LogFilter.isLoggable threw a non-fatal unchecked exception as follows:");
-			e.printStackTrace(System.err);
+			getErrorStream().println("LogFilter.isLoggable threw a non-fatal unchecked exception as follows:");
+			e.printStackTrace(getErrorStream());
 		}
 		return false;
+	}
+
+	private static synchronized PrintStream getErrorStream() {
+		if (errorStream == null)
+			return System.err;
+
+		return errorStream;
+	}
+
+	public static synchronized void setErrorStream(PrintStream ps) {
+		errorStream = ps;
 	}
 
 	static void safeLogged(LogListener listener, LogEntry logEntry) {
@@ -76,12 +90,12 @@ public class ExtendedLogReaderServiceFactory implements ServiceFactory {
 		} catch (RuntimeException e) {
 			// "listener.logged" calls user code and might throw an unchecked exception
 			// we catch the error here to gather information on where the problem occurred.
-			System.err.println("LogListener.logged threw a non-fatal unchecked exception as follows:");
-			e.printStackTrace(System.err);
+			getErrorStream().println("LogListener.logged threw a non-fatal unchecked exception as follows:");
+			e.printStackTrace(getErrorStream());
 		} catch (LinkageError e) {
 			// Catch linkage errors as these are generally recoverable but let other Errors propagate (see bug 222001)
-			System.err.println("LogListener.logged threw a non-fatal unchecked exception as follows:");
-			e.printStackTrace(System.err);
+			getErrorStream().println("LogListener.logged threw a non-fatal unchecked exception as follows:");
+			e.printStackTrace(getErrorStream());
 		}
 	}
 
@@ -106,7 +120,7 @@ public class ExtendedLogReaderServiceFactory implements ServiceFactory {
 			int filtersLength = filters.length;
 			for (int i = 0; i < filtersLength; i++) {
 				LogFilter filter = filters[i];
-				if (filter.isLoggable(bundle, name, level))
+				if (safeIsLoggable(filter, bundle, name, level))
 					return true;
 			}
 		} finally {

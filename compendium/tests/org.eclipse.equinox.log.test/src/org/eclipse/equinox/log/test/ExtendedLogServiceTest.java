@@ -1,14 +1,8 @@
 package org.eclipse.equinox.log.test;
 
-import org.osgi.framework.Bundle;
-
-import org.eclipse.equinox.log.LogFilter;
-
-import org.eclipse.equinox.log.ExtendedLogReaderService;
-
-import org.eclipse.equinox.log.ExtendedLogService;
-
 import junit.framework.TestCase;
+import org.eclipse.equinox.log.*;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
@@ -84,9 +78,72 @@ public class ExtendedLogServiceTest extends TestCase {
 			public boolean isLoggable(Bundle b, String loggerName, int logLevel) {
 				return false;
 			}
-
 		});
 		if (log.isLoggable(LogService.LOG_INFO))
+			fail();
+	}
+
+	public void testNamedLoggerLogNull() throws Exception {
+		synchronized (listener) {
+			log.getLogger("test").log(null, 0, null, null);
+			listener.wait();
+		}
+		assertTrue(listener.getEntryX().getLoggerName() == "test");
+		assertTrue(listener.getEntry().getLevel() == 0);
+		assertTrue(listener.getEntry().getMessage() == null);
+		assertTrue(listener.getEntry().getException() == null);
+		assertTrue(listener.getEntry().getServiceReference() == null);
+	}
+
+	public void testNullLoggerLogNull() throws Exception {
+		synchronized (listener) {
+			log.getLogger(null).log(null, 0, null, null);
+			listener.wait();
+		}
+		assertTrue(listener.getEntryX().getLoggerName() == null);
+		assertTrue(listener.getEntry().getLevel() == 0);
+		assertTrue(listener.getEntry().getMessage() == null);
+		assertTrue(listener.getEntry().getException() == null);
+		assertTrue(listener.getEntry().getServiceReference() == null);
+	}
+
+	public void testNamedLoggerLogFull() throws Exception {
+		String message = "test";
+		Throwable t = new Throwable("test");
+		synchronized (listener) {
+			log.getLogger("test").log(logReference, LogService.LOG_INFO, message, t);
+			listener.wait();
+		}
+		assertTrue(listener.getEntryX().getLoggerName() == "test");
+		assertTrue(listener.getEntry().getLevel() == LogService.LOG_INFO);
+		assertTrue(listener.getEntry().getMessage().equals(message));
+		assertTrue(listener.getEntry().getException().getMessage().equals(t.getMessage()));
+		assertTrue(listener.getEntry().getServiceReference() == logReference);
+	}
+
+	public void testLoggerIsLoggableTrue() throws Exception {
+		reader.addLogListener(listener, new LogFilter() {
+
+			public boolean isLoggable(Bundle b, String loggerName, int logLevel) {
+				if (loggerName.equals("test"))
+					return true;
+				return false;
+			}
+		});
+		if (!log.getLogger("test").isLoggable(LogService.LOG_INFO))
+			fail();
+	}
+
+	public void testLoggerNotIsLoggableWithListener() throws Exception {
+		reader.addLogListener(listener, new LogFilter() {
+
+			public boolean isLoggable(Bundle b, String loggerName, int logLevel) {
+				if (loggerName.equals("test"))
+					return false;
+				return true;
+			}
+		});
+		if (log.getLogger("test").isLoggable(LogService.LOG_INFO))
 			fail();
 	}
 }

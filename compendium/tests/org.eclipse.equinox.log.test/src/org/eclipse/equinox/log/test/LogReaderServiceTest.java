@@ -1,6 +1,8 @@
 package org.eclipse.equinox.log.test;
 
+import java.io.*;
 import junit.framework.TestCase;
+import org.eclipse.equinox.log.internal.ExtendedLogReaderServiceFactory;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.*;
 
@@ -68,6 +70,12 @@ public class LogReaderServiceTest extends TestCase {
 			}
 		};
 		reader.addLogListener(listener);
+
+		ExtendedLogReaderServiceFactory.setErrorStream(new PrintStream(new OutputStream() {
+			public void write(int arg0) throws IOException {
+
+			}
+		}));
 
 		synchronized (listener) {
 			log.log(LogService.LOG_INFO, "info");
