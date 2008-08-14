@@ -1,14 +1,9 @@
 package org.eclipse.equinox.log.test;
 
-import org.osgi.service.log.LogReaderService;
-
-
-
-import org.osgi.service.log.LogService;
-
-import org.osgi.framework.ServiceReference;
-
 import junit.framework.TestCase;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.log.LogReaderService;
+import org.osgi.service.log.LogService;
 
 public class LogServiceTest extends TestCase {
 
@@ -137,7 +132,7 @@ public class LogServiceTest extends TestCase {
 		}
 		assertTrue(listener.getEntry().getServiceReference() == null);
 	}
-	
+
 	public void testLogServiceReferenceWithNullThrowable() throws Exception {
 		synchronized (listener) {
 			log.log(logReference, LogService.LOG_INFO, null, null);
@@ -179,7 +174,6 @@ public class LogServiceTest extends TestCase {
 		assertTrue(listener.getEntry().getServiceReference() == null);
 	}
 
-	
 	public void testLogNull4() throws Exception {
 		synchronized (listener) {
 			log.log(null, 0, null, null);
@@ -191,7 +185,6 @@ public class LogServiceTest extends TestCase {
 		assertTrue(listener.getEntry().getServiceReference() == null);
 	}
 
-	
 	public void testLogFull1() throws Exception {
 		String message = "test";
 		synchronized (listener) {
@@ -229,7 +222,6 @@ public class LogServiceTest extends TestCase {
 		assertTrue(listener.getEntry().getServiceReference() == logReference);
 	}
 
-	
 	public void testLogFull4() throws Exception {
 		String message = "test";
 		Throwable t = new Throwable("test");
@@ -242,5 +234,5 @@ public class LogServiceTest extends TestCase {
 		assertTrue(listener.getEntry().getException().getMessage().equals(t.getMessage()));
 		assertTrue(listener.getEntry().getServiceReference() == logReference);
 	}
-	
+
 }

@@ -6,8 +6,6 @@ import org.eclipse.equinox.log.LogFilter;
 
 import org.eclipse.equinox.log.ExtendedLogReaderService;
 
-import org.osgi.service.log.LogReaderService;
-
 import org.eclipse.equinox.log.ExtendedLogService;
 
 import junit.framework.TestCase;
@@ -60,7 +58,7 @@ public class ExtendedLogServiceTest extends TestCase {
 		}
 		assertTrue(listener.getEntryX().getContext() == null);
 	}
-	
+
 	public void testLogContextWithNullThrowable() throws Exception {
 		synchronized (listener) {
 			log.log(this, LogService.LOG_INFO, null, null);
@@ -68,25 +66,25 @@ public class ExtendedLogServiceTest extends TestCase {
 		}
 		assertTrue(listener.getEntryX().getContext() == this);
 	}
-	
+
 	public void testIsLoggableTrue() throws Exception {
-		if (! log.isLoggable(LogService.LOG_INFO))
+		if (!log.isLoggable(LogService.LOG_INFO))
 			fail();
 	}
-	
+
 	public void testNotIsLoggableWithNoListener() throws Exception {
 		reader.removeLogListener(listener);
 		if (log.isLoggable(LogService.LOG_INFO))
 			fail();
 	}
-	
+
 	public void testNotIsLoggableWithListener() throws Exception {
 		reader.addLogListener(listener, new LogFilter() {
 
-			public boolean isLoggable(Bundle b, String loggerName, int logLevel) {				
+			public boolean isLoggable(Bundle b, String loggerName, int logLevel) {
 				return false;
 			}
-			
+
 		});
 		if (log.isLoggable(LogService.LOG_INFO))
 			fail();
