@@ -60,9 +60,11 @@ public class ExtendedLogReaderServiceFactory implements ServiceFactory {
 		} catch (RuntimeException e) {
 			// "listener.logged" calls user code and might throw an unchecked exception
 			// we catch the error here to gather information on where the problem occurred.
+			System.err.println("LogFilter.isLoggable threw a non-fatal unchecked exception as follows:");
 			e.printStackTrace(System.err);
 		} catch (LinkageError e) {
 			// Catch linkage errors as these are generally recoverable but let other Errors propagate (see bug 222001)
+			System.err.println("LogFilter.isLoggable threw a non-fatal unchecked exception as follows:");
 			e.printStackTrace(System.err);
 		}
 		return false;
@@ -74,9 +76,11 @@ public class ExtendedLogReaderServiceFactory implements ServiceFactory {
 		} catch (RuntimeException e) {
 			// "listener.logged" calls user code and might throw an unchecked exception
 			// we catch the error here to gather information on where the problem occurred.
+			System.err.println("LogListener.logged threw a non-fatal unchecked exception as follows:");
 			e.printStackTrace(System.err);
 		} catch (LinkageError e) {
 			// Catch linkage errors as these are generally recoverable but let other Errors propagate (see bug 222001)
+			System.err.println("LogListener.logged threw a non-fatal unchecked exception as follows:");
 			e.printStackTrace(System.err);
 		}
 	}
