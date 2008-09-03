@@ -15,14 +15,20 @@ import org.osgi.service.log.LogService;
 
 public class Activator implements BundleActivator {
 
+	private static final String EVENT_ADMIN_CLASS = "org.osgi.service.event.EventAdmin"; //$NON-NLS-1$
 	private static final String[] LOGSERVICE_CLASSES = {LogService.class.getName(), ExtendedLogService.class.getName()};
 	private static final String[] LOGREADERSERVICE_CLASSES = {LogReaderService.class.getName(), ExtendedLogReaderService.class.getName()};
 
 	private ServiceRegistration logReaderServiceRegistration;
 	private ServiceRegistration logServiceRegistration;
+	private EventAdminAdapter eventAdminAdapter;
 
 	public void start(BundleContext context) throws Exception {
 		ExtendedLogReaderServiceFactory logReaderServiceFactory = new ExtendedLogReaderServiceFactory();
+		if (checkEventAdmin()) {
+			eventAdminAdapter = new EventAdminAdapter(context, logReaderServiceFactory);
+			eventAdminAdapter.start();
+		}
 		ExtendedLogServiceFactory logServiceFactory = new ExtendedLogServiceFactory(logReaderServiceFactory);
 
 		logReaderServiceRegistration = context.registerService(LOGREADERSERVICE_CLASSES, logReaderServiceFactory, null);
@@ -33,6 +39,21 @@ public class Activator implements BundleActivator {
 		logServiceRegistration.unregister();
 		logServiceRegistration = null;
 		logReaderServiceRegistration.unregister();
+		if (eventAdminAdapter != null) {
+			eventAdminAdapter.stop();
+			eventAdminAdapter = null;
+		}
 		logReaderServiceRegistration = null;
 	}
+
+	private static boolean checkEventAdmin() {
+		// cannot support scheduling without the event admin package
+		try {
+			Class.forName(EVENT_ADMIN_CLASS);
+			return true;
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
+	}
+
 }
