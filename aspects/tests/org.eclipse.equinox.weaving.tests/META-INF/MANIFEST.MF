@@ -9,11 +9,13 @@ Require-Bundle: org.junit,
  org.eclipse.equinox.weaving.tests.bundles.aspectWeavingLT,
  org.eclipse.equinox.weaving.tests.bundles.aspectWeavingLT2,
  org.eclipse.equinox.weaving.tests.aunit,
- system.bundle
+ system.bundle,
+ org.easymock;bundle-version="2.4.0"
 Import-Package: org.eclipse.core.runtime,
  org.eclipse.osgi.aspectj.tests.bundles.aspectWeaving,
  org.eclipse.osgi.aspectj.tests.bundles.extraSpareBundle,
  org.eclipse.osgi.aspectj.tests.bundles.spareBundle,
+ org.eclipse.osgi.util;version="1.1.0",
  resource.pkg
 Export-Package: org.eclipse.osgi.aspectj.tests.exportedPackage
 Bundle-Activator: org.eclipse.osgi.aspectj.tests.TestsActivator

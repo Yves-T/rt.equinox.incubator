@@ -6,7 +6,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   David Knibb               initial implementation      
+ *   David Knibb               initial implementation
+ *   Martin Lippert            new tests added     
  *******************************************************************************/
 
 package org.eclipse.osgi.aspectj.tests;
@@ -16,17 +17,19 @@ import junit.framework.TestSuite;
 
 public class AllTests {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite(
-				"Test for org.eclipse.equinox.weaving.tests");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(SupplementsBundlesTest.class);
-		suite.addTestSuite(SupplementsBundleWithRequireTest.class);
-		suite.addTestSuite(SupplementsExportersTest.class);
-		suite.addTestSuite(SupplementsImportersTest.class);
-		suite.addTestSuite(WeavingTest.class);
-		//$JUnit-END$
-		return suite;
-	}
+    public static Test suite() {
+        TestSuite suite = new TestSuite(
+                "Test for org.eclipse.equinox.weaving.tests");
+        //$JUnit-BEGIN$
+        suite.addTestSuite(SupplementsBundlesTest.class);
+        suite.addTestSuite(SupplementsBundleWithRequireTest.class);
+        suite.addTestSuite(SupplementsExportersTest.class);
+        suite.addTestSuite(SupplementsImportersTest.class);
+        suite.addTestSuite(WeavingTest.class);
+        suite.addTestSuite(SupplementerRegistryTest.class);
+        suite.addTestSuite(WeavingLoaderDelegateHookTest.class);
+        //$JUnit-END$
+        return suite;
+    }
 
 }
