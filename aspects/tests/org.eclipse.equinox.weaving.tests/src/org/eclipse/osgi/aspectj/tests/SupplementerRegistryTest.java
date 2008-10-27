@@ -18,10 +18,13 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
+import org.eclipse.equinox.service.weaving.ISupplementerRegistry;
+import org.eclipse.equinox.weaving.hooks.IAdaptorProvider;
 import org.eclipse.equinox.weaving.hooks.SupplementerRegistry;
 import org.eclipse.osgi.util.ManifestElement;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.packageadmin.PackageAdmin;
 
 /**
  * several test cases for the supplementer registry
@@ -36,7 +39,7 @@ public class SupplementerRegistryTest extends TestCase {
 
     private Bundle otherBundle;
 
-    private SupplementerRegistry registry;
+    private ISupplementerRegistry registry;
 
     private Bundle supplementedBundle1;
 
@@ -50,14 +53,16 @@ public class SupplementerRegistryTest extends TestCase {
 
     private Bundle supplementerBundle3;
 
+    private IAdaptorProvider adaptorProvider;
+
+    private PackageAdmin packageAdmin;
+
     /**
      * test the supplementer registry by adding a simple bundle without any
      * supplementing to it
      */
     public void testSupplementerRegistryAddSimpleBundle() {
         EasyMock.expect(bundle.getHeaders()).andStubReturn(new Hashtable());
-        EasyMock.expect(bundle.getSymbolicName())
-                .andStubReturn("symbolic-name");
 
         EasyMock.replay(mocks);
 
@@ -79,7 +84,6 @@ public class SupplementerRegistryTest extends TestCase {
      * @throws Exception
      */
     public void testSupplementerRegistryEmpty() throws Exception {
-        EasyMock.expect(context.getBundle(0)).andReturn(bundle);
 
         EasyMock.replay(mocks);
 
@@ -97,7 +101,7 @@ public class SupplementerRegistryTest extends TestCase {
                 "Import-Package", "org.test1,\n org.test2"); //$NON-NLS-1$ //$NON-NLS-2$
         final ManifestElement[] exports = ManifestElement.parseHeader(
                 "Export-Package", "org.test3,\n org.test4"); //$NON-NLS-1$ //$NON-NLS-2$
-        final List possibleSupplementers = registry.getSupplementers(
+        final List<Bundle> possibleSupplementers = registry.getSupplementers(
                 "symbolicName", imports, exports); //$NON-NLS-1$
         assertNotNull(possibleSupplementers);
         assertEquals(0, possibleSupplementers.size());
@@ -113,7 +117,8 @@ public class SupplementerRegistryTest extends TestCase {
         Hashtable headers = new Hashtable();
         headers.put("Eclipse-SupplementImporter", "test.import1");
         headers.put("Eclipse-SupplementExporter", "test.export1");
-        headers.put("Eclipse-SupplementBundle", "test.bundle1");
+        headers.put("Eclipse-SupplementBundle",
+                "symbolic-name-supplementedBundle1");
         EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
         EasyMock.expect(bundle.getSymbolicName()).andStubReturn("supplementer");
         EasyMock.expect(context.getBundles())
@@ -121,22 +126,16 @@ public class SupplementerRegistryTest extends TestCase {
 
         EasyMock.expect(supplementedBundle1.getHeaders()).andStubReturn(
                 new Hashtable());
-        EasyMock.expect(supplementedBundle1.getSymbolicName()).andStubReturn(
-                "test.bundle1");
 
         headers = new Hashtable();
         headers.put("Export-Package", "test.export1");
         EasyMock.expect(supplementedBundle2.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementedBundle2.getSymbolicName()).andStubReturn(
-                "test.bundle2");
 
         headers = new Hashtable();
         headers.put("Import-Package", "test.import1");
         EasyMock.expect(supplementedBundle3.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementedBundle3.getSymbolicName()).andStubReturn(
-                "test.bundle3");
 
         EasyMock.replay(mocks);
 
@@ -166,22 +165,17 @@ public class SupplementerRegistryTest extends TestCase {
         headers.put("Eclipse-SupplementImporter", "test.import1");
         EasyMock.expect(supplementerBundle1.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementerBundle1.getSymbolicName()).andStubReturn(
-                "supplementer1");
 
         headers = new Hashtable();
         headers.put("Eclipse-SupplementExporter", "test.export1");
         EasyMock.expect(supplementerBundle2.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementerBundle2.getSymbolicName()).andStubReturn(
-                "supplementer2");
 
         headers = new Hashtable();
-        headers.put("Eclipse-SupplementBundle", "test.bundle1");
+        headers.put("Eclipse-SupplementBundle",
+                "symbolic-name-supplementedBundle*");
         EasyMock.expect(supplementerBundle3.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementerBundle3.getSymbolicName()).andStubReturn(
-                "supplementer3");
 
         EasyMock.expect(context.getBundles()).andStubReturn(
                 new Bundle[] { supplementerBundle1, supplementerBundle2,
@@ -192,23 +186,20 @@ public class SupplementerRegistryTest extends TestCase {
         headers.put("Export-Package", "test.export1");
         EasyMock.expect(supplementedBundle1.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementedBundle1.getSymbolicName()).andStubReturn(
-                "test.bundle1");
 
         headers = new Hashtable();
         EasyMock.expect(supplementedBundle2.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementedBundle2.getSymbolicName()).andStubReturn(
-                "test.bundle1");
 
         EasyMock.expect(supplementedBundle1.getState()).andStubReturn(
                 Bundle.RESOLVED);
         EasyMock.expect(supplementedBundle2.getState()).andStubReturn(
                 Bundle.RESOLVED);
 
-        supplementedBundle1.update();
-        supplementedBundle1.update();
-        supplementedBundle2.update();
+        packageAdmin.refreshPackages(EasyMock
+                .aryEq(new Bundle[] { supplementedBundle1 }));
+        packageAdmin.refreshPackages(EasyMock.aryEq(new Bundle[] {
+                supplementedBundle1, supplementedBundle2 }));
 
         EasyMock.replay(mocks);
 
@@ -247,22 +238,17 @@ public class SupplementerRegistryTest extends TestCase {
         headers.put("Eclipse-SupplementImporter", "test.import1");
         EasyMock.expect(supplementerBundle1.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementerBundle1.getSymbolicName()).andStubReturn(
-                "supplementer1");
 
         headers = new Hashtable();
         headers.put("Eclipse-SupplementExporter", "test.export1");
         EasyMock.expect(supplementerBundle2.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementerBundle2.getSymbolicName()).andStubReturn(
-                "supplementer2");
 
         headers = new Hashtable();
-        headers.put("Eclipse-SupplementBundle", "test.bundle1");
+        headers.put("Eclipse-SupplementBundle",
+                "symbolic-name-supplementedBundle*");
         EasyMock.expect(supplementerBundle3.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementerBundle3.getSymbolicName()).andStubReturn(
-                "supplementer3");
 
         EasyMock.expect(context.getBundles()).andStubReturn(
                 new Bundle[] { supplementerBundle1, supplementerBundle2,
@@ -273,14 +259,10 @@ public class SupplementerRegistryTest extends TestCase {
         headers.put("Export-Package", "test.export1");
         EasyMock.expect(supplementedBundle1.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementedBundle1.getSymbolicName()).andStubReturn(
-                "test.bundle1");
 
         headers = new Hashtable();
         EasyMock.expect(supplementedBundle2.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementedBundle2.getSymbolicName()).andStubReturn(
-                "test.bundle1");
 
         EasyMock.replay(mocks);
 
@@ -310,7 +292,6 @@ public class SupplementerRegistryTest extends TestCase {
         final Hashtable headers = new Hashtable();
         headers.put("Eclipse-SupplementBundle", "test.bundle1");
         EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
-        EasyMock.expect(bundle.getSymbolicName()).andStubReturn("supplementer");
         EasyMock.expect(context.getBundles())
                 .andReturn(new Bundle[] { bundle });
 
@@ -323,8 +304,8 @@ public class SupplementerRegistryTest extends TestCase {
                 "Import-Package", "org.test1,\n org.test2"); //$NON-NLS-1$ //$NON-NLS-2$
         final ManifestElement[] exports = ManifestElement.parseHeader(
                 "Export-Package", "org.test3,\n org.test4"); //$NON-NLS-1$ //$NON-NLS-2$
-        final List supplementers = registry.getSupplementers("test.bundle1",
-                imports, exports);
+        final List<Bundle> supplementers = registry.getSupplementers(
+                "test.bundle1", imports, exports);
         assertNotNull(supplementers);
         assertEquals(0, supplementers.size());
 
@@ -339,16 +320,14 @@ public class SupplementerRegistryTest extends TestCase {
     public void testSupplementerRegistryWithSupplementedBundle()
             throws Exception {
         final Hashtable headers = new Hashtable();
-        headers.put("Eclipse-SupplementBundle", "test.bundle1");
+        headers.put("Eclipse-SupplementBundle",
+                "symbolic-name-supplementedBundle1");
         EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
-        EasyMock.expect(bundle.getSymbolicName()).andStubReturn("supplementer");
         EasyMock.expect(context.getBundles())
                 .andReturn(new Bundle[] { bundle });
 
         EasyMock.expect(supplementedBundle1.getHeaders()).andStubReturn(
                 new Hashtable());
-        EasyMock.expect(supplementedBundle1.getSymbolicName()).andStubReturn(
-                "test.bundle1");
 
         EasyMock.replay(mocks);
 
@@ -372,7 +351,6 @@ public class SupplementerRegistryTest extends TestCase {
         Hashtable headers = new Hashtable();
         headers.put("Eclipse-SupplementExporter", "test.package1");
         EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
-        EasyMock.expect(bundle.getSymbolicName()).andStubReturn("supplementer");
         EasyMock.expect(context.getBundles())
                 .andReturn(new Bundle[] { bundle });
 
@@ -380,8 +358,6 @@ public class SupplementerRegistryTest extends TestCase {
         headers.put("Export-Package", "test.package1");
         EasyMock.expect(supplementedBundle1.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementedBundle1.getSymbolicName()).andStubReturn(
-                "test.bundle1");
 
         EasyMock.replay(mocks);
 
@@ -405,7 +381,6 @@ public class SupplementerRegistryTest extends TestCase {
         Hashtable headers = new Hashtable();
         headers.put("Eclipse-SupplementImporter", "test.package1");
         EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
-        EasyMock.expect(bundle.getSymbolicName()).andStubReturn("supplementer");
         EasyMock.expect(context.getBundles())
                 .andReturn(new Bundle[] { bundle });
 
@@ -413,8 +388,6 @@ public class SupplementerRegistryTest extends TestCase {
         headers.put("Import-Package", "test.package1");
         EasyMock.expect(supplementedBundle1.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementedBundle1.getSymbolicName()).andStubReturn(
-                "test.bundle1");
 
         EasyMock.replay(mocks);
 
@@ -437,7 +410,6 @@ public class SupplementerRegistryTest extends TestCase {
         final Hashtable headers = new Hashtable();
         headers.put("Eclipse-SupplementBundle", "test.bundle1");
         EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
-        EasyMock.expect(bundle.getSymbolicName()).andStubReturn("supplementer");
         EasyMock.expect(context.getBundles())
                 .andReturn(new Bundle[] { bundle });
 
@@ -448,11 +420,11 @@ public class SupplementerRegistryTest extends TestCase {
                 "Import-Package", "org.test1,\n org.test2"); //$NON-NLS-1$ //$NON-NLS-2$
         final ManifestElement[] exports = ManifestElement.parseHeader(
                 "Export-Package", "org.test3,\n org.test4"); //$NON-NLS-1$ //$NON-NLS-2$
-        final List supplementers = registry.getSupplementers("test.bundle1",
-                imports, exports);
+        final List<Bundle> supplementers = registry.getSupplementers(
+                "test.bundle1", imports, exports);
         assertNotNull(supplementers);
         assertEquals(1, supplementers.size());
-        assertEquals("supplementer", supplementers.get(0));
+        assertEquals(bundle, supplementers.get(0));
 
         EasyMock.verify(mocks);
     }
@@ -460,18 +432,15 @@ public class SupplementerRegistryTest extends TestCase {
     public void testSupplementerRegistryWithWildcards() throws Exception {
         Hashtable headers = new Hashtable();
         headers = new Hashtable();
-        headers.put("Eclipse-SupplementBundle", "test.*");
+        headers.put("Eclipse-SupplementBundle",
+                "symbolic-name-supplementedBundle*");
         EasyMock.expect(supplementerBundle1.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementerBundle1.getSymbolicName()).andStubReturn(
-                "supplementer1");
 
         headers = new Hashtable();
-        headers.put("Eclipse-SupplementBundle", "test.bundle*");
+        headers.put("Eclipse-SupplementBundle", "symbolic-name-supplemented*");
         EasyMock.expect(supplementerBundle2.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementerBundle2.getSymbolicName()).andStubReturn(
-                "supplementer2");
 
         EasyMock.expect(context.getBundles()).andStubReturn(
                 new Bundle[] { supplementerBundle1, supplementerBundle2 });
@@ -479,20 +448,14 @@ public class SupplementerRegistryTest extends TestCase {
         headers = new Hashtable();
         EasyMock.expect(supplementedBundle1.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementedBundle1.getSymbolicName()).andStubReturn(
-                "test.bundle.more");
 
         headers = new Hashtable();
         EasyMock.expect(supplementedBundle2.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementedBundle2.getSymbolicName()).andStubReturn(
-                "test2.bundle");
 
         headers = new Hashtable();
         EasyMock.expect(supplementedBundle3.getHeaders())
                 .andStubReturn(headers);
-        EasyMock.expect(supplementedBundle3.getSymbolicName()).andStubReturn(
-                "test.bundle");
 
         EasyMock.replay(mocks);
 
@@ -508,14 +471,14 @@ public class SupplementerRegistryTest extends TestCase {
         assertTrue(Arrays.asList(supplementers).contains(supplementerBundle2));
 
         supplementers = registry.getSupplementers(supplementedBundle2);
-        assertEquals(0, supplementers.length);
-        assertFalse(Arrays.asList(supplementers).contains(supplementerBundle1));
-        assertFalse(Arrays.asList(supplementers).contains(supplementerBundle2));
-
-        supplementers = registry.getSupplementers(supplementedBundle3);
         assertEquals(2, supplementers.length);
         assertTrue(Arrays.asList(supplementers).contains(supplementerBundle1));
         assertTrue(Arrays.asList(supplementers).contains(supplementerBundle2));
+
+        supplementers = registry.getSupplementers(supplementedBundle3);
+        assertEquals(0, supplementers.length);
+        assertFalse(Arrays.asList(supplementers).contains(supplementerBundle1));
+        assertFalse(Arrays.asList(supplementers).contains(supplementerBundle2));
 
         EasyMock.verify(mocks);
     }
@@ -526,9 +489,9 @@ public class SupplementerRegistryTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        registry = new SupplementerRegistry();
 
-        context = EasyMock.createMock(BundleContext.class);
+        adaptorProvider = EasyMock.createNiceMock(IAdaptorProvider.class);
+        context = EasyMock.createNiceMock(BundleContext.class);
         bundle = EasyMock.createMock(Bundle.class);
         otherBundle = EasyMock.createMock(Bundle.class);
         supplementerBundle1 = EasyMock.createMock(Bundle.class);
@@ -537,11 +500,43 @@ public class SupplementerRegistryTest extends TestCase {
         supplementedBundle1 = EasyMock.createMock(Bundle.class);
         supplementedBundle2 = EasyMock.createMock(Bundle.class);
         supplementedBundle3 = EasyMock.createMock(Bundle.class);
-        registry.setBundleContext(context);
 
-        mocks = new Object[] { context, bundle, otherBundle,
-                supplementedBundle1, supplementedBundle2, supplementedBundle3,
-                supplementerBundle1, supplementerBundle2, supplementerBundle3 };
+        packageAdmin = EasyMock.createMock(PackageAdmin.class);
+
+        registry = new SupplementerRegistry(adaptorProvider);
+        registry.setBundleContext(context);
+        registry.setPackageAdmin(packageAdmin);
+
+        EasyMock.expect(bundle.getBundleId()).andStubReturn(1l);
+        EasyMock.expect(otherBundle.getBundleId()).andStubReturn(2l);
+        EasyMock.expect(supplementerBundle1.getBundleId()).andStubReturn(3l);
+        EasyMock.expect(supplementerBundle2.getBundleId()).andStubReturn(4l);
+        EasyMock.expect(supplementerBundle3.getBundleId()).andStubReturn(5l);
+        EasyMock.expect(supplementedBundle1.getBundleId()).andStubReturn(6l);
+        EasyMock.expect(supplementedBundle2.getBundleId()).andStubReturn(7l);
+        EasyMock.expect(supplementedBundle3.getBundleId()).andStubReturn(8l);
+
+        EasyMock.expect(bundle.getSymbolicName()).andStubReturn(
+                "symbolic-name-bundle");
+        EasyMock.expect(otherBundle.getSymbolicName()).andStubReturn(
+                "symbolic-name-otherBundle");
+        EasyMock.expect(supplementerBundle1.getSymbolicName()).andStubReturn(
+                "symbolic-name-supplementerBundle1");
+        EasyMock.expect(supplementerBundle2.getSymbolicName()).andStubReturn(
+                "symbolic-name-supplementerBundle2");
+        EasyMock.expect(supplementerBundle3.getSymbolicName()).andStubReturn(
+                "symbolic-name-supplementerBundle3");
+        EasyMock.expect(supplementedBundle1.getSymbolicName()).andStubReturn(
+                "symbolic-name-supplementedBundle1");
+        EasyMock.expect(supplementedBundle2.getSymbolicName()).andStubReturn(
+                "symbolic-name-supplementedBundle2");
+        EasyMock.expect(supplementedBundle3.getSymbolicName()).andStubReturn(
+                "different-symbolic-name");
+
+        mocks = new Object[] { adaptorProvider, packageAdmin, context, bundle,
+                otherBundle, supplementedBundle1, supplementedBundle2,
+                supplementedBundle3, supplementerBundle1, supplementerBundle2,
+                supplementerBundle3 };
     }
 
 }

@@ -12,15 +12,18 @@
 package org.eclipse.osgi.aspectj.tests;
 
 /**
- * This class is used by the main testing classes.
- * It attempt to resolve a specified class using Class.forname()
+ * This class is used by the main testing classes. It attempt to resolve a
+ * specified class using Class.forname()
+ * 
  * @author David Knibb
- *
+ * 
  */
 public class ClassVisibilityTester {
-	
-	public static void testVis(String name) throws ClassNotFoundException {
-		Class clazz = Class.forName(name);
-		System.out.println(clazz);
-	}
+
+    public static void testVis(String name) throws ClassNotFoundException {
+        //		Class clazz = Class.forName(name);
+        Class<?> clazz = ClassVisibilityTester.class.getClassLoader()
+                .loadClass(name);
+        System.out.println(clazz);
+    }
 }
