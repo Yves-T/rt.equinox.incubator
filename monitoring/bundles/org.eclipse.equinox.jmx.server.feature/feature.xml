@@ -14,7 +14,7 @@
    </license>
 
    <requires>
-      <import feature="org.eclipse.equinox.jmx.common.feature" version="1.0.0.qualifier"/>
+      <import feature="org.eclipse.equinox.jmx.common.feature" version="1.0.0"/>
    </requires>
 
    <plugin
