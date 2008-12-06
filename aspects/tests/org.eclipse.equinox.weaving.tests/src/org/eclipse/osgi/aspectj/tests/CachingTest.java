@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *   Matthew Webster           initial implementation      
+ *   Martin Lippert            extracted caching service factory
  *******************************************************************************/
 
 package org.eclipse.osgi.aspectj.tests;
@@ -18,7 +19,7 @@ import java.util.List;
 
 import org.aspectj.aunit.TestMessageHandler;
 import org.aspectj.aunit.WeavingTestCase;
-import org.eclipse.equinox.service.weaving.ICachingService;
+import org.eclipse.equinox.service.weaving.ICachingServiceFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -55,12 +56,12 @@ public class CachingTest extends WeavingTestCase {
 
     public void testCachingService() {
         ServiceReference ref = context
-                .getServiceReference(ICachingService.class.getName());
+                .getServiceReference(ICachingServiceFactory.class.getName());
         assertNotNull("Cannot find caching service", ref);
-        ICachingService singletonCachingService = (ICachingService) context
+        ICachingServiceFactory cachingServiceFactory = (ICachingServiceFactory) context
                 .getService(ref);
         assertNotNull("Cannot instantiate caching service",
-                singletonCachingService);
+                cachingServiceFactory);
     }
 
     public void testBundleNamespaces() {
