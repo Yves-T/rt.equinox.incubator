@@ -52,6 +52,8 @@ public class CachingTest extends WeavingTestCase {
 
     private static Class previousClazz = null;
 
+    private Bundle[] installedBundles;
+
     //	private List installedBundles = new LinkedList();
 
     public void testCachingService() {
@@ -64,144 +66,167 @@ public class CachingTest extends WeavingTestCase {
                 cachingServiceFactory);
     }
 
-    public void testBundleNamespaces() {
-        testNamespaces(HELLO_CLASS);
+    public void testBundleNoWeaveNoCache() {
+        testNoWeaveNoCache(HELLO_CLASS);
     }
 
-    public void testFragmentNamespaces() {
-        testNamespaces(HELLOFRAGMENT_CLASS);
+    public void testFragmentNoWeaveNoCache() {
+        testNoWeaveNoCache(HELLOFRAGMENT_CLASS);
     }
 
-    private void testNamespaces(String className) {
-        Class helloClazz;
-
+    private void testNoWeaveNoCache(String className) {
         TestMessageHandler.clear();
-        helloClazz = runHello(className);
-        assertNotWoven(helloClazz, TRACING_ASPECT);
 
-        TestMessageHandler.clear();
-        helloClazz = runHelloAndTracing(className);
-        assertWoven(helloClazz, TRACING_ASPECT);
-
-        TestMessageHandler.clear();
-        helloClazz = runHelloAndTracing(className);
-        assertNotWoven(helloClazz, TRACING_ASPECT);
-
-        TestMessageHandler.clear();
-        helloClazz = runSecondHello(className);
-        assertNotWoven(helloClazz, TRACING_ASPECT);
-
-        TestMessageHandler.clear();
-        helloClazz = runSecondHelloAndTracing(className);
-        assertWoven(helloClazz, TRACING_ASPECT);
-
-        TestMessageHandler.clear();
-        helloClazz = runSecondHelloAndTracing(className);
-        assertNotWoven(helloClazz, TRACING_ASPECT);
-
-        TestMessageHandler.clear();
-        helloClazz = runHello(className);
-        assertNotWoven(helloClazz, TRACING_ASPECT);
-    }
-
-    private Class runHello(String className) {
-        Class clazz = null;
         Bundle bundle1 = installBundle(HELLO_BUNDLE, true);
         Bundle bundle2 = installBundle(HELLO_FRAGMENT, false);
-        try {
-            clazz = bundle1.loadClass(className);
-            if (debug)
-                System.out.println("? CachingTest.testHello() clazz=" + clazz
-                        + "@" + Integer.toString(clazz.hashCode(), 16)
-                        + ", loader=" + clazz.getClassLoader());
-            assertNotSame(previousClazz, clazz);
-            previousClazz = clazz;
-            runMain(clazz, new String[] {});
-        } catch (Exception ex) {
-            fail(ex.toString());
-        } finally {
-            uninstallBundles(new Bundle[] { bundle1, bundle2 });
-        }
+        installedBundles = new Bundle[] { bundle1, bundle2 };
 
-        return clazz;
+        Class<?> helloClazz = runHello(bundle1, className);
+
+        assertNotWoven(helloClazz, TRACING_ASPECT);
     }
 
-    private Class runSecondHello(String className) {
-        Class clazz = null;
-        Bundle bundle1 = installBundle(SECOND_HELLO_BUNDLE, true);
-        Bundle bundle2 = installBundle(SECOND_HELLO_FRAGMENT, false);
-        try {
-            clazz = bundle1.loadClass(className);
-            if (debug)
-                System.out.println("? CachingTest.testHello() clazz=" + clazz
-                        + "@" + Integer.toString(clazz.hashCode(), 16)
-                        + ", loader=" + clazz.getClassLoader());
-            assertNotSame(previousClazz, clazz);
-            previousClazz = clazz;
-            runMain(clazz, new String[] {});
-        } catch (Exception ex) {
-            fail(ex.toString());
-        } finally {
-            uninstallBundles(new Bundle[] { bundle1, bundle2 });
-        }
-
-        return clazz;
+    public void testBundleFirstWeaveNoCache() {
+        testFirstWeaveNoCache(HELLO_CLASS);
     }
 
-    private Class runHelloAndTracing(String className) {
-        Class clazz = null;
+    public void testFragmentFirstWeaveNoCache() {
+        testFirstWeaveNoCache(HELLOFRAGMENT_CLASS);
+    }
+
+    private void testFirstWeaveNoCache(String className) {
+        TestMessageHandler.clear();
+
         Bundle bundle2 = installBundle(TRACING_BUNDLE, true);
         Bundle bundle3 = installBundle(HELLOTRACING_FRAGMENT, false);
         Bundle bundle1 = installBundle(HELLO_BUNDLE, true);
         Bundle bundle4 = installBundle(HELLO_FRAGMENT, false);
-        //		System.out.println("? CachingTest.testHelloAndTracing() host=" + Platform.getHosts(bundle3)[0].getSymbolicName());
-        try {
-            clazz = bundle1.loadClass(className);
-            if (debug)
-                System.out.println("? CachingTest.testHelloAndTracing() clazz="
-                        + clazz + "@" + Integer.toString(clazz.hashCode(), 16)
-                        + ", loader=" + clazz.getClassLoader());
-            assertNotSame(previousClazz, clazz);
-            previousClazz = clazz;
-            runMain(clazz, new String[] {});
-        } catch (Exception ex) {
-            fail(ex.toString());
-        } finally {
-            uninstallBundles(new Bundle[] { bundle1, bundle3, bundle2, bundle4 });
-        }
+        installedBundles = new Bundle[] { bundle1, bundle2, bundle3, bundle4 };
 
-        return clazz;
+        Class<?> helloClazz = runHello(bundle1, className);
+
+        assertWoven(helloClazz, TRACING_ASPECT);
     }
 
-    private Class runSecondHelloAndTracing(String className) {
-        Class clazz = null;
+    public void testBundleSecondLoadCached() throws InterruptedException {
+        testSecondLoadCached(HELLO_CLASS);
+    }
+
+    public void testFragmentSecondLoadCached() throws InterruptedException {
+        testSecondLoadCached(HELLOFRAGMENT_CLASS);
+    }
+
+    private void testSecondLoadCached(String className)
+            throws InterruptedException {
+        Bundle bundle2 = installBundle(TRACING_BUNDLE, true);
+        Bundle bundle3 = installBundle(HELLOTRACING_FRAGMENT, false);
+        Bundle bundle1 = installBundle(HELLO_BUNDLE, true);
+        Bundle bundle4 = installBundle(HELLO_FRAGMENT, false);
+        installedBundles = new Bundle[] { bundle1, bundle2, bundle3, bundle4 };
+
+        runHello(bundle1, className);
+
+        updateBundles(new Bundle[] { bundle1, bundle4 });
+        Thread.sleep(2000);
+
+        TestMessageHandler.clear();
+        Class<?> helloClazz = runHello(bundle1, className);
+        assertNotWoven(helloClazz, TRACING_ASPECT);
+    }
+
+    public void testBundleDifferentVersionNoWeavingNoCache() {
+        testDifferentVersionNoWeavingNoCache(HELLO_CLASS);
+    }
+
+    public void testFragmentDifferentVersionNoWeavingNoCache() {
+        testDifferentVersionNoWeavingNoCache(HELLOFRAGMENT_CLASS);
+    }
+
+    private void testDifferentVersionNoWeavingNoCache(String className) {
+        TestMessageHandler.clear();
+
+        Bundle bundle1 = installBundle(SECOND_HELLO_BUNDLE, true);
+        Bundle bundle2 = installBundle(SECOND_HELLO_FRAGMENT, false);
+        installedBundles = new Bundle[] { bundle1, bundle2 };
+
+        Class<?> helloClazz = runHello(bundle1, className);
+
+        assertNotWoven(helloClazz, TRACING_ASPECT);
+    }
+
+    public void testBundleDifferentVersionFirstWeaveNoCache() {
+        testDifferentVersionFirstWeaveNoCache(HELLO_CLASS);
+    }
+
+    public void testFragmentDifferentVersionFirstWeaveNoCache() {
+        testDifferentVersionFirstWeaveNoCache(HELLOFRAGMENT_CLASS);
+    }
+
+    private void testDifferentVersionFirstWeaveNoCache(String className) {
+        TestMessageHandler.clear();
+
         Bundle bundle2 = installBundle(TRACING_BUNDLE, true);
         Bundle bundle3 = installBundle(HELLOTRACING_FRAGMENT, false);
         Bundle bundle1 = installBundle(SECOND_HELLO_BUNDLE, true);
         Bundle bundle4 = installBundle(SECOND_HELLO_FRAGMENT, false);
-        //      System.out.println("? CachingTest.testHelloAndTracing() host=" + Platform.getHosts(bundle3)[0].getSymbolicName());
+        installedBundles = new Bundle[] { bundle1, bundle2, bundle3, bundle4 };
+
+        Class<?> helloClazz = runHello(bundle1, className);
+
+        assertWoven(helloClazz, TRACING_ASPECT);
+    }
+
+    public void testBundleDifferentVersionSecondLoadCached()
+            throws InterruptedException {
+        testDifferentVersionSecondLoadCached(HELLO_CLASS);
+    }
+
+    public void testFragmentDifferentVersionSecondLoadCached()
+            throws InterruptedException {
+        testDifferentVersionSecondLoadCached(HELLOFRAGMENT_CLASS);
+    }
+
+    private void testDifferentVersionSecondLoadCached(String className)
+            throws InterruptedException {
+        Bundle bundle2 = installBundle(TRACING_BUNDLE, true);
+        Bundle bundle3 = installBundle(HELLOTRACING_FRAGMENT, false);
+        Bundle bundle1 = installBundle(SECOND_HELLO_BUNDLE, true);
+        Bundle bundle4 = installBundle(SECOND_HELLO_FRAGMENT, false);
+        installedBundles = new Bundle[] { bundle1, bundle2, bundle3, bundle4 };
+
+        runHello(bundle1, className);
+
+        updateBundles(new Bundle[] { bundle1, bundle4 });
+        Thread.sleep(2000);
+
+        TestMessageHandler.clear();
+        Class<?> helloClazz = runHello(bundle1, className);
+        assertNotWoven(helloClazz, TRACING_ASPECT);
+    }
+
+    private Class<?> runHello(Bundle bundle, String className) {
+        Class<?> clazz = null;
+
         try {
-            clazz = bundle1.loadClass(className);
+            clazz = bundle.loadClass(className);
             if (debug)
-                System.out.println("? CachingTest.testHelloAndTracing() clazz="
-                        + clazz + "@" + Integer.toString(clazz.hashCode(), 16)
+                System.out.println("? CachingTest.testHello() clazz=" + clazz
+                        + "@" + Integer.toString(clazz.hashCode(), 16)
                         + ", loader=" + clazz.getClassLoader());
             assertNotSame(previousClazz, clazz);
             previousClazz = clazz;
             runMain(clazz, new String[] {});
         } catch (Exception ex) {
             fail(ex.toString());
-        } finally {
-            uninstallBundles(new Bundle[] { bundle1, bundle3, bundle2, bundle4 });
         }
 
         return clazz;
     }
 
-    private void runMain(Class clazz, String[] args) {
+    private void runMain(Class<?> clazz, String[] args) {
         try {
             Object[] parameters = new Object[] { args };
-            Class[] parameterTypes = new Class[] { args.getClass() };
+            Class<?>[] parameterTypes = new Class[] { args.getClass() };
             Method mainMethod = clazz.getMethod("main", parameterTypes);
             mainMethod.invoke(null, parameters);
         } catch (Exception ex) {
@@ -210,14 +235,13 @@ public class CachingTest extends WeavingTestCase {
         }
     }
 
-    protected static Bundle installBundle(String name, boolean start) {
+    private Bundle installBundle(String name, boolean start) {
         if (CachingTest.debug)
             System.out.println("> CachingTest.installBundle() name=" + name);
         Bundle bundle = null;
 
         try {
             bundle = TestsActivator.installBundle(name, start);
-            //			installedBundles.remove(bundle);
         } catch (Exception ex) {
             fail(ex.toString());
         }
@@ -228,14 +252,29 @@ public class CachingTest extends WeavingTestCase {
         return bundle;
     }
 
-    protected void uninstallBundles(Bundle[] bundles) {
+    private void updateBundles(Bundle[] bundles) {
+        if (debug)
+            System.out.println("> CachingTest.refreshBundles() bundles="
+                    + Arrays.asList(bundles));
+
+        try {
+            TestsActivator.refreshPackages(bundles);
+        } catch (BundleException ex) {
+            fail(ex.toString());
+        }
+
+        if (debug)
+            System.out.println("< CachingTest.refreshBundles() states="
+                    + getBundleStates(bundles));
+    }
+
+    private void uninstallBundles(Bundle[] bundles) {
         if (debug)
             System.out.println("> CachingTest.uninstallBundles() bundles="
                     + Arrays.asList(bundles));
 
         try {
             TestsActivator.uninstallBundles(bundles);
-            //			installedBundles.remove(bundle);
         } catch (BundleException ex) {
             fail(ex.toString());
         }
@@ -254,8 +293,11 @@ public class CachingTest extends WeavingTestCase {
     }
 
     protected void tearDown() throws Exception {
+        if (installedBundles != null && installedBundles.length > 0) {
+            uninstallBundles(installedBundles);
+            installedBundles = null;
+        }
         super.tearDown();
-
-        //		assertTrue("Unexpected bundles: " + installedBundles.toString(),installedBundles.isEmpty());
     }
+
 }
