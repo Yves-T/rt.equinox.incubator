@@ -126,12 +126,40 @@ public class CachingTest extends WeavingTestCase {
 
         runHello(bundle1, className);
 
-        updateBundles(new Bundle[] { bundle1, bundle4 });
+        refreshBundles(new Bundle[] { bundle1, bundle4 });
         Thread.sleep(2000);
 
         TestMessageHandler.clear();
         Class<?> helloClazz = runHello(bundle1, className);
         assertNotWoven(helloClazz, TRACING_ASPECT);
+    }
+
+    public void testBundleSecondLoadUpdateNotCached()
+            throws InterruptedException {
+        testSecondLoadUpdatedNotCached(HELLO_CLASS);
+    }
+
+    public void testFragmentSecondLoadUpdateNotCached()
+            throws InterruptedException {
+        testSecondLoadUpdatedNotCached(HELLOFRAGMENT_CLASS);
+    }
+
+    private void testSecondLoadUpdatedNotCached(String className)
+            throws InterruptedException {
+        Bundle bundle2 = installBundle(TRACING_BUNDLE, true);
+        Bundle bundle3 = installBundle(HELLOTRACING_FRAGMENT, false);
+        Bundle bundle1 = installBundle(HELLO_BUNDLE, true);
+        Bundle bundle4 = installBundle(HELLO_FRAGMENT, false);
+        installedBundles = new Bundle[] { bundle1, bundle2, bundle3, bundle4 };
+
+        runHello(bundle1, className);
+
+        updateBundles(new Bundle[] { bundle1, bundle4, bundle3 });
+        Thread.sleep(2000);
+
+        TestMessageHandler.clear();
+        Class<?> helloClazz = runHello(bundle1, className);
+        assertWoven(helloClazz, TRACING_ASPECT);
     }
 
     public void testBundleDifferentVersionNoWeavingNoCache() {
@@ -196,7 +224,7 @@ public class CachingTest extends WeavingTestCase {
 
         runHello(bundle1, className);
 
-        updateBundles(new Bundle[] { bundle1, bundle4 });
+        refreshBundles(new Bundle[] { bundle1, bundle4 });
         Thread.sleep(2000);
 
         TestMessageHandler.clear();
@@ -252,7 +280,7 @@ public class CachingTest extends WeavingTestCase {
         return bundle;
     }
 
-    private void updateBundles(Bundle[] bundles) {
+    private void refreshBundles(Bundle[] bundles) {
         if (debug)
             System.out.println("> CachingTest.refreshBundles() bundles="
                     + Arrays.asList(bundles));
@@ -265,6 +293,22 @@ public class CachingTest extends WeavingTestCase {
 
         if (debug)
             System.out.println("< CachingTest.refreshBundles() states="
+                    + getBundleStates(bundles));
+    }
+
+    private void updateBundles(Bundle[] bundles) {
+        if (debug)
+            System.out.println("> CachingTest.updateBundles() bundles="
+                    + Arrays.asList(bundles));
+
+        try {
+            TestsActivator.updateBundles(bundles);
+        } catch (BundleException ex) {
+            fail(ex.toString());
+        }
+
+        if (debug)
+            System.out.println("< CachingTest.updateBundles() states="
                     + getBundleStates(bundles));
     }
 

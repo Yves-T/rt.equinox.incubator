@@ -99,6 +99,13 @@ public class TestsActivator implements BundleActivator {
         refreshPackages(null);
     }
 
+    public static void updateBundles(Bundle[] bundles) throws BundleException {
+        for (int i = 0; i < bundles.length; i++) {
+            bundles[i].update();
+        }
+        refreshPackages(bundles);
+    }
+
     public static void refreshPackages(Bundle[] bundles) throws BundleException {
         packageAdmin.refreshPackages(bundles);
         synchronized (listener) {
