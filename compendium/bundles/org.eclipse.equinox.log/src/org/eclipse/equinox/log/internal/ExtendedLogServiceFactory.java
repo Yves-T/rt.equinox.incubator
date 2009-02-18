@@ -7,9 +7,13 @@
  ******************************************************************************/
 package org.eclipse.equinox.log.internal;
 
+import java.security.Permission;
+import org.eclipse.equinox.log.LogPermission;
 import org.osgi.framework.*;
 
 public class ExtendedLogServiceFactory implements ServiceFactory {
+
+	private final Permission logPermission = new LogPermission("*", LogPermission.LOG); //$NON-NLS-1$
 	private final ExtendedLogReaderServiceFactory logReaderServiceFactory;
 
 	public ExtendedLogServiceFactory(ExtendedLogReaderServiceFactory logReaderServiceFactory) {
@@ -30,5 +34,11 @@ public class ExtendedLogServiceFactory implements ServiceFactory {
 
 	public void log(Bundle bundle, String name, Object context, int level, String message, Throwable exception) {
 		logReaderServiceFactory.log(bundle, name, context, level, message, exception);
+	}
+
+	public void checkLogPermission() throws SecurityException {
+		SecurityManager sm = System.getSecurityManager();
+		if (sm != null)
+			sm.checkPermission(logPermission);
 	}
 }

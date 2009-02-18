@@ -7,9 +7,15 @@
  ******************************************************************************/
 package org.eclipse.equinox.log;
 
+import org.osgi.framework.Bundle;
 import org.osgi.service.log.LogService;
 
 public interface ExtendedLogService extends LogService, Logger {
 
 	public Logger getLogger(String loggerName);
+
+	/**
+	* @throws SecurityException if the caller does not have <code>LogPermission[*,LOG]</code>.
+	*/
+	public Logger getLogger(Bundle bundle, String loggerName);
 }

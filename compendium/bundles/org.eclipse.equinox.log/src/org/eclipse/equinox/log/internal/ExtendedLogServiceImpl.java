@@ -8,6 +8,7 @@
 package org.eclipse.equinox.log.internal;
 
 import java.util.HashMap;
+import java.util.WeakHashMap;
 import org.eclipse.equinox.log.ExtendedLogService;
 import org.eclipse.equinox.log.Logger;
 import org.osgi.framework.Bundle;
@@ -18,6 +19,7 @@ public class ExtendedLogServiceImpl implements ExtendedLogService {
 	private final ExtendedLogServiceFactory factory;
 	private final Bundle bundle;
 	private HashMap loggerCache = new HashMap();
+	private WeakHashMap bundleLogServices = null;
 
 	public ExtendedLogServiceImpl(ExtendedLogServiceFactory factory, Bundle bundle) {
 		this.factory = factory;
@@ -56,6 +58,31 @@ public class ExtendedLogServiceImpl implements ExtendedLogService {
 			loggerCache.put(name, logger);
 		}
 		return logger;
+	}
+
+	public Logger getLogger(Bundle logBundle, String name) {
+		if (logBundle == null)
+			throw new IllegalArgumentException("bundle cannot be null"); //$NON-NLS-1$
+
+		if (logBundle == bundle)
+			return getLogger(name);
+
+		ExtendedLogService bundleLogService = getLogService(logBundle);
+		return bundleLogService.getLogger(name);
+	}
+
+	private synchronized ExtendedLogService getLogService(Bundle logBundle) {
+		factory.checkLogPermission();
+		checkShutdown();
+		if (bundleLogServices == null)
+			bundleLogServices = new WeakHashMap();
+
+		ExtendedLogService bundleLogService = (ExtendedLogService) bundleLogServices.get(logBundle);
+		if (bundleLogService == null) {
+			bundleLogService = new ExtendedLogServiceImpl(factory, logBundle);
+			bundleLogServices.put(bundle, bundleLogService);
+		}
+		return bundleLogService;
 	}
 
 	public String getName() {
