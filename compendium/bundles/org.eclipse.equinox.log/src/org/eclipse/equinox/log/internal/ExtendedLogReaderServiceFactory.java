@@ -63,11 +63,11 @@ public class ExtendedLogReaderServiceFactory implements ServiceFactory {
 		} catch (RuntimeException e) {
 			// "listener.logged" calls user code and might throw an unchecked exception
 			// we catch the error here to gather information on where the problem occurred.
-			getErrorStream().println("LogFilter.isLoggable threw a non-fatal unchecked exception as follows:");
+			getErrorStream().println("LogFilter.isLoggable threw a non-fatal unchecked exception as follows:"); //$NON-NLS-1$
 			e.printStackTrace(getErrorStream());
 		} catch (LinkageError e) {
 			// Catch linkage errors as these are generally recoverable but let other Errors propagate (see bug 222001)
-			getErrorStream().println("LogFilter.isLoggable threw a non-fatal unchecked exception as follows:");
+			getErrorStream().println("LogFilter.isLoggable threw a non-fatal unchecked exception as follows:"); //$NON-NLS-1$
 			e.printStackTrace(getErrorStream());
 		}
 		return false;
@@ -90,11 +90,11 @@ public class ExtendedLogReaderServiceFactory implements ServiceFactory {
 		} catch (RuntimeException e) {
 			// "listener.logged" calls user code and might throw an unchecked exception
 			// we catch the error here to gather information on where the problem occurred.
-			getErrorStream().println("LogListener.logged threw a non-fatal unchecked exception as follows:");
+			getErrorStream().println("LogListener.logged threw a non-fatal unchecked exception as follows:"); //$NON-NLS-1$
 			e.printStackTrace(getErrorStream());
 		} catch (LinkageError e) {
 			// Catch linkage errors as these are generally recoverable but let other Errors propagate (see bug 222001)
-			getErrorStream().println("LogListener.logged threw a non-fatal unchecked exception as follows:");
+			getErrorStream().println("LogListener.logged threw a non-fatal unchecked exception as follows:"); //$NON-NLS-1$
 			e.printStackTrace(getErrorStream());
 		}
 	}
