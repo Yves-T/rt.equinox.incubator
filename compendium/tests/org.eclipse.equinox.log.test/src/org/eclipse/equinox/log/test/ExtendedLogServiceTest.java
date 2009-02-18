@@ -8,6 +8,8 @@ import org.osgi.service.log.LogService;
 
 public class ExtendedLogServiceTest extends TestCase {
 
+	private Bundle bundle;
+	private Bundle logBundle;
 	private ExtendedLogService log;
 	private ServiceReference logReference;
 	private ExtendedLogReaderService reader;
@@ -19,7 +21,9 @@ public class ExtendedLogServiceTest extends TestCase {
 	}
 
 	protected void setUp() throws Exception {
-		Activator.getBundle("org.eclipse.equinox.log").start();
+		bundle = Activator.getBundleContext().getBundle();
+		logBundle = Activator.getBundle("org.eclipse.equinox.log");
+		logBundle.start();
 		logReference = Activator.getBundleContext().getServiceReference(ExtendedLogService.class.getName());
 		readerReference = Activator.getBundleContext().getServiceReference(ExtendedLogReaderService.class.getName());
 
@@ -34,7 +38,7 @@ public class ExtendedLogServiceTest extends TestCase {
 		reader.removeLogListener(listener);
 		Activator.getBundleContext().ungetService(logReference);
 		Activator.getBundleContext().ungetService(readerReference);
-		Activator.getBundle("org.eclipse.equinox.log").stop();
+		logBundle.stop();
 	}
 
 	public void testLogContext() throws Exception {
@@ -115,6 +119,37 @@ public class ExtendedLogServiceTest extends TestCase {
 			listener.wait();
 		}
 		assertTrue(listener.getEntryX().getLoggerName() == "test");
+		assertTrue(listener.getEntry().getBundle() == bundle);
+		assertTrue(listener.getEntry().getLevel() == LogService.LOG_INFO);
+		assertTrue(listener.getEntry().getMessage().equals(message));
+		assertTrue(listener.getEntry().getException().getMessage().equals(t.getMessage()));
+		assertTrue(listener.getEntry().getServiceReference() == logReference);
+	}
+
+	public void testNamedLoggerLogFullWithNullBundle() throws Exception {
+		String message = "test";
+		Throwable t = new Throwable("test");
+		synchronized (listener) {
+			log.getLogger(null, "test").log(logReference, LogService.LOG_INFO, message, t);
+			listener.wait();
+		}
+		assertTrue(listener.getEntryX().getLoggerName() == "test");
+		assertTrue(listener.getEntry().getBundle() == bundle);
+		assertTrue(listener.getEntry().getLevel() == LogService.LOG_INFO);
+		assertTrue(listener.getEntry().getMessage().equals(message));
+		assertTrue(listener.getEntry().getException().getMessage().equals(t.getMessage()));
+		assertTrue(listener.getEntry().getServiceReference() == logReference);
+	}
+
+	public void testNamedLoggerLogFullWithBundle() throws Exception {
+		String message = "test";
+		Throwable t = new Throwable("test");
+		synchronized (listener) {
+			log.getLogger(logBundle, "test").log(logReference, LogService.LOG_INFO, message, t);
+			listener.wait();
+		}
+		assertTrue(listener.getEntryX().getLoggerName() == "test");
+		assertTrue(listener.getEntry().getBundle() == logBundle);
 		assertTrue(listener.getEntry().getLevel() == LogService.LOG_INFO);
 		assertTrue(listener.getEntry().getMessage().equals(message));
 		assertTrue(listener.getEntry().getException().getMessage().equals(t.getMessage()));

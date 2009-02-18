@@ -61,10 +61,8 @@ public class ExtendedLogServiceImpl implements ExtendedLogService {
 	}
 
 	public Logger getLogger(Bundle logBundle, String name) {
-		if (logBundle == null)
-			throw new IllegalArgumentException("bundle cannot be null"); //$NON-NLS-1$
-
-		if (logBundle == bundle)
+		factory.checkLogPermission();
+		if (logBundle == null || logBundle == bundle)
 			return getLogger(name);
 
 		ExtendedLogService bundleLogService = getLogService(logBundle);
@@ -72,7 +70,6 @@ public class ExtendedLogServiceImpl implements ExtendedLogService {
 	}
 
 	private synchronized ExtendedLogService getLogService(Bundle logBundle) {
-		factory.checkLogPermission();
 		checkShutdown();
 		if (bundleLogServices == null)
 			bundleLogServices = new WeakHashMap();
