@@ -8,35 +8,67 @@
 package org.eclipse.equinox.log.internal;
 
 import java.security.Permission;
+import java.util.HashMap;
+import java.util.Map;
 import org.eclipse.equinox.log.LogPermission;
 import org.osgi.framework.*;
 
-public class ExtendedLogServiceFactory implements ServiceFactory {
+public class ExtendedLogServiceFactory implements ServiceFactory, BundleListener {
 
 	private final Permission logPermission = new LogPermission("*", LogPermission.LOG); //$NON-NLS-1$
 	private final ExtendedLogReaderServiceFactory logReaderServiceFactory;
+	private Map logServices = new HashMap();
 
 	public ExtendedLogServiceFactory(ExtendedLogReaderServiceFactory logReaderServiceFactory) {
 		this.logReaderServiceFactory = logReaderServiceFactory;
 	}
 
 	public Object getService(Bundle bundle, ServiceRegistration registration) {
-		return new ExtendedLogServiceImpl(this, bundle);
+		return getLogService(bundle);
 	}
 
 	public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
-		((ExtendedLogServiceImpl) service).shutdown();
+		// do nothing
 	}
 
-	public boolean isLoggable(Bundle bundle, String name, int level) {
+	public void bundleChanged(BundleEvent event) {
+		if (event.getType() == BundleEvent.UNINSTALLED)
+			removeLogService(event.getBundle());
+	}
+
+	protected synchronized ExtendedLogServiceImpl getLogService(Bundle bundle) {
+		if (logServices == null || bundle.getState() == Bundle.UNINSTALLED)
+			throw new IllegalStateException("LogService for " + bundle.getSymbolicName() + " (id=" + bundle.getBundleId() + ") is shutdown."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+		ExtendedLogServiceImpl logService = (ExtendedLogServiceImpl) logServices.get(bundle);
+		if (logService == null) {
+			logService = new ExtendedLogServiceImpl(this, bundle);
+			logServices.put(bundle, logService);
+		}
+		return logService;
+	}
+
+	protected synchronized void shutdown() {
+		if (logServices != null) {
+			logServices.clear();
+			logServices = null;
+		}
+	}
+
+	private synchronized void removeLogService(Bundle bundle) {
+		if (logServices != null)
+			logServices.remove(bundle);
+	}
+
+	protected boolean isLoggable(Bundle bundle, String name, int level) {
 		return logReaderServiceFactory.isLoggable(bundle, name, level);
 	}
 
-	public void log(Bundle bundle, String name, Object context, int level, String message, Throwable exception) {
+	protected void log(Bundle bundle, String name, Object context, int level, String message, Throwable exception) {
 		logReaderServiceFactory.log(bundle, name, context, level, message, exception);
 	}
 
-	public void checkLogPermission() throws SecurityException {
+	protected void checkLogPermission() throws SecurityException {
 		SecurityManager sm = System.getSecurityManager();
 		if (sm != null)
 			sm.checkPermission(logPermission);

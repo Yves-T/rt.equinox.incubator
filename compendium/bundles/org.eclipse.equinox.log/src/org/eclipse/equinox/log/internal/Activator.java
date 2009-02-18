@@ -22,6 +22,7 @@ public class Activator implements BundleActivator {
 	private ServiceRegistration logReaderServiceRegistration;
 	private ServiceRegistration logServiceRegistration;
 	private EventAdminAdapter eventAdminAdapter;
+	private ExtendedLogServiceFactory logServiceFactory;
 
 	public void start(BundleContext context) throws Exception {
 		ExtendedLogReaderServiceFactory logReaderServiceFactory = new ExtendedLogReaderServiceFactory();
@@ -29,8 +30,8 @@ public class Activator implements BundleActivator {
 			eventAdminAdapter = new EventAdminAdapter(context, logReaderServiceFactory);
 			eventAdminAdapter.start();
 		}
-		ExtendedLogServiceFactory logServiceFactory = new ExtendedLogServiceFactory(logReaderServiceFactory);
-
+		logServiceFactory = new ExtendedLogServiceFactory(logReaderServiceFactory);
+		context.addBundleListener(logServiceFactory);
 		logReaderServiceRegistration = context.registerService(LOGREADERSERVICE_CLASSES, logReaderServiceFactory, null);
 		logServiceRegistration = context.registerService(LOGSERVICE_CLASSES, logServiceFactory, null);
 	}
@@ -39,6 +40,8 @@ public class Activator implements BundleActivator {
 		logServiceRegistration.unregister();
 		logServiceRegistration = null;
 		logReaderServiceRegistration.unregister();
+		logServiceFactory.shutdown();
+		logServiceFactory = null;
 		if (eventAdminAdapter != null) {
 			eventAdminAdapter.stop();
 			eventAdminAdapter = null;

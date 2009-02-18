@@ -8,7 +8,6 @@
 package org.eclipse.equinox.log.internal;
 
 import java.util.HashMap;
-import java.util.WeakHashMap;
 import org.eclipse.equinox.log.ExtendedLogService;
 import org.eclipse.equinox.log.Logger;
 import org.osgi.framework.Bundle;
@@ -19,7 +18,6 @@ public class ExtendedLogServiceImpl implements ExtendedLogService {
 	private final ExtendedLogServiceFactory factory;
 	private final Bundle bundle;
 	private HashMap loggerCache = new HashMap();
-	private WeakHashMap bundleLogServices = null;
 
 	public ExtendedLogServiceImpl(ExtendedLogServiceFactory factory, Bundle bundle) {
 		this.factory = factory;
@@ -51,7 +49,6 @@ public class ExtendedLogServiceImpl implements ExtendedLogService {
 	}
 
 	public synchronized Logger getLogger(String name) {
-		checkShutdown();
 		Logger logger = (Logger) loggerCache.get(name);
 		if (logger == null) {
 			logger = new LoggerImpl(this, name);
@@ -65,21 +62,8 @@ public class ExtendedLogServiceImpl implements ExtendedLogService {
 		if (logBundle == null || logBundle == bundle)
 			return getLogger(name);
 
-		ExtendedLogService bundleLogService = getLogService(logBundle);
+		ExtendedLogService bundleLogService = factory.getLogService(logBundle);
 		return bundleLogService.getLogger(name);
-	}
-
-	private synchronized ExtendedLogService getLogService(Bundle logBundle) {
-		checkShutdown();
-		if (bundleLogServices == null)
-			bundleLogServices = new WeakHashMap();
-
-		ExtendedLogService bundleLogService = (ExtendedLogService) bundleLogServices.get(logBundle);
-		if (bundleLogService == null) {
-			bundleLogService = new ExtendedLogServiceImpl(factory, logBundle);
-			bundleLogServices.put(bundle, bundleLogService);
-		}
-		return bundleLogService;
 	}
 
 	public String getName() {
@@ -92,22 +76,11 @@ public class ExtendedLogServiceImpl implements ExtendedLogService {
 
 	// package private methods called from Logger
 	boolean isLoggable(String name, int level) {
-		checkShutdown(); // Note: best effort
 		return factory.isLoggable(bundle, name, level);
 	}
 
 	// package private methods called from Logger
 	void log(String name, Object context, int level, String message, Throwable exception) {
-		checkShutdown(); // Note: best effort
 		factory.log(bundle, name, context, level, message, exception);
-	}
-
-	private synchronized void checkShutdown() {
-		if (loggerCache == null)
-			throw new IllegalStateException("LogService for " + bundle.getSymbolicName() + " (id=" + bundle.getBundleId() + ") is shutdown."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	}
-
-	synchronized void shutdown() {
-		loggerCache = null;
 	}
 }
