@@ -115,14 +115,4 @@ public class ExtendedLogEntryImpl implements ExtendedLogEntry {
 	public Object getContext() {
 		return contextObject;
 	}
-
-	/**
-	 *  @deprecated
-	 *  this will be removed very soon!!!
-	 *  use getThreadId() instead
-	 *  
-	 */
-	public long getThreadID() {
-		return threadId;
-	}
 }
