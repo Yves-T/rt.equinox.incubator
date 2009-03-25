@@ -28,6 +28,7 @@ public class AllTests {
         suite.addTestSuite(WeavingTest.class);
         suite.addTestSuite(SupplementerRegistryTest.class);
         suite.addTestSuite(WeavingLoaderDelegateHookTest.class);
+        suite.addTestSuite(AspectAdminImplTest.class);
         //$JUnit-END$
         return suite;
     }
