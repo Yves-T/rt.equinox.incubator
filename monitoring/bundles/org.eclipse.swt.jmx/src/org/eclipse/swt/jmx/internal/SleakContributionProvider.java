@@ -197,7 +197,6 @@ public class SleakContributionProvider extends ContributionProvider {
 	private class Sleak extends Thread {
 
 		Object[] oldObjects = new Object[0];
-		Error[] oldErrors = new Error[0];
 		Object[] objects = new Object[0];
 		Error[] errors = new Error[0];
 
