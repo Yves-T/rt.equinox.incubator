@@ -18,6 +18,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.aspectj.weaver.loadtime.definition.Definition;
+import org.aspectj.weaver.loadtime.definition.Definition.ConcreteAspect;
 import org.easymock.EasyMock;
 import org.eclipse.equinox.weaving.aspectj.AspectAdmin;
 import org.eclipse.equinox.weaving.aspectj.loadtime.AspectAdminImpl;
@@ -134,6 +135,89 @@ public class AspectAdminImplTest extends TestCase {
         Definition definition = aspectRegistry
                 .getExportedAspectDefinitions(bundle);
         assertNull(definition);
+
+        Definition resolvedRequired = aspectRegistry.resolveRequiredBundle(
+                bundle, AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        assertNull(resolvedRequired);
+
+        Definition resolvedImports = aspectRegistry.resolveImportedPackage(
+                bundle, "org.eclipse.equinox.weaving.tests", //$NON-NLS-1$
+                AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        assertNull(resolvedImports);
+    }
+
+    public void testNoAspectsButOptionsInAopXml() {
+        Bundle bundle = EasyMock.createMock(Bundle.class);
+
+        URL testAopDefFile = this.getClass().getResource(
+                "test-aop-with-options.xml"); //$NON-NLS-1$
+        Hashtable<Object, Object> headers = new Hashtable<Object, Object>();
+        EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
+        EasyMock.expect(
+                bundle.getEntry(AspectAdmin.AOP_CONTEXT_DEFAULT_LOCATION))
+                .andReturn(testAopDefFile);
+
+        EasyMock.replay(bundle);
+        aspectRegistry.bundleResolved(bundle);
+        EasyMock.verify(bundle);
+
+        Definition definition = aspectRegistry
+                .getExportedAspectDefinitions(bundle);
+        assertNotNull(definition);
+        assertEquals(0, definition.getAspectClassNames().size());
+        assertEquals("here are the options ", definition.getWeaverOptions()); //$NON-NLS-1$
+
+        Definition resolvedRequires = aspectRegistry.resolveRequiredBundle(
+                bundle, AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        assertNotNull(resolvedRequires);
+        assertEquals(0, resolvedRequires.getAspectClassNames().size());
+        assertEquals("here are the options ", resolvedRequires //$NON-NLS-1$
+                .getWeaverOptions());
+
+        Definition resolvedImports = aspectRegistry.resolveImportedPackage(
+                bundle, "org.eclipse.equinox.weaving.tests", //$NON-NLS-1$
+                AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        assertNotNull(resolvedImports);
+        assertEquals(0, resolvedImports.getAspectClassNames().size());
+        assertEquals("here are the options ", resolvedImports //$NON-NLS-1$
+                .getWeaverOptions());
+    }
+
+    public void testNonExportedAspectsButOptionsInAopXml() {
+        Bundle bundle = EasyMock.createMock(Bundle.class);
+
+        URL testAopDefFile = this.getClass().getResource(
+                "test-aop-with-options-and-aspects.xml"); //$NON-NLS-1$
+        Hashtable<Object, Object> headers = new Hashtable<Object, Object>();
+        EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
+        EasyMock.expect(
+                bundle.getEntry(AspectAdmin.AOP_CONTEXT_DEFAULT_LOCATION))
+                .andReturn(testAopDefFile);
+
+        EasyMock.replay(bundle);
+        aspectRegistry.bundleResolved(bundle);
+        EasyMock.verify(bundle);
+
+        Definition definition = aspectRegistry
+                .getExportedAspectDefinitions(bundle);
+        assertNotNull(definition);
+        assertEquals(0, definition.getAspectClassNames().size());
+        assertEquals("here are the options ", definition.getWeaverOptions()); //$NON-NLS-1$
+
+        Definition resolvedRequires = aspectRegistry.resolveRequiredBundle(
+                bundle, AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        assertNotNull(resolvedRequires);
+        assertEquals(0, resolvedRequires.getAspectClassNames().size());
+        assertEquals("here are the options ", resolvedRequires //$NON-NLS-1$
+                .getWeaverOptions());
+
+        Definition resolvedImports = aspectRegistry.resolveImportedPackage(
+                bundle, "org.eclipse.equinox.weaving.tests", //$NON-NLS-1$
+                AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        assertNotNull(resolvedImports);
+        assertEquals(0, resolvedImports.getAspectClassNames().size());
+        assertEquals("here are the options ", resolvedImports //$NON-NLS-1$
+                .getWeaverOptions());
     }
 
     public void testExportedAspectsInAopXml() {
@@ -160,6 +244,253 @@ public class AspectAdminImplTest extends TestCase {
                 aspectClassNames.get(0));
         assertEquals(AspectAdmin.ASPECT_POLICY_NOT_DEFINED, aspectRegistry
                 .getAspectPolicy(bundle, "org.eclipse.equinox.weaving.tests")); //$NON-NLS-1$
+
+        Definition resolvedRequires = aspectRegistry.resolveRequiredBundle(
+                bundle, AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        assertNotNull(resolvedRequires);
+        assertEquals(1, aspectClassNames.size());
+        assertEquals("org.eclipse.equinox.weaving.tests.TestAspectType", //$NON-NLS-1$
+                aspectClassNames.get(0));
+
+        Definition resolvedImports = aspectRegistry.resolveImportedPackage(
+                bundle, "org.eclipse.equinox.weaving.tests", //$NON-NLS-1$
+                AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        assertNotNull(resolvedImports);
+        assertEquals(1, aspectClassNames.size());
+        assertEquals("org.eclipse.equinox.weaving.tests.TestAspectType", //$NON-NLS-1$
+                aspectClassNames.get(0));
+    }
+
+    public void testExportedAspectsAndOptionsInAopXml() {
+        Bundle bundle = EasyMock.createMock(Bundle.class);
+
+        URL testAopDefFile = this.getClass().getResource(
+                "test-aop-with-options-and-aspects.xml"); //$NON-NLS-1$
+        Hashtable<Object, Object> headers = new Hashtable<Object, Object>();
+        headers.put(Constants.EXPORT_PACKAGE,
+                "org.eclipse.equinox.weaving.tests"); //$NON-NLS-1$
+        EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
+        EasyMock.expect(
+                bundle.getEntry(AspectAdmin.AOP_CONTEXT_DEFAULT_LOCATION))
+                .andReturn(testAopDefFile);
+
+        EasyMock.replay(bundle);
+        aspectRegistry.bundleResolved(bundle);
+        EasyMock.verify(bundle);
+
+        Definition definition = aspectRegistry
+                .getExportedAspectDefinitions(bundle);
+        List<?> aspectClassNames = definition.getAspectClassNames();
+        assertEquals(1, aspectClassNames.size());
+        assertEquals("org.eclipse.equinox.weaving.tests.TestAspectType", //$NON-NLS-1$
+                aspectClassNames.get(0));
+        assertEquals(AspectAdmin.ASPECT_POLICY_NOT_DEFINED, aspectRegistry
+                .getAspectPolicy(bundle, "org.eclipse.equinox.weaving.tests")); //$NON-NLS-1$
+        assertEquals("here are the options ", definition.getWeaverOptions());
+
+        Definition resolvedRequires = aspectRegistry.resolveRequiredBundle(
+                bundle, AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        assertNotNull(resolvedRequires);
+        assertEquals(1, aspectClassNames.size());
+        assertEquals("org.eclipse.equinox.weaving.tests.TestAspectType", //$NON-NLS-1$
+                aspectClassNames.get(0));
+        assertEquals("here are the options ", resolvedRequires
+                .getWeaverOptions());
+
+        Definition resolvedImports = aspectRegistry.resolveImportedPackage(
+                bundle, "org.eclipse.equinox.weaving.tests", //$NON-NLS-1$
+                AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        assertNotNull(resolvedImports);
+        assertEquals(1, aspectClassNames.size());
+        assertEquals("org.eclipse.equinox.weaving.tests.TestAspectType", //$NON-NLS-1$
+                aspectClassNames.get(0));
+        assertEquals("here are the options ", resolvedImports
+                .getWeaverOptions());
+    }
+
+    public void testConcreteAspectsInAopXml() {
+        Bundle bundle = EasyMock.createMock(Bundle.class);
+
+        URL testAopDefFile = this.getClass().getResource(
+                "test-aop-with-concrete-aspect.xml"); //$NON-NLS-1$
+        Hashtable<Object, Object> headers = new Hashtable<Object, Object>();
+        headers
+                .put(Constants.EXPORT_PACKAGE,
+                        "org.eclipse.equinox.weaving.tests, org.eclipse.equinox.weaving.tests.concrete"); //$NON-NLS-1$
+        EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
+        EasyMock.expect(
+                bundle.getEntry(AspectAdmin.AOP_CONTEXT_DEFAULT_LOCATION))
+                .andReturn(testAopDefFile);
+
+        EasyMock.replay(bundle);
+        aspectRegistry.bundleResolved(bundle);
+        EasyMock.verify(bundle);
+
+        // exported definition
+        Definition definition = aspectRegistry
+                .getExportedAspectDefinitions(bundle);
+        List<?> aspectClassNames = definition.getAspectClassNames();
+        assertEquals(1, aspectClassNames.size());
+        assertEquals("org.eclipse.equinox.weaving.tests.MyAspect", //$NON-NLS-1$
+                aspectClassNames.get(0));
+        assertEquals(AspectAdmin.ASPECT_POLICY_NOT_DEFINED, aspectRegistry
+                .getAspectPolicy(bundle, "org.eclipse.equinox.weaving.tests")); //$NON-NLS-1$
+
+        List<?> concreteAspects = definition.getConcreteAspects();
+        assertEquals(1, concreteAspects.size());
+        Definition.ConcreteAspect concreteAspect = (ConcreteAspect) concreteAspects
+                .get(0);
+        assertEquals("tracing.AbstractTracing", concreteAspect.extend); //$NON-NLS-1$
+        assertEquals("org.eclipse.equinox.weaving.tests.concrete.MyTracing", //$NON-NLS-1$
+                concreteAspect.name);
+        assertNull(concreteAspect.perclause);
+        assertEquals("com.xyz.first, *", concreteAspect.precedence); //$NON-NLS-1$
+        assertEquals(
+                "within(org.maw.*)", //$NON-NLS-1$
+                ((Definition.Pointcut) concreteAspect.pointcuts.get(0)).expression);
+        assertEquals("tracingScope", //$NON-NLS-1$
+                ((Definition.Pointcut) concreteAspect.pointcuts.get(0)).name);
+
+        // resolved require bundle
+        Definition resolvedRequires = aspectRegistry.resolveRequiredBundle(
+                bundle, AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        aspectClassNames = resolvedRequires.getAspectClassNames();
+        assertEquals(1, aspectClassNames.size());
+        assertEquals("org.eclipse.equinox.weaving.tests.MyAspect", //$NON-NLS-1$
+                aspectClassNames.get(0));
+        assertEquals(AspectAdmin.ASPECT_POLICY_NOT_DEFINED, aspectRegistry
+                .getAspectPolicy(bundle, "org.eclipse.equinox.weaving.tests")); //$NON-NLS-1$
+
+        concreteAspects = resolvedRequires.getConcreteAspects();
+        assertEquals(1, concreteAspects.size());
+        concreteAspect = (ConcreteAspect) concreteAspects.get(0);
+        assertEquals("tracing.AbstractTracing", concreteAspect.extend); //$NON-NLS-1$
+        assertEquals("org.eclipse.equinox.weaving.tests.concrete.MyTracing", //$NON-NLS-1$
+                concreteAspect.name);
+        assertNull(concreteAspect.perclause);
+        assertEquals("com.xyz.first, *", concreteAspect.precedence); //$NON-NLS-1$
+        assertEquals(
+                "within(org.maw.*)", //$NON-NLS-1$
+                ((Definition.Pointcut) concreteAspect.pointcuts.get(0)).expression);
+        assertEquals("tracingScope", //$NON-NLS-1$
+                ((Definition.Pointcut) concreteAspect.pointcuts.get(0)).name);
+
+        // resolve import package 1
+        Definition resolvedImports = aspectRegistry.resolveImportedPackage(
+                bundle, "org.eclipse.equinox.weaving.tests", //$NON-NLS-1$
+                AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        aspectClassNames = resolvedImports.getAspectClassNames();
+        assertEquals(1, aspectClassNames.size());
+        assertEquals("org.eclipse.equinox.weaving.tests.MyAspect", //$NON-NLS-1$
+                aspectClassNames.get(0));
+        assertEquals(AspectAdmin.ASPECT_POLICY_NOT_DEFINED, aspectRegistry
+                .getAspectPolicy(bundle, "org.eclipse.equinox.weaving.tests")); //$NON-NLS-1$
+        concreteAspects = resolvedImports.getConcreteAspects();
+        assertEquals(0, concreteAspects.size());
+
+        // resolve import package 2
+        resolvedImports = aspectRegistry.resolveImportedPackage(bundle,
+                "org.eclipse.equinox.weaving.tests.concrete", //$NON-NLS-1$
+                AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        aspectClassNames = resolvedImports.getAspectClassNames();
+        assertEquals(0, aspectClassNames.size());
+        concreteAspects = resolvedImports.getConcreteAspects();
+        assertEquals(1, concreteAspects.size());
+        concreteAspect = (ConcreteAspect) concreteAspects.get(0);
+        assertEquals("tracing.AbstractTracing", concreteAspect.extend); //$NON-NLS-1$
+        assertEquals("org.eclipse.equinox.weaving.tests.concrete.MyTracing", //$NON-NLS-1$
+                concreteAspect.name);
+        assertNull(concreteAspect.perclause);
+        assertEquals("com.xyz.first, *", concreteAspect.precedence); //$NON-NLS-1$
+        assertEquals(
+                "within(org.maw.*)", //$NON-NLS-1$
+                ((Definition.Pointcut) concreteAspect.pointcuts.get(0)).expression);
+        assertEquals("tracingScope", //$NON-NLS-1$
+                ((Definition.Pointcut) concreteAspect.pointcuts.get(0)).name);
+    }
+
+    public void testExportedAndNotExportedConcreteAspectsInAopXml() {
+        Bundle bundle = EasyMock.createMock(Bundle.class);
+
+        URL testAopDefFile = this.getClass().getResource(
+                "test-aop-with-concrete-aspects-in-different-packages.xml"); //$NON-NLS-1$
+        Hashtable<Object, Object> headers = new Hashtable<Object, Object>();
+        headers.put(Constants.EXPORT_PACKAGE,
+                "org.eclipse.equinox.weaving.tests.concrete"); //$NON-NLS-1$
+        EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
+        EasyMock.expect(
+                bundle.getEntry(AspectAdmin.AOP_CONTEXT_DEFAULT_LOCATION))
+                .andReturn(testAopDefFile);
+
+        EasyMock.replay(bundle);
+        aspectRegistry.bundleResolved(bundle);
+        EasyMock.verify(bundle);
+
+        Definition definition = aspectRegistry
+                .getExportedAspectDefinitions(bundle);
+        List<?> aspectClassNames = definition.getAspectClassNames();
+        assertEquals(0, aspectClassNames.size());
+
+        List<?> concreteAspects = definition.getConcreteAspects();
+        assertEquals(1, concreteAspects.size());
+        Definition.ConcreteAspect concreteAspect = (ConcreteAspect) concreteAspects
+                .get(0);
+        assertEquals("tracing.AbstractTracing", concreteAspect.extend); //$NON-NLS-1$
+        assertEquals("org.eclipse.equinox.weaving.tests.concrete.MyTracing", //$NON-NLS-1$
+                concreteAspect.name);
+        assertNull(concreteAspect.perclause);
+        assertEquals("com.xyz.first, *", concreteAspect.precedence); //$NON-NLS-1$
+        assertEquals(
+                "within(org.maw.*)", //$NON-NLS-1$
+                ((Definition.Pointcut) concreteAspect.pointcuts.get(0)).expression);
+        assertEquals("tracingScope", //$NON-NLS-1$
+                ((Definition.Pointcut) concreteAspect.pointcuts.get(0)).name);
+
+        // resolved require bundle
+        Definition resolvedRequires = aspectRegistry.resolveRequiredBundle(
+                bundle, AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        aspectClassNames = resolvedRequires.getAspectClassNames();
+        assertEquals(0, aspectClassNames.size());
+
+        concreteAspects = definition.getConcreteAspects();
+        assertEquals(1, concreteAspects.size());
+        concreteAspect = (ConcreteAspect) concreteAspects.get(0);
+        assertEquals("tracing.AbstractTracing", concreteAspect.extend); //$NON-NLS-1$
+        assertEquals("org.eclipse.equinox.weaving.tests.concrete.MyTracing", //$NON-NLS-1$
+                concreteAspect.name);
+        assertNull(concreteAspect.perclause);
+        assertEquals("com.xyz.first, *", concreteAspect.precedence); //$NON-NLS-1$
+        assertEquals(
+                "within(org.maw.*)", //$NON-NLS-1$
+                ((Definition.Pointcut) concreteAspect.pointcuts.get(0)).expression);
+        assertEquals("tracingScope", //$NON-NLS-1$
+                ((Definition.Pointcut) concreteAspect.pointcuts.get(0)).name);
+
+        // resolve import package 1
+        Definition resolvedImports = aspectRegistry.resolveImportedPackage(
+                bundle, "org.eclipse.equinox.weaving.tests.concrete", //$NON-NLS-1$
+                AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        aspectClassNames = resolvedImports.getAspectClassNames();
+        assertEquals(0, aspectClassNames.size());
+        concreteAspects = resolvedImports.getConcreteAspects();
+        assertEquals(1, concreteAspects.size());
+        concreteAspect = (ConcreteAspect) concreteAspects.get(0);
+        assertEquals("tracing.AbstractTracing", concreteAspect.extend); //$NON-NLS-1$
+        assertEquals("org.eclipse.equinox.weaving.tests.concrete.MyTracing", //$NON-NLS-1$
+                concreteAspect.name);
+        assertNull(concreteAspect.perclause);
+        assertEquals("com.xyz.first, *", concreteAspect.precedence); //$NON-NLS-1$
+        assertEquals(
+                "within(org.maw.*)", //$NON-NLS-1$
+                ((Definition.Pointcut) concreteAspect.pointcuts.get(0)).expression);
+        assertEquals("tracingScope", //$NON-NLS-1$
+                ((Definition.Pointcut) concreteAspect.pointcuts.get(0)).name);
+
+        // resolve import package 2
+        resolvedImports = aspectRegistry.resolveImportedPackage(bundle,
+                "org.eclipse.equinox.weaving.tests.concrete.nonvisible", //$NON-NLS-1$
+                AspectAdmin.ASPECT_APPLY_POLICY_NOT_DEFINED);
+        assertNull(resolvedImports);
     }
 
     public void testExportedAspectsInManifest() {
@@ -364,6 +695,43 @@ public class AspectAdminImplTest extends TestCase {
                 .get(0));
         assertEquals("org.eclipse.equinox.weaving.tests3.OtherThirdAspect", //$NON-NLS-1$
                 aspects.get(1));
+    }
+
+    public void testExportedAspectsInAopXmlAndManifest() {
+        Bundle bundle = EasyMock.createMock(Bundle.class);
+
+        Hashtable<Object, Object> headers = new Hashtable<Object, Object>();
+        StringBuilder export = new StringBuilder();
+        export.append("org.eclipse.equinox.weaving.tests, "); //$NON-NLS-1$
+        export.append("org.eclipse.equinox.weaving.tests2;"); //$NON-NLS-1$
+        export.append("aspect-policy:=opt-out;"); //$NON-NLS-1$
+        export.append("aspects=\"SecondAspect,OtherSecondAspect\""); //$NON-NLS-1$
+        headers.put(Constants.EXPORT_PACKAGE, export.toString());
+
+        EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
+        URL testAopDefFile = this.getClass().getResource("test-aop.xml"); //$NON-NLS-1$
+        EasyMock.expect(
+                bundle.getEntry(AspectAdmin.AOP_CONTEXT_DEFAULT_LOCATION))
+                .andReturn(testAopDefFile);
+
+        EasyMock.replay(bundle);
+        aspectRegistry.bundleResolved(bundle);
+        EasyMock.verify(bundle);
+
+        Definition definition = aspectRegistry
+                .getExportedAspectDefinitions(bundle);
+        List<?> aspectClassNames = definition.getAspectClassNames();
+        assertEquals(3, aspectClassNames.size());
+        assertEquals("org.eclipse.equinox.weaving.tests2.SecondAspect", //$NON-NLS-1$
+                aspectClassNames.get(0));
+        assertEquals("org.eclipse.equinox.weaving.tests2.OtherSecondAspect", //$NON-NLS-1$
+                aspectClassNames.get(1));
+        assertEquals("org.eclipse.equinox.weaving.tests.TestAspectType", //$NON-NLS-1$
+                aspectClassNames.get(2));
+        assertEquals(AspectAdmin.ASPECT_POLICY_NOT_DEFINED, aspectRegistry
+                .getAspectPolicy(bundle, "org.eclipse.equinox.weaving.tests")); //$NON-NLS-1$
+        assertEquals(AspectAdmin.ASPECT_POLICY_OPT_OUT, aspectRegistry
+                .getAspectPolicy(bundle, "org.eclipse.equinox.weaving.tests2")); //$NON-NLS-1$
     }
 
 }

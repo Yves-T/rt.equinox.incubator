@@ -1,0 +1,6 @@
+<aspectj>
+	<aspects>
+		<aspect name="org.eclipse.equinox.weaving.tests.TestAspectType"/>
+	</aspects>
+    <weaver options="here are the options"/>
+</aspectj>

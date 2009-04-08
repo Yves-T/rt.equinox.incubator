@@ -87,10 +87,13 @@ public class AspectResolverTest extends TestCase {
 
         bundle = EasyMock.createMock(Bundle.class);
         EasyMock.expect(bundle.getBundleId()).andStubReturn(10l);
+        EasyMock.expect(bundle.getSymbolicName()).andStubReturn("bundle"); //$NON-NLS-1$
         bundleDescription = EasyMock.createMock(BundleDescription.class);
         EasyMock.expect(bundleDescription.getBundleId()).andStubReturn(10l);
         EasyMock.expect(bundleDescription.getFragments()).andStubReturn(
                 new BundleDescription[0]);
+        EasyMock.expect(bundleDescription.getVersion()).andStubReturn(
+                new Version("0.0.0")); //$NON-NLS-1$
         EasyMock.expect(bundleContext.getBundle(10l)).andStubReturn(bundle);
 
         requiredBundle1 = EasyMock.createMock(Bundle.class);
@@ -188,9 +191,32 @@ public class AspectResolverTest extends TestCase {
         assertEquals("", resolvedAspects.getFingerprint()); //$NON-NLS-1$
     }
 
-    public void testResolveWithSupplementers() {
+    public void testResolveIgnoreOwnAspects() {
+        Definition ownAspects = new Definition();
         EasyMock.expect(aspectAdmin.getAspectDefinition(bundle)).andStubReturn(
-                null);
+                ownAspects);
+        EasyMock.expect(bundleDescription.getResolvedRequires()).andStubReturn(
+                new BundleDescription[0]);
+        EasyMock.expect(bundleDescription.getResolvedImports()).andStubReturn(
+                new ExportPackageDescription[0]);
+
+        EasyMock.expect(supplementerRegistry.getSupplementers(10l))
+                .andStubReturn(new Bundle[0]);
+
+        EasyMock.replay(mocks);
+        AspectConfiguration resolvedAspects = resolver.resolveAspectsFor(
+                bundle, bundleDescription);
+        EasyMock.verify(mocks);
+
+        assertNotNull(resolvedAspects);
+        assertEquals(0, resolvedAspects.getAspectDefinitions().size());
+        assertEquals("", resolvedAspects.getFingerprint()); //$NON-NLS-1$
+    }
+
+    public void testResolveWithSupplementers() {
+        Definition ownAspects = new Definition();
+        EasyMock.expect(aspectAdmin.getAspectDefinition(bundle)).andStubReturn(
+                ownAspects);
         EasyMock.expect(bundleDescription.getResolvedRequires()).andStubReturn(
                 new BundleDescription[0]);
         EasyMock.expect(bundleDescription.getResolvedImports()).andStubReturn(
@@ -212,10 +238,12 @@ public class AspectResolverTest extends TestCase {
         EasyMock.verify(mocks);
 
         assertNotNull(resolvedAspects);
-        assertEquals(1, resolvedAspects.getAspectDefinitions().size());
+        assertEquals(2, resolvedAspects.getAspectDefinitions().size());
         assertSame(supplementerAspects, resolvedAspects.getAspectDefinitions()
                 .get(0));
-        assertEquals("supplementer:1.2.3;", resolvedAspects.getFingerprint()); //$NON-NLS-1$
+        assertSame(ownAspects, resolvedAspects.getAspectDefinitions().get(1));
+        assertEquals(
+                "bundle:0.0.0;supplementer:1.2.3;", resolvedAspects.getFingerprint()); //$NON-NLS-1$
     }
 
     public void testResolveWithRequiredBundlesNoApplyAspectsPolicy() {

@@ -1,0 +1,14 @@
+<aspectj>
+      <aspects>
+              <concrete-aspect name="org.eclipse.equinox.weaving.tests.concrete.MyTracing"
+                               extends="tracing.AbstractTracing"
+                               precedence="com.xyz.first, *">
+                <pointcut name="tracingScope" expression="within(org.maw.*)"/>
+              </concrete-aspect>
+              <concrete-aspect name="org.eclipse.equinox.weaving.tests.concrete.nonvisible.MyTracing"
+                               extends="tracing.AbstractTracing"
+                               precedence="com.xyz.first, *">
+                <pointcut name="tracingScope" expression="within(org.maw.*)"/>
+              </concrete-aspect>
+      </aspects>
+</aspectj>

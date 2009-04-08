@@ -1,0 +1,3 @@
+<aspectj>
+    <weaver options="here are the options"/>
+</aspectj>
