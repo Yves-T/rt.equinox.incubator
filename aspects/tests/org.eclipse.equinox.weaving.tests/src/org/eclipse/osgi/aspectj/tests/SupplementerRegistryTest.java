@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (c) 2008 Martin Lippert and others.
+ * Copyright (c) 2008, 2009 Martin Lippert and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Martin Lippert               initial implementation      
+ *   Martin Lippert            initial implementation      
+ *   Martin Lippert            fragment handling fixed
  *******************************************************************************/
 
 package org.eclipse.osgi.aspectj.tests;
 
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -19,6 +19,7 @@ import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
 import org.eclipse.equinox.service.weaving.ISupplementerRegistry;
+import org.eclipse.equinox.service.weaving.Supplementer;
 import org.eclipse.equinox.weaving.hooks.IAdaptorProvider;
 import org.eclipse.equinox.weaving.hooks.SupplementerRegistry;
 import org.eclipse.osgi.util.ManifestElement;
@@ -29,6 +30,7 @@ import org.osgi.service.packageadmin.PackageAdmin;
 /**
  * several test cases for the supplementer registry
  */
+@SuppressWarnings("nls")
 public class SupplementerRegistryTest extends TestCase {
 
     private Bundle bundle;
@@ -67,7 +69,7 @@ public class SupplementerRegistryTest extends TestCase {
         EasyMock.replay(mocks);
 
         registry.addBundle(bundle);
-        Bundle[] supplementers = registry.getSupplementers(bundle);
+        Supplementer[] supplementers = registry.getSupplementers(bundle);
         assertNotNull(supplementers);
         assertEquals(0, supplementers.length);
 
@@ -87,7 +89,7 @@ public class SupplementerRegistryTest extends TestCase {
 
         EasyMock.replay(mocks);
 
-        Bundle[] supplementers = registry.getSupplementers(0);
+        Supplementer[] supplementers = registry.getSupplementers(0);
         assertNotNull(supplementers);
         assertEquals(0, supplementers.length);
 
@@ -98,11 +100,11 @@ public class SupplementerRegistryTest extends TestCase {
         EasyMock.verify(mocks);
 
         final ManifestElement[] imports = ManifestElement.parseHeader(
-                "Import-Package", "org.test1,\n org.test2"); //$NON-NLS-1$ //$NON-NLS-2$
+                "Import-Package", "org.test1,\n org.test2");
         final ManifestElement[] exports = ManifestElement.parseHeader(
-                "Export-Package", "org.test3,\n org.test4"); //$NON-NLS-1$ //$NON-NLS-2$
-        final List<Bundle> possibleSupplementers = registry.getSupplementers(
-                "symbolicName", imports, exports); //$NON-NLS-1$
+                "Export-Package", "org.test3,\n org.test4");
+        final List<Supplementer> possibleSupplementers = registry
+                .getMatchingSupplementers("symbolicName", imports, exports);
         assertNotNull(possibleSupplementers);
         assertEquals(0, possibleSupplementers.size());
     }
@@ -144,12 +146,13 @@ public class SupplementerRegistryTest extends TestCase {
         registry.addBundle(supplementedBundle2);
         registry.addBundle(supplementedBundle3);
 
-        Bundle[] supplementers = registry.getSupplementers(supplementedBundle1);
-        assertSame(bundle, supplementers[0]);
+        Supplementer[] supplementers = registry
+                .getSupplementers(supplementedBundle1);
+        assertSame(bundle, supplementers[0].getSupplementerBundle());
         supplementers = registry.getSupplementers(supplementedBundle2);
-        assertSame(bundle, supplementers[0]);
+        assertSame(bundle, supplementers[0].getSupplementerBundle());
         supplementers = registry.getSupplementers(supplementedBundle3);
-        assertSame(bundle, supplementers[0]);
+        assertSame(bundle, supplementers[0].getSupplementerBundle());
 
         EasyMock.verify(mocks);
     }
@@ -212,19 +215,29 @@ public class SupplementerRegistryTest extends TestCase {
         registry.removeBundle(supplementerBundle1);
         registry.removeBundle(supplementerBundle3);
 
-        Bundle[] supplementers = registry.getSupplementers(supplementedBundle1);
+        Supplementer[] supplementers = registry
+                .getSupplementers(supplementedBundle1);
         assertEquals(1, supplementers.length);
-        assertFalse(Arrays.asList(supplementers).contains(supplementerBundle1));
-        assertTrue(Arrays.asList(supplementers).contains(supplementerBundle2));
-        assertFalse(Arrays.asList(supplementers).contains(supplementerBundle3));
+        assertFalse(containsSupplementer(supplementers, supplementerBundle1));
+        assertTrue(containsSupplementer(supplementers, supplementerBundle2));
+        assertFalse(containsSupplementer(supplementers, supplementerBundle3));
 
         supplementers = registry.getSupplementers(supplementedBundle2);
         assertEquals(0, supplementers.length);
-        assertFalse(Arrays.asList(supplementers).contains(supplementerBundle1));
-        assertFalse(Arrays.asList(supplementers).contains(supplementerBundle2));
-        assertFalse(Arrays.asList(supplementers).contains(supplementerBundle3));
+        assertFalse(containsSupplementer(supplementers, supplementerBundle1));
+        assertFalse(containsSupplementer(supplementers, supplementerBundle2));
+        assertFalse(containsSupplementer(supplementers, supplementerBundle3));
 
         EasyMock.verify(mocks);
+    }
+
+    private boolean containsSupplementer(Supplementer[] supplementers,
+            Bundle supplementer) {
+        for (int i = 0; i < supplementers.length; i++) {
+            if (supplementers[i].getSupplementerBundle() == supplementer)
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -272,17 +285,18 @@ public class SupplementerRegistryTest extends TestCase {
         registry.addBundle(supplementedBundle1);
         registry.addBundle(supplementedBundle2);
 
-        Bundle[] supplementers = registry.getSupplementers(supplementedBundle1);
+        Supplementer[] supplementers = registry
+                .getSupplementers(supplementedBundle1);
         assertEquals(3, supplementers.length);
-        assertTrue(Arrays.asList(supplementers).contains(supplementerBundle1));
-        assertTrue(Arrays.asList(supplementers).contains(supplementerBundle2));
-        assertTrue(Arrays.asList(supplementers).contains(supplementerBundle3));
+        assertTrue(containsSupplementer(supplementers, supplementerBundle1));
+        assertTrue(containsSupplementer(supplementers, supplementerBundle2));
+        assertTrue(containsSupplementer(supplementers, supplementerBundle3));
 
         supplementers = registry.getSupplementers(supplementedBundle2);
         assertEquals(1, supplementers.length);
-        assertFalse(Arrays.asList(supplementers).contains(supplementerBundle1));
-        assertFalse(Arrays.asList(supplementers).contains(supplementerBundle2));
-        assertTrue(Arrays.asList(supplementers).contains(supplementerBundle3));
+        assertFalse(containsSupplementer(supplementers, supplementerBundle1));
+        assertFalse(containsSupplementer(supplementers, supplementerBundle2));
+        assertTrue(containsSupplementer(supplementers, supplementerBundle3));
 
         EasyMock.verify(mocks);
     }
@@ -301,11 +315,11 @@ public class SupplementerRegistryTest extends TestCase {
         registry.removeBundle(bundle);
 
         final ManifestElement[] imports = ManifestElement.parseHeader(
-                "Import-Package", "org.test1,\n org.test2"); //$NON-NLS-1$ //$NON-NLS-2$
+                "Import-Package", "org.test1,\n org.test2");
         final ManifestElement[] exports = ManifestElement.parseHeader(
-                "Export-Package", "org.test3,\n org.test4"); //$NON-NLS-1$ //$NON-NLS-2$
-        final List<Bundle> supplementers = registry.getSupplementers(
-                "test.bundle1", imports, exports);
+                "Export-Package", "org.test3,\n org.test4");
+        final List<Supplementer> supplementers = registry
+                .getMatchingSupplementers("test.bundle1", imports, exports);
         assertNotNull(supplementers);
         assertEquals(0, supplementers.size());
 
@@ -334,9 +348,9 @@ public class SupplementerRegistryTest extends TestCase {
         registry.addBundle(bundle);
         registry.addBundle(supplementedBundle1);
 
-        final Bundle[] supplementers = registry
+        final Supplementer[] supplementers = registry
                 .getSupplementers(supplementedBundle1);
-        assertSame(bundle, supplementers[0]);
+        assertSame(bundle, supplementers[0].getSupplementerBundle());
 
         EasyMock.verify(mocks);
     }
@@ -364,9 +378,9 @@ public class SupplementerRegistryTest extends TestCase {
         registry.addBundle(bundle);
         registry.addBundle(supplementedBundle1);
 
-        final Bundle[] supplementers = registry
+        final Supplementer[] supplementers = registry
                 .getSupplementers(supplementedBundle1);
-        assertSame(bundle, supplementers[0]);
+        assertSame(bundle, supplementers[0].getSupplementerBundle());
 
         EasyMock.verify(mocks);
     }
@@ -394,9 +408,9 @@ public class SupplementerRegistryTest extends TestCase {
         registry.addBundle(bundle);
         registry.addBundle(supplementedBundle1);
 
-        final Bundle[] supplementers = registry
+        final Supplementer[] supplementers = registry
                 .getSupplementers(supplementedBundle1);
-        assertSame(bundle, supplementers[0]);
+        assertSame(bundle, supplementers[0].getSupplementerBundle());
 
         EasyMock.verify(mocks);
     }
@@ -417,14 +431,14 @@ public class SupplementerRegistryTest extends TestCase {
 
         registry.addBundle(bundle);
         final ManifestElement[] imports = ManifestElement.parseHeader(
-                "Import-Package", "org.test1,\n org.test2"); //$NON-NLS-1$ //$NON-NLS-2$
+                "Import-Package", "org.test1,\n org.test2");
         final ManifestElement[] exports = ManifestElement.parseHeader(
-                "Export-Package", "org.test3,\n org.test4"); //$NON-NLS-1$ //$NON-NLS-2$
-        final List<Bundle> supplementers = registry.getSupplementers(
-                "test.bundle1", imports, exports);
+                "Export-Package", "org.test3,\n org.test4");
+        final List<Supplementer> supplementers = registry
+                .getMatchingSupplementers("test.bundle1", imports, exports);
         assertNotNull(supplementers);
         assertEquals(1, supplementers.size());
-        assertEquals(bundle, supplementers.get(0));
+        assertEquals(bundle, supplementers.get(0).getSupplementerBundle());
 
         EasyMock.verify(mocks);
     }
@@ -465,20 +479,21 @@ public class SupplementerRegistryTest extends TestCase {
         registry.addBundle(supplementedBundle2);
         registry.addBundle(supplementedBundle3);
 
-        Bundle[] supplementers = registry.getSupplementers(supplementedBundle1);
+        Supplementer[] supplementers = registry
+                .getSupplementers(supplementedBundle1);
         assertEquals(2, supplementers.length);
-        assertTrue(Arrays.asList(supplementers).contains(supplementerBundle1));
-        assertTrue(Arrays.asList(supplementers).contains(supplementerBundle2));
+        assertTrue(containsSupplementer(supplementers, supplementerBundle1));
+        assertTrue(containsSupplementer(supplementers, supplementerBundle2));
 
         supplementers = registry.getSupplementers(supplementedBundle2);
         assertEquals(2, supplementers.length);
-        assertTrue(Arrays.asList(supplementers).contains(supplementerBundle1));
-        assertTrue(Arrays.asList(supplementers).contains(supplementerBundle2));
+        assertTrue(containsSupplementer(supplementers, supplementerBundle1));
+        assertTrue(containsSupplementer(supplementers, supplementerBundle2));
 
         supplementers = registry.getSupplementers(supplementedBundle3);
         assertEquals(0, supplementers.length);
-        assertFalse(Arrays.asList(supplementers).contains(supplementerBundle1));
-        assertFalse(Arrays.asList(supplementers).contains(supplementerBundle2));
+        assertFalse(containsSupplementer(supplementers, supplementerBundle1));
+        assertFalse(containsSupplementer(supplementers, supplementerBundle2));
 
         EasyMock.verify(mocks);
     }
@@ -502,6 +517,20 @@ public class SupplementerRegistryTest extends TestCase {
         supplementedBundle3 = EasyMock.createMock(Bundle.class);
 
         packageAdmin = EasyMock.createMock(PackageAdmin.class);
+
+        EasyMock.expect(packageAdmin.getHosts(bundle)).andStubReturn(null);
+        EasyMock.expect(packageAdmin.getHosts(supplementedBundle1))
+                .andStubReturn(null);
+        EasyMock.expect(packageAdmin.getHosts(supplementedBundle2))
+                .andStubReturn(null);
+        EasyMock.expect(packageAdmin.getHosts(supplementedBundle3))
+                .andStubReturn(null);
+        EasyMock.expect(packageAdmin.getHosts(supplementerBundle1))
+                .andStubReturn(null);
+        EasyMock.expect(packageAdmin.getHosts(supplementerBundle2))
+                .andStubReturn(null);
+        EasyMock.expect(packageAdmin.getHosts(supplementerBundle3))
+                .andStubReturn(null);
 
         registry = new SupplementerRegistry(adaptorProvider);
         registry.setBundleContext(context);

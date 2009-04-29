@@ -6,7 +6,8 @@
  * http://www.eclipse.org/legal/epl-v10.html.
  * 
  * Contributors:
- *     Martin Lippert - initial implementation
+ *   Martin Lippert            initial implementation
+ *   Martin Lippert            fragment handling fixed
  ******************************************************************************/
 
 package org.eclipse.osgi.aspectj.tests;
@@ -18,6 +19,7 @@ import junit.framework.TestCase;
 import org.aspectj.weaver.loadtime.definition.Definition;
 import org.easymock.EasyMock;
 import org.eclipse.equinox.service.weaving.ISupplementerRegistry;
+import org.eclipse.equinox.service.weaving.Supplementer;
 import org.eclipse.equinox.weaving.aspectj.AspectAdmin;
 import org.eclipse.equinox.weaving.aspectj.AspectConfiguration;
 import org.eclipse.equinox.weaving.aspectj.loadtime.AspectResolver;
@@ -32,6 +34,7 @@ import org.osgi.framework.Version;
 /**
  * @author Martin Lippert
  */
+@SuppressWarnings("nls")
 public class AspectResolverTest extends TestCase {
 
     private Object[] mocks;
@@ -87,7 +90,7 @@ public class AspectResolverTest extends TestCase {
 
         bundle = EasyMock.createMock(Bundle.class);
         EasyMock.expect(bundle.getBundleId()).andStubReturn(10l);
-        EasyMock.expect(bundle.getSymbolicName()).andStubReturn("bundle"); //$NON-NLS-1$
+        EasyMock.expect(bundle.getSymbolicName()).andStubReturn("bundle");
         bundleDescription = EasyMock.createMock(BundleDescription.class);
         EasyMock.expect(bundleDescription.getBundleId()).andStubReturn(10l);
         EasyMock.expect(bundleDescription.getFragments()).andStubReturn(
@@ -138,7 +141,7 @@ public class AspectResolverTest extends TestCase {
         EasyMock.expect(requiredBundle2Desc.getVersion()).andStubReturn(
                 new Version("2.2.2")); //$NON-NLS-1$
         importedPackage1 = EasyMock.createMock(ExportPackageDescription.class);
-        EasyMock.expect(importedPackage1.getName()).andStubReturn("imported1"); //$NON-NLS-1$
+        EasyMock.expect(importedPackage1.getName()).andStubReturn("imported1");
         EasyMock.expect(importedPackage1.getVersion()).andStubReturn(
                 new Version("5.5.5")); //$NON-NLS-1$
         EasyMock.expect(importedPackage1.getExporter()).andStubReturn(
@@ -179,7 +182,7 @@ public class AspectResolverTest extends TestCase {
         EasyMock.expect(bundleDescription.getResolvedImports()).andStubReturn(
                 new ExportPackageDescription[0]);
         EasyMock.expect(supplementerRegistry.getSupplementers(10l))
-                .andStubReturn(new Bundle[0]);
+                .andStubReturn(new Supplementer[0]);
 
         EasyMock.replay(mocks);
         AspectConfiguration resolvedAspects = resolver.resolveAspectsFor(
@@ -188,7 +191,7 @@ public class AspectResolverTest extends TestCase {
 
         assertNotNull(resolvedAspects);
         assertEquals(0, resolvedAspects.getAspectDefinitions().size());
-        assertEquals("", resolvedAspects.getFingerprint()); //$NON-NLS-1$
+        assertEquals("", resolvedAspects.getFingerprint());
     }
 
     public void testResolveIgnoreOwnAspects() {
@@ -201,7 +204,7 @@ public class AspectResolverTest extends TestCase {
                 new ExportPackageDescription[0]);
 
         EasyMock.expect(supplementerRegistry.getSupplementers(10l))
-                .andStubReturn(new Bundle[0]);
+                .andStubReturn(new Supplementer[0]);
 
         EasyMock.replay(mocks);
         AspectConfiguration resolvedAspects = resolver.resolveAspectsFor(
@@ -210,7 +213,7 @@ public class AspectResolverTest extends TestCase {
 
         assertNotNull(resolvedAspects);
         assertEquals(0, resolvedAspects.getAspectDefinitions().size());
-        assertEquals("", resolvedAspects.getFingerprint()); //$NON-NLS-1$
+        assertEquals("", resolvedAspects.getFingerprint());
     }
 
     public void testResolveWithSupplementers() {
@@ -222,8 +225,10 @@ public class AspectResolverTest extends TestCase {
         EasyMock.expect(bundleDescription.getResolvedImports()).andStubReturn(
                 new ExportPackageDescription[0]);
 
+        Supplementer supplementer = new Supplementer(supplementerBundle, null,
+                null, null, null);
         EasyMock.expect(supplementerRegistry.getSupplementers(10l))
-                .andStubReturn(new Bundle[] { supplementerBundle });
+                .andStubReturn(new Supplementer[] { supplementer });
 
         Definition supplementerAspects = new Definition();
         EasyMock.expect(
@@ -242,13 +247,13 @@ public class AspectResolverTest extends TestCase {
         assertSame(supplementerAspects, resolvedAspects.getAspectDefinitions()
                 .get(0));
         assertSame(ownAspects, resolvedAspects.getAspectDefinitions().get(1));
-        assertEquals(
-                "bundle:0.0.0;supplementer:1.2.3;", resolvedAspects.getFingerprint()); //$NON-NLS-1$
+        assertEquals("bundle:0.0.0;supplementer:1.2.3;", resolvedAspects
+                .getFingerprint());
     }
 
     public void testResolveWithRequiredBundlesNoApplyAspectsPolicy() {
         Hashtable<Object, Object> headers = new Hashtable<Object, Object>();
-        headers.put(Constants.REQUIRE_BUNDLE, "required1"); //$NON-NLS-1$
+        headers.put(Constants.REQUIRE_BUNDLE, "required1");
         EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
 
         EasyMock.expect(aspectAdmin.getAspectDefinition(bundle)).andStubReturn(
@@ -259,7 +264,7 @@ public class AspectResolverTest extends TestCase {
                 new ExportPackageDescription[0]);
 
         EasyMock.expect(supplementerRegistry.getSupplementers(10l))
-                .andStubReturn(new Bundle[0]);
+                .andStubReturn(new Supplementer[0]);
 
         Definition requiredBundleAspects = new Definition();
         EasyMock.expect(
@@ -278,12 +283,12 @@ public class AspectResolverTest extends TestCase {
         assertEquals(1, resolvedAspects.getAspectDefinitions().size());
         assertSame(requiredBundleAspects, resolvedAspects
                 .getAspectDefinitions().get(0));
-        assertEquals("required1:1.1.1;", resolvedAspects.getFingerprint()); //$NON-NLS-1$
+        assertEquals("required1:1.1.1;", resolvedAspects.getFingerprint());
     }
 
     public void testResolveWithRequiredBundlesDoApplyAspectsPolicy() {
         Hashtable<Object, Object> headers = new Hashtable<Object, Object>();
-        headers.put(Constants.REQUIRE_BUNDLE, "required1;apply-aspects:=true"); //$NON-NLS-1$
+        headers.put(Constants.REQUIRE_BUNDLE, "required1;apply-aspects:=true");
         EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
 
         EasyMock.expect(aspectAdmin.getAspectDefinition(bundle)).andStubReturn(
@@ -294,7 +299,7 @@ public class AspectResolverTest extends TestCase {
                 new ExportPackageDescription[0]);
 
         EasyMock.expect(supplementerRegistry.getSupplementers(10l))
-                .andStubReturn(new Bundle[0]);
+                .andStubReturn(new Supplementer[0]);
 
         Definition requiredBundleAspects = new Definition();
         EasyMock.expect(
@@ -313,12 +318,12 @@ public class AspectResolverTest extends TestCase {
         assertEquals(1, resolvedAspects.getAspectDefinitions().size());
         assertSame(requiredBundleAspects, resolvedAspects
                 .getAspectDefinitions().get(0));
-        assertEquals("required1:1.1.1;", resolvedAspects.getFingerprint()); //$NON-NLS-1$
+        assertEquals("required1:1.1.1;", resolvedAspects.getFingerprint());
     }
 
     public void testResolveWithRequiredBundlesDontApplyAspectsPolicy() {
         Hashtable<Object, Object> headers = new Hashtable<Object, Object>();
-        headers.put(Constants.REQUIRE_BUNDLE, "required1;apply-aspects:=false"); //$NON-NLS-1$
+        headers.put(Constants.REQUIRE_BUNDLE, "required1;apply-aspects:=false");
         EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
 
         EasyMock.expect(aspectAdmin.getAspectDefinition(bundle)).andStubReturn(
@@ -329,7 +334,7 @@ public class AspectResolverTest extends TestCase {
                 new ExportPackageDescription[0]);
 
         EasyMock.expect(supplementerRegistry.getSupplementers(10l))
-                .andStubReturn(new Bundle[0]);
+                .andStubReturn(new Supplementer[0]);
 
         EasyMock.expect(
                 aspectAdmin.resolveRequiredBundle(requiredBundle1,
@@ -345,12 +350,12 @@ public class AspectResolverTest extends TestCase {
 
         assertNotNull(resolvedAspects);
         assertEquals(0, resolvedAspects.getAspectDefinitions().size());
-        assertEquals("", resolvedAspects.getFingerprint()); //$NON-NLS-1$
+        assertEquals("", resolvedAspects.getFingerprint());
     }
 
     public void testResolveWithImportedPackageNoApplyAspectsPolicy() {
         Hashtable<Object, Object> headers = new Hashtable<Object, Object>();
-        headers.put(Constants.IMPORT_PACKAGE, "imported1"); //$NON-NLS-1$
+        headers.put(Constants.IMPORT_PACKAGE, "imported1");
         EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
 
         EasyMock.expect(aspectAdmin.getAspectDefinition(bundle)).andStubReturn(
@@ -361,7 +366,7 @@ public class AspectResolverTest extends TestCase {
                 new ExportPackageDescription[] { importedPackage1 });
 
         EasyMock.expect(supplementerRegistry.getSupplementers(10l))
-                .andStubReturn(new Bundle[0]);
+                .andStubReturn(new Supplementer[0]);
 
         Definition importedPackageAspects = new Definition();
         EasyMock.expect(
@@ -381,12 +386,12 @@ public class AspectResolverTest extends TestCase {
         assertEquals(1, resolvedAspects.getAspectDefinitions().size());
         assertSame(importedPackageAspects, resolvedAspects
                 .getAspectDefinitions().get(0));
-        assertEquals("imported1:5.5.5;", resolvedAspects.getFingerprint()); //$NON-NLS-1$
+        assertEquals("imported1:5.5.5;", resolvedAspects.getFingerprint());
     }
 
     public void testResolveWithImportedPackageDoApplyAspectsPolicy() {
         Hashtable<Object, Object> headers = new Hashtable<Object, Object>();
-        headers.put(Constants.IMPORT_PACKAGE, "imported1;apply-aspects:=true"); //$NON-NLS-1$
+        headers.put(Constants.IMPORT_PACKAGE, "imported1;apply-aspects:=true");
         EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
 
         EasyMock.expect(aspectAdmin.getAspectDefinition(bundle)).andStubReturn(
@@ -397,7 +402,7 @@ public class AspectResolverTest extends TestCase {
                 new ExportPackageDescription[] { importedPackage1 });
 
         EasyMock.expect(supplementerRegistry.getSupplementers(10l))
-                .andStubReturn(new Bundle[0]);
+                .andStubReturn(new Supplementer[0]);
 
         Definition importedPackageAspects = new Definition();
         EasyMock.expect(
@@ -417,12 +422,12 @@ public class AspectResolverTest extends TestCase {
         assertEquals(1, resolvedAspects.getAspectDefinitions().size());
         assertSame(importedPackageAspects, resolvedAspects
                 .getAspectDefinitions().get(0));
-        assertEquals("imported1:5.5.5;", resolvedAspects.getFingerprint()); //$NON-NLS-1$
+        assertEquals("imported1:5.5.5;", resolvedAspects.getFingerprint());
     }
 
     public void testResolveWithImportedPackageDontApplyAspectsPolicy() {
         Hashtable<Object, Object> headers = new Hashtable<Object, Object>();
-        headers.put(Constants.IMPORT_PACKAGE, "imported1;apply-aspects:=false"); //$NON-NLS-1$
+        headers.put(Constants.IMPORT_PACKAGE, "imported1;apply-aspects:=false");
         EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
 
         EasyMock.expect(aspectAdmin.getAspectDefinition(bundle)).andStubReturn(
@@ -433,7 +438,7 @@ public class AspectResolverTest extends TestCase {
                 new ExportPackageDescription[] { importedPackage1 });
 
         EasyMock.expect(supplementerRegistry.getSupplementers(10l))
-                .andStubReturn(new Bundle[0]);
+                .andStubReturn(new Supplementer[0]);
 
         Definition importedPackageAspects = new Definition();
         EasyMock.expect(
@@ -451,7 +456,7 @@ public class AspectResolverTest extends TestCase {
 
         assertNotNull(resolvedAspects);
         assertEquals(0, resolvedAspects.getAspectDefinitions().size());
-        assertEquals("", resolvedAspects.getFingerprint()); //$NON-NLS-1$
+        assertEquals("", resolvedAspects.getFingerprint());
     }
 
 }
