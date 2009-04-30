@@ -194,7 +194,37 @@ public class AspectResolverTest extends TestCase {
         assertEquals("", resolvedAspects.getFingerprint());
     }
 
+    public void testResolveOwnAspects() {
+        Definition ownAspects = new Definition();
+        EasyMock.expect(aspectAdmin.getAspectDefinition(bundle)).andStubReturn(
+                ownAspects);
+        EasyMock.expect(bundleDescription.getResolvedRequires()).andStubReturn(
+                new BundleDescription[0]);
+        EasyMock.expect(bundleDescription.getResolvedImports()).andStubReturn(
+                new ExportPackageDescription[0]);
+
+        EasyMock.expect(supplementerRegistry.getSupplementers(10l))
+                .andStubReturn(new Supplementer[0]);
+
+        Hashtable<Object, Object> headers = new Hashtable<Object, Object>();
+        EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
+
+        EasyMock.replay(mocks);
+        AspectConfiguration resolvedAspects = resolver.resolveAspectsFor(
+                bundle, bundleDescription);
+        EasyMock.verify(mocks);
+
+        assertNotNull(resolvedAspects);
+        assertEquals(1, resolvedAspects.getAspectDefinitions().size());
+        assertSame(ownAspects, resolvedAspects.getAspectDefinitions().get(0));
+        assertEquals("bundle:0.0.0;", resolvedAspects.getFingerprint());
+    }
+
     public void testResolveIgnoreOwnAspects() {
+        Hashtable<Object, Object> headers = new Hashtable<Object, Object>();
+        headers.put("Eclipse-AspectBundle", "finished");
+        EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
+
         Definition ownAspects = new Definition();
         EasyMock.expect(aspectAdmin.getAspectDefinition(bundle)).andStubReturn(
                 ownAspects);
@@ -236,6 +266,9 @@ public class AspectResolverTest extends TestCase {
                 .andStubReturn(supplementerAspects);
         EasyMock.expect(aspectAdmin.getAspectDefinition(supplementerBundle))
                 .andStubReturn(new Definition());
+
+        Hashtable<Object, Object> headers = new Hashtable<Object, Object>();
+        EasyMock.expect(bundle.getHeaders()).andStubReturn(headers);
 
         EasyMock.replay(mocks);
         AspectConfiguration resolvedAspects = resolver.resolveAspectsFor(
