@@ -20,6 +20,7 @@ import junit.framework.TestCase;
 import org.easymock.EasyMock;
 import org.eclipse.equinox.service.weaving.ISupplementerRegistry;
 import org.eclipse.equinox.service.weaving.Supplementer;
+import org.eclipse.equinox.weaving.adaptors.IWeavingAdaptor;
 import org.eclipse.equinox.weaving.hooks.IAdaptorProvider;
 import org.eclipse.equinox.weaving.hooks.SupplementerRegistry;
 import org.eclipse.osgi.util.ManifestElement;
@@ -203,6 +204,11 @@ public class SupplementerRegistryTest extends TestCase {
                 .aryEq(new Bundle[] { supplementedBundle1 }));
         packageAdmin.refreshPackages(EasyMock.aryEq(new Bundle[] {
                 supplementedBundle1, supplementedBundle2 }));
+
+        IWeavingAdaptor adaptor = EasyMock
+                .createNiceMock(IWeavingAdaptor.class);
+        EasyMock.expect(adaptorProvider.getAdaptor(6l)).andStubReturn(adaptor);
+        EasyMock.expect(adaptorProvider.getAdaptor(7l)).andStubReturn(adaptor);
 
         EasyMock.replay(mocks);
 
