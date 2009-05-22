@@ -1,0 +1,14 @@
+<plugin>
+  <extension point="org.eclipse.equinox.http.registry.resources">
+    <resource
+      alias="/files"
+      base-name="/web"/>
+  </extension>
+  <extension
+        point="org.eclipse.equinox.http.registry.servlets">
+     <servlet
+           alias="/files/install"
+           class="org.eclipse.equinox.p2.weblistener.InstallServlet">
+     </servlet>
+  </extension>
+</plugin>
