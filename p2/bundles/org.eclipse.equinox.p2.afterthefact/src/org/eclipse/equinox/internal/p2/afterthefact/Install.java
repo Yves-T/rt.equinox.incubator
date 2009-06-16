@@ -42,6 +42,7 @@ import org.eclipse.equinox.internal.provisional.p2.metadata.query.InstallableUni
 import org.eclipse.equinox.internal.provisional.p2.metadata.repository.IMetadataRepositoryManager;
 import org.eclipse.equinox.internal.provisional.p2.query.Collector;
 import org.eclipse.osgi.service.resolver.PlatformAdmin;
+import org.osgi.service.packageadmin.PackageAdmin;
 
 public class Install {
 	private IArtifactRepository repo;
@@ -77,8 +78,12 @@ public class Install {
 		request.addInstallableUnits(iusToInstall);
 		ProvisioningPlan plan = planner.getProvisioningPlan(request, new ProvisioningContext(), null);
 		
-		//Execute the plan
+		//Execute the plan. This causes the files to be downloaded and the bundles to be installed
 		System.out.println(engine.perform(profile, new DefaultPhaseSet(), plan.getOperands(), null, null));
+		
+		//Refresh the framework to get the bundles installed
+		PackageAdmin packageAdmin = (PackageAdmin) ServiceHelper.getService(Activator.getContext(), PackageAdmin.class.getName());
+		packageAdmin.refreshPackages(null);
 	}
 
 	//Helper method to get IUs to install
@@ -139,7 +144,7 @@ public class Install {
 		//((SimpleArtifactRepository) repo).initializeMapper();
 		Method initializeMapper;
 		try {
-			initializeMapper = SimpleArtifactRepository.class.getMethod("initializeMapper", null);
+			initializeMapper = SimpleArtifactRepository.class.getDeclaredMethod("initializeMapper", null);
 			initializeMapper.setAccessible(true);
 			initializeMapper.invoke(repo, null);
 		} catch (SecurityException e) {
