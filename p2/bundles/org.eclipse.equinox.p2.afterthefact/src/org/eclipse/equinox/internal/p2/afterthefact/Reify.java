@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.equinox.p2.reconciler.inprocess;
+package org.eclipse.equinox.internal.p2.afterthefact;
 
 import java.util.ArrayList;
 import java.util.Collection;

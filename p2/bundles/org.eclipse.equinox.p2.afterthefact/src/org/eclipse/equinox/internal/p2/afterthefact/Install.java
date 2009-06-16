@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.equinox.p2.reconciler.inprocess;
+package org.eclipse.equinox.internal.p2.afterthefact;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -46,12 +46,8 @@ import org.eclipse.osgi.service.resolver.PlatformAdmin;
 public class Install {
 	private IArtifactRepository repo;
 
-	// reify --> that could be shortcircuited to know if the state of the
-	// fwk has changed.
-	// spoof up a profile --> location of the bundle pool?
-	// create a change request
-	// provide a plan
 	public void doInstall() {
+		//Acquire services that are necessary for the rest of the installation
 		IProfileRegistry registry = (IProfileRegistry) ServiceHelper.getService(Activator.getContext(), IProfileRegistry.class.getName());
 		PlatformAdmin platformAdmin = (PlatformAdmin) ServiceHelper.getService(Activator.getContext(), PlatformAdmin.class.getName());
 		IEngine engine = (IEngine) ServiceHelper.getService(Activator.getContext(), IEngine.class.getName());
@@ -59,9 +55,13 @@ public class Install {
 		IMetadataRepositoryManager repoMgr = (IMetadataRepositoryManager) ServiceHelper.getService(Activator.getContext(), IMetadataRepositoryManager.class.getName());
 		IArtifactRepositoryManager artifactRepoMgr = (IArtifactRepositoryManager) ServiceHelper.getService(Activator.getContext(), IArtifactRepositoryManager.class.getName());
 
+		//Create a bundle pool. This does not have to be done all the time
 		repo = createBundlePool(artifactRepoMgr);
 
+		//Get the IU to install
 		IInstallableUnit[] iusToInstall = getRandomIUToInstall(repoMgr, artifactRepoMgr);
+		
+		//Create a representation of what is already installed into the running system
 		Collection ius = new Reify().reify(platformAdmin);
 		IProfile profile = null;
 		try {
@@ -72,12 +72,16 @@ public class Install {
 		if (profile == null)
 			return;
 
+		//Create a request to install the IUs and compute a plan to install those
 		ProfileChangeRequest request = new ProfileChangeRequest(profile);
 		request.addInstallableUnits(iusToInstall);
 		ProvisioningPlan plan = planner.getProvisioningPlan(request, new ProvisioningContext(), null);
+		
+		//Execute the plan
 		System.out.println(engine.perform(profile, new DefaultPhaseSet(), plan.getOperands(), null, null));
 	}
 
+	//Helper method to get IUs to install
 	private IInstallableUnit[] getRandomIUToInstall(IMetadataRepositoryManager repoMgr, IArtifactRepositoryManager artifactMgr) {
 		try {
 			repoMgr.addRepository(new URI("http://download.eclipse.org/releases/galileo"));
@@ -104,7 +108,6 @@ public class Install {
 			operands[i++] = new InstallableUnitOperand(null, iu);
 			operands[i++] = new InstallableUnitPropertyOperand(iu, "org.eclipse.equinox.p2.internal.inclusion.rules", null, PlannerHelper.createOptionalInclusionRule(iu));
 		}
-		// operands[operands.length - 1] = new PropertyOperand("a", null, "c");
 		IStatus status = engine.perform(profile, DefaultPhaseSet.createDefaultPhaseSet(DefaultPhaseSet.PHASE_CHECK_TRUST | DefaultPhaseSet.PHASE_COLLECT | DefaultPhaseSet.PHASE_CONFIGURE | DefaultPhaseSet.PHASE_UNCONFIGURE | DefaultPhaseSet.PHASE_UNINSTALL), operands, new ProvisioningContext(), null);
 		if (!status.isOK())
 			return null;

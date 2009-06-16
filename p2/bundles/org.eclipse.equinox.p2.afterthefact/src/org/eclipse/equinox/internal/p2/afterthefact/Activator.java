@@ -8,14 +8,18 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.equinox.p2.reconciler.inprocess;
+package org.eclipse.equinox.internal.p2.afterthefact;
 
+import org.eclipse.equinox.internal.p2.afterthefact.command.RunExampleCommand;
+import org.eclipse.osgi.framework.console.CommandProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 public class Activator implements BundleActivator {
 
 	private static BundleContext ctx;
+	private ServiceRegistration registration;
 
 	/*
 	 * (non-Javadoc)
@@ -23,6 +27,7 @@ public class Activator implements BundleActivator {
 	 */
 	public void start(BundleContext context) throws Exception {
 		ctx = context;
+		registration = context.registerService(CommandProvider.class.getName(), new RunExampleCommand(context), null);
 	}
 
 	/*
@@ -31,6 +36,7 @@ public class Activator implements BundleActivator {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		ctx = null;
+		registration.unregister();
 	}
 	
 	public static BundleContext getContext() {
