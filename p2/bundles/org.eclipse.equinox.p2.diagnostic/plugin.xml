@@ -12,5 +12,14 @@
          </run>
       </application>
    </extension>
+   <extension
+         id="app3"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            thread="any"
+            visible="true">
+         <run class="solution3.RepositoryDumpingApplication"/>
+      </application>
+   </extension>
 
 </plugin>

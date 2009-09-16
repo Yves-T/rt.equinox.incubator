@@ -10,7 +10,8 @@ import org.osgi.service.component.ComponentInstance;
 public class Activator implements BundleActivator {
 
 	private static ComponentInstance componentInstance;
-	
+	private static BundleContext context;
+
 	/**
 	 * The constructor
 	 */
@@ -22,13 +23,18 @@ public class Activator implements BundleActivator {
 	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
+		Activator.context = context;
 	}
 
+	public static BundleContext getContext() {
+		return context;
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
+		Activator.context = null;
 	}
 
 	public static void setComponentInstance(ComponentInstance componentInstance) {
