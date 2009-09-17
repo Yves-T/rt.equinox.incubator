@@ -19,6 +19,7 @@ public class RepositoryDumpingApplication implements IApplication {
 		RepositoryDumper dumper = (RepositoryDumper)bundleContext.getService(sr);
 		new File("/Users/Pascal/tmp/allRepos").mkdirs();
 		dumper.dump(new URI("file:/Users/Pascal/tmp/allRepos"));
+		bundleContext.ungetService(sr);
 		return IApplication.EXIT_OK;
 	}
 
