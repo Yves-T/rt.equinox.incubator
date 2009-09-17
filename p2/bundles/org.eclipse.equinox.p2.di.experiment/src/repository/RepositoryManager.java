@@ -1,11 +1,11 @@
 package repository;
+import engine.Profile;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import unclassified.EventBus;
-import unclassified.Profile;
-import environment.ExtensionRegistry;
-import environment.Preferences;
 
 public class RepositoryManager {
-	public RepositoryManager(EventBus bus, Preferences preferences, Profile profile, ExtensionRegistry registry) {
+	public RepositoryManager(EventBus bus, IPreferencesService preferences, Profile profile, IExtensionRegistry registry) {
 	}
 	
 	//This will call to the SimpleRepositoryFactory through the creation of executable extension

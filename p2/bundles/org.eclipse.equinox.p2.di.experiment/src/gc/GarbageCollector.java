@@ -1,10 +1,10 @@
 package gc;
 
 import unclassified.EventBus;
-import engine.SimpleProfileRegistry;
+import engine.ProfileRegistry;
 
 public class GarbageCollector {
 
-	public GarbageCollector(SimpleProfileRegistry registry, EventBus bus) { //Does it have to the same bus than the simple profile registry one?
+	public GarbageCollector(ProfileRegistry registry, EventBus bus) { //Does it have to the same bus than the simple profile registry one?
 	}
 }

@@ -1,8 +1,8 @@
 package engine;
 
-import environment.ExtensionRegistry;
+import org.eclipse.core.runtime.IExtensionRegistry;
 
 public class TouchpointManager {
-	public TouchpointManager(ExtensionRegistry reg) {
+	public TouchpointManager(IExtensionRegistry reg) {
 	}
 }

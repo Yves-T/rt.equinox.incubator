@@ -3,9 +3,9 @@ import environment.Location;
 import unclassified.EventBus;
 
 
-public class SimpleProfileRegistry {
+public class ProfileRegistry {
 	
 	//TODO Will that be enough to handle the SurrogateProfileRegistry?
-	public SimpleProfileRegistry(Location registryFolder, EventBus bus) {
+	public ProfileRegistry(Location registryFolder, EventBus bus) {
 	}
 }

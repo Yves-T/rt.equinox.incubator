@@ -1,7 +1,9 @@
 package repository;
 
+import environment.Location;
+
 public class CacheManager {
-	public CacheManager(String cacheLocation, Transport t) {
+	public CacheManager(Location cacheLocation, Transport t) {
 		
 	}
 }

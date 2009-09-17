@@ -1,8 +1,8 @@
 package engine;
 
-import environment.ExtensionRegistry;
+import org.eclipse.core.runtime.IExtensionRegistry;
 
 public class ActionManager {
-	public ActionManager(TouchpointManager tpMgr, ExtensionRegistry reg) {
+	public ActionManager(TouchpointManager tpMgr, IExtensionRegistry reg) {
 	}
 }
