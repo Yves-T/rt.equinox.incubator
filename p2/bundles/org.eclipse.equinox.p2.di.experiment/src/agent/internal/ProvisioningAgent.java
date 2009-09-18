@@ -12,7 +12,6 @@ package agent.internal;
 
 import agent.IAgentServiceFactory;
 import agent.IProvisioningAgent;
-
 import environment.Location;
 import java.util.*;
 import org.osgi.framework.*;
@@ -25,14 +24,6 @@ public class ProvisioningAgent implements IProvisioningAgent {
 	private final Map agentServices = Collections.synchronizedMap(new HashMap());
 
 	private BundleContext context;
-
-	public void setBundleContext(BundleContext context) {
-		this.context = context;
-	}
-
-	public void setLocation(Location location) {
-		agentServices.put(Location.class.getName(), location);
-	}
 
 	/* (non-Javadoc)
 	 * @see agent.IProvisioningAgent#getService(java.lang.String)
@@ -58,5 +49,24 @@ public class ProvisioningAgent implements IProvisioningAgent {
 		if (service != null)
 			agentServices.put(serviceName, service);
 		return service;
+	}
+
+	public void registerService(String serviceName, Object service) {
+		agentServices.put(serviceName, service);
+	}
+
+	public void setBundleContext(BundleContext context) {
+		this.context = context;
+	}
+
+	public void setLocation(Location location) {
+		agentServices.put(Location.class.getName(), location);
+	}
+
+	public void unregisterService(String serviceName, Object service) {
+		synchronized (agentServices) {
+			if (agentServices.get(serviceName) == service)
+				agentServices.remove(serviceName);
+		}
 	}
 }
