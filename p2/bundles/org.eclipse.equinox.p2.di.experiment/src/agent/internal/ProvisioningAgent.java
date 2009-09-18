@@ -8,7 +8,10 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package agent;
+package agent.internal;
+
+import agent.IAgentServiceFactory;
+import agent.IProvisioningAgent;
 
 import environment.Location;
 import java.util.*;
