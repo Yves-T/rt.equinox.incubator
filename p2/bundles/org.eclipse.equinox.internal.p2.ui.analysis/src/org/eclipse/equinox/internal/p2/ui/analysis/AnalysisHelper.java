@@ -23,18 +23,18 @@ import org.eclipse.equinox.internal.provisional.p2.engine.IUProfilePropertyQuery
 import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.internal.provisional.p2.metadata.IRequiredCapability;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.CapabilityQuery;
+import org.eclipse.equinox.internal.provisional.p2.metadata.query.Collector;
+import org.eclipse.equinox.internal.provisional.p2.metadata.query.IQueryable;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.InstallableUnitQuery;
 import org.eclipse.equinox.internal.provisional.p2.metadata.repository.IMetadataRepository;
 import org.eclipse.equinox.internal.provisional.p2.metadata.repository.IMetadataRepositoryManager;
-import org.eclipse.equinox.internal.provisional.p2.query.Collector;
-import org.eclipse.equinox.internal.provisional.p2.query.IQueryable;
 import org.eclipse.equinox.internal.provisional.p2.repository.IRepositoryManager;
 
 public class AnalysisHelper {
 
 	// Get the root IUs of a profile
 	public static IInstallableUnit[] getProfileRoots(IProfile profile, IProgressMonitor monitor) {
-		return (IInstallableUnit[]) profile.query(new IUProfilePropertyQuery(profile, IInstallableUnit.PROP_PROFILE_ROOT_IU, Boolean.TRUE.toString()), new Collector(), monitor).toArray(IInstallableUnit.class);
+		return (IInstallableUnit[]) profile.query(new IUProfilePropertyQuery(IInstallableUnit.PROP_PROFILE_ROOT_IU, Boolean.TRUE.toString()), new Collector(), monitor).toArray(IInstallableUnit.class);
 	}
 
 	// Determine if the profile is valid (ie, all dependencies met)

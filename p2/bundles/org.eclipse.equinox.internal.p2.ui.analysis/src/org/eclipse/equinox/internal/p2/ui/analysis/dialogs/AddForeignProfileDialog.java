@@ -1,10 +1,9 @@
 package org.eclipse.equinox.internal.p2.ui.analysis.dialogs;
 
-import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfile;
-
 import java.io.File;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisActivator;
 import org.eclipse.equinox.internal.p2.ui.analysis.Messages;
+import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfile;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.StatusDialog;

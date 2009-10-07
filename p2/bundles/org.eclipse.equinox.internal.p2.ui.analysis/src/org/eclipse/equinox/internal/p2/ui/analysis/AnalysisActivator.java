@@ -1,7 +1,6 @@
 package org.eclipse.equinox.internal.p2.ui.analysis;
 
 import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfiles;
-
 import org.eclipse.equinox.internal.provisional.p2.ui.policy.IUViewQueryContext;
 import org.eclipse.equinox.internal.provisional.p2.ui.policy.Policy;
 import org.eclipse.ui.plugin.AbstractUIPlugin;

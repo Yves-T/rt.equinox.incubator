@@ -1,7 +1,6 @@
 package org.eclipse.equinox.internal.p2.ui.analysis.query;
 
 import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfile;
-
 import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfileElement;
 import org.eclipse.equinox.internal.p2.ui.model.QueriedElementWrapper;
 

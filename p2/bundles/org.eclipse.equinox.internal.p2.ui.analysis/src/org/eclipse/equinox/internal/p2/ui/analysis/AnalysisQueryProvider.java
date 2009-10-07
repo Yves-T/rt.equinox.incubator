@@ -1,7 +1,6 @@
 package org.eclipse.equinox.internal.p2.ui.analysis;
 
 import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfile;
-
 import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfileElement;
 import org.eclipse.equinox.internal.p2.ui.analysis.query.ForeignProfileElementWrapper;
 import org.eclipse.equinox.internal.p2.ui.model.IIUElement;
@@ -10,9 +9,9 @@ import org.eclipse.equinox.internal.p2.ui.query.AnyRequiredCapabilityQuery;
 import org.eclipse.equinox.internal.p2.ui.query.InstalledIUElementWrapper;
 import org.eclipse.equinox.internal.provisional.p2.engine.IUProfilePropertyQuery;
 import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.internal.provisional.p2.query.Collector;
-import org.eclipse.equinox.internal.provisional.p2.query.IQueryable;
-import org.eclipse.equinox.internal.provisional.p2.query.MatchQuery;
+import org.eclipse.equinox.internal.provisional.p2.metadata.query.Collector;
+import org.eclipse.equinox.internal.provisional.p2.metadata.query.IQueryable;
+import org.eclipse.equinox.internal.provisional.p2.metadata.query.MatchQuery;
 import org.eclipse.equinox.internal.provisional.p2.ui.ElementQueryDescriptor;
 import org.eclipse.equinox.internal.provisional.p2.ui.ProvUI;
 import org.eclipse.equinox.internal.provisional.p2.ui.policy.IUViewQueryContext;
@@ -53,7 +52,7 @@ public class AnalysisQueryProvider extends QueryProvider {
 
 				if (profile == null)
 					return null;
-				return new ElementQueryDescriptor(profile, new IUProfilePropertyQuery(profile, IInstallableUnit.PROP_PROFILE_ROOT_IU, Boolean.TRUE.toString()), new Collector(), new InstalledIUElementWrapper(profile, element));
+				return new ElementQueryDescriptor(profile, new IUProfilePropertyQuery(IInstallableUnit.PROP_PROFILE_ROOT_IU, Boolean.TRUE.toString()), new Collector(), new InstalledIUElementWrapper(profile, element));
 		}
 		return null;
 	}

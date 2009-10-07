@@ -24,8 +24,8 @@ import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnitPatc
 import org.eclipse.equinox.internal.provisional.p2.metadata.IRequiredCapability;
 import org.eclipse.equinox.internal.provisional.p2.metadata.IRequirementChange;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.CapabilityQuery;
-import org.eclipse.equinox.internal.provisional.p2.query.Collector;
-import org.eclipse.equinox.internal.provisional.p2.query.IQueryable;
+import org.eclipse.equinox.internal.provisional.p2.metadata.query.Collector;
+import org.eclipse.equinox.internal.provisional.p2.metadata.query.IQueryable;
 import org.osgi.framework.InvalidSyntaxException;
 
 /*

@@ -8,7 +8,7 @@ import java.util.Map;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisActivator;
 import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.internal.provisional.p2.metadata.IRequiredCapability;
-import org.eclipse.equinox.internal.provisional.p2.query.MatchQuery;
+import org.eclipse.equinox.internal.provisional.p2.metadata.query.MatchQuery;
 import org.osgi.framework.InvalidSyntaxException;
 
 public class MissingRequirementQuery extends MatchQuery {
