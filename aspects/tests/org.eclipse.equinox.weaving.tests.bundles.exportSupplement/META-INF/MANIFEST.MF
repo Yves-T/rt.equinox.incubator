@@ -1,8 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: ExportSupplement Plug-in (Incubation)
-Bundle-SymbolicName: org.eclipse.equinox.weaving.tests.bundles.exportSupplement
-Bundle-Version: 1.0.0
-Bundle-Localization: plugin
-Export-Package: org.eclipse.osgi.aspectj.tests.bundles.exportSupplement
-Eclipse-SupplementExporter: org.eclipse.osgi.aspectj.tests.exportedPackage

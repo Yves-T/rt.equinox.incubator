@@ -1,8 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: RemoteAspectFragment Fragment (Incubation)
-Bundle-SymbolicName: org.eclipse.equinox.weaving.tests.remoteAspectFragment
-Bundle-Version: 1.0.0
-Fragment-Host: org.eclipse.equinox.weaving.tests;bundle-version="[1.0.0,2.0.0)"
-Bundle-Localization: plugin
-Require-Bundle: org.eclipse.equinox.weaving.tests.remoteAspect

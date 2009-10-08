@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: aUnit Plug-in (Incubation)
-Bundle-SymbolicName: org.eclipse.equinox.weaving.tests.aunit
-Bundle-Version: 1.0.0
-Require-Bundle: org.aspectj.weaver,
- org.junit
-Export-Package: org.aspectj.aunit
-Eclipse-SupplementBundle: demo.hello
