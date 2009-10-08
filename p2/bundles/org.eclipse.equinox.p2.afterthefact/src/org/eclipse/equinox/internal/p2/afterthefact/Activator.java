@@ -115,7 +115,7 @@ public class Activator implements BundleActivator {
 	}
 
 	private void registerProfileRegistry() {
-		profileRegistry = new SimpleProfileRegistry();
+		profileRegistry = new SimpleProfileRegistry(null);
 		registrationProfileRegistry = context.registerService(IProfileRegistry.class.getName(), profileRegistry, null);
 	}
 

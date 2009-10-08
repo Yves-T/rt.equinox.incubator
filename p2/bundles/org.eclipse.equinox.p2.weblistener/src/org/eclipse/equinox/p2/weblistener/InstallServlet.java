@@ -21,6 +21,7 @@ import org.eclipse.equinox.internal.provisional.p2.core.ProvisionException;
 import org.eclipse.equinox.internal.provisional.p2.director.*;
 import org.eclipse.equinox.internal.provisional.p2.engine.*;
 import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.internal.provisional.p2.metadata.Version;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.Collector;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.InstallableUnitQuery;
 import org.eclipse.equinox.p2.internal.weblistener.WebListenerActivator;
@@ -50,7 +51,7 @@ public class InstallServlet extends HttpServlet implements Servlet {
 	private IStatus install(String unitId, String version, IProfile profile, IProgressMonitor progress) throws ProvisionException {
 		if (profile == null)
 			return null;
-		Collector units = ProvisioningHelper.getInstallableUnits(null, new InstallableUnitQuery(unitId, new org.eclipse.equinox.internal.provisional.p2.core.Version(version)), progress);
+		Collector units = ProvisioningHelper.getInstallableUnits(null, new InstallableUnitQuery(unitId, new Version(version)), progress);
 		if (units.isEmpty()) {
 			StringBuffer error = new StringBuffer();
 			error.append("Installable unit not found: " + unitId + ' ' + version + '\n');
