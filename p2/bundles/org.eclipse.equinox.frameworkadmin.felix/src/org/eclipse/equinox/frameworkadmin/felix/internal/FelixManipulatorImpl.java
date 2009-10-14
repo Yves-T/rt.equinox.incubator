@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,13 +12,11 @@ package org.eclipse.equinox.frameworkadmin.felix.internal;
 
 import java.io.File;
 import java.io.IOException;
-
-import org.eclipse.equinox.configuratormanipulator.ConfiguratorManipulator;
-import org.eclipse.equinox.frameworkadmin.*;
 import org.eclipse.equinox.internal.frameworkadmin.utils.SimpleBundlesState;
 import org.eclipse.equinox.internal.frameworkadmin.utils.Utils;
+import org.eclipse.equinox.internal.provisional.configuratormanipulator.ConfiguratorManipulator;
+import org.eclipse.equinox.internal.provisional.frameworkadmin.*;
 import org.osgi.framework.*;
-import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class FelixManipulatorImpl implements Manipulator {
@@ -28,12 +26,9 @@ public class FelixManipulatorImpl implements Manipulator {
 
 	BundleContext context = null;
 	BundlesState bundleState = null;
-
 	ServiceTracker cmTracker;
 	int trackingCount = -1;
-
 	ConfiguratorManipulator configuratorManipulator;
-
 	FelixFwAdminImpl fwAdmin = null;
 
 	FelixManipulatorImpl(BundleContext context, FelixFwAdminImpl fwAdmin) {
@@ -45,37 +40,51 @@ public class FelixManipulatorImpl implements Manipulator {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.internal.provisional.frameworkadmin.Manipulator#getBundlesState()
+	 */
 	public BundlesState getBundlesState() throws FrameworkAdminRuntimeException {
 		return new SimpleBundlesState(fwAdmin, this, SYSTEMBUNDLE_SYMBOLICNAME);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.internal.provisional.frameworkadmin.Manipulator#getConfigData()
+	 */
 	public ConfigData getConfigData() throws FrameworkAdminRuntimeException {
 		return configData;
 	}
 
-	public BundleInfo[] getExpectedState() throws IllegalArgumentException, IOException, FrameworkAdminRuntimeException {
-		Log.log(LogService.LOG_DEBUG, this, "getExpectedState()", "BEGIN");
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.internal.provisional.frameworkadmin.Manipulator#getExpectedState()
+	 */
+	public BundleInfo[] getExpectedState() throws IllegalArgumentException, FrameworkAdminRuntimeException {
 		SimpleBundlesState.checkAvailability(fwAdmin);
-
-		BundlesState bundleState = this.getBundlesState();
-		bundleState.resolve(true);
-		return bundleState.getExpectedState();
+		BundlesState state = this.getBundlesState();
+		state.resolve(true);
+		return state.getExpectedState();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.internal.provisional.frameworkadmin.Manipulator#getLauncherData()
+	 */
 	public LauncherData getLauncherData() throws FrameworkAdminRuntimeException {
 		return launcherData;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.internal.provisional.frameworkadmin.Manipulator#initialize()
+	 */
 	public void initialize() {
-		Log.log(LogService.LOG_DEBUG, this, "initialize()", "BEGIN");
 		configData.initialize();
 		launcherData.initialize();
 	}
 
-	// Load parameters from LauncherConfigFile, FwConfigFile, and ConfiguratorConfigFile if required.
-	// The parameter has been set will be updated.
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.internal.provisional.frameworkadmin.Manipulator#load()
+	 */
 	public void load() throws IOException, FrameworkAdminRuntimeException {
-		Log.log(LogService.LOG_DEBUG, this, "load()", "BEGIN");
+		// Load parameters from LauncherConfigFile, FwConfigFile, and ConfiguratorConfigFile if required.
+		// The parameter has been set will be updated.
 		SimpleBundlesState.checkAvailability(fwAdmin);
 
 		// current implementation for KF doesn't support launcher.
@@ -100,9 +109,10 @@ public class FelixManipulatorImpl implements Manipulator {
 		return;
 	}
 
-	// Save all parameter in memory into proper config files.
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.internal.provisional.frameworkadmin.Manipulator#save(boolean)
+	 */
 	public void save(boolean backup) throws IOException, FrameworkAdminRuntimeException {
-		Log.log(LogService.LOG_DEBUG, this, "save()", "BEGIN");
 		SimpleBundlesState.checkAvailability(fwAdmin);
 
 		// current implementation for KF doesn't support launcher.
@@ -130,14 +140,7 @@ public class FelixManipulatorImpl implements Manipulator {
 		BundleInfo[] bInfos = configData.getBundles();
 		for (int i = 0; i < bInfos.length; i++)
 			this.configData.addBundle(bInfos[i]);
-		this.configData.setFwIndependentProps(configData.getFwIndependentProps());
-		if (this.configData.getFwName().equals(configData.getFwName()))
-			if (this.configData.getFwVersion().equals(configData.getFwVersion())) {
-				// TODO refine the algorithm to copying fw dependent props.
-				//  configData.getFwName()/getFwVersion()/
-				//	getLauncherName()/getLauncherVersion() might be taken into consideration. 
-				this.configData.setFwDependentProps(configData.getFwDependentProps());
-			}
+		this.configData.setProperties(configData.getProperties());
 	}
 
 	/**
@@ -179,6 +182,9 @@ public class FelixManipulatorImpl implements Manipulator {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.internal.provisional.frameworkadmin.Manipulator#setLauncherData(org.eclipse.equinox.internal.provisional.frameworkadmin.LauncherData)
+	 */
 	public void setLauncherData(LauncherData launcherData) {
 		this.launcherData.initialize();
 		this.launcherData.setFwConfigLocation(launcherData.getFwConfigLocation());
@@ -194,6 +200,9 @@ public class FelixManipulatorImpl implements Manipulator {
 			}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.internal.provisional.frameworkadmin.Manipulator#getTimeStamp()
+	 */
 	public long getTimeStamp() {
 		throw new FrameworkAdminRuntimeException(FrameworkAdminRuntimeException.UNSUPPORTED_OPERATION, "getTimeStamp() is not supported by FelixManipulator.");
 	}

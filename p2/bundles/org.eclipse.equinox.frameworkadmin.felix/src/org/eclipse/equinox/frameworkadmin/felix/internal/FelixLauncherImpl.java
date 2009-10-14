@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,19 +14,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.eclipse.equinox.frameworkadmin.*;
 import org.eclipse.equinox.internal.frameworkadmin.utils.SimpleBundlesState;
 import org.eclipse.equinox.internal.frameworkadmin.utils.Utils;
+import org.eclipse.equinox.internal.provisional.frameworkadmin.*;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.log.LogService;
 
 public class FelixLauncherImpl {
 	static String getStringOfCmd(String[] cmdarray) {
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < cmdarray.length; i++) {
 			sb.append(cmdarray[i]);
-			sb.append(" ");
+			sb.append(' ');
 		}
 		return sb.toString();
 	}
@@ -41,7 +39,6 @@ public class FelixLauncherImpl {
 	}
 
 	public Process launch(Manipulator manipulator, File cwd) throws IllegalArgumentException, IOException, FrameworkAdminRuntimeException {
-		Log.log(LogService.LOG_DEBUG, this, "launch(Manipulator manipulator, File cwd)", "");
 		LauncherData launcherData = manipulator.getLauncherData();
 		if (launcherData.getLauncher() == null)
 			return launchInMemory(manipulator, cwd);
@@ -110,7 +107,7 @@ public class FelixLauncherImpl {
 				File fwPersistentDataLocation = tmpLauncherData.getFwPersistentDataLocation();
 				if (fwPersistentDataLocation != null) {
 					if (fwPersistentDataLocation.exists())
-						Utils.deleteDir(fwPersistentDataLocation);
+						Activator.deleteAll(fwPersistentDataLocation);
 					//			fwPrivateArea = fwPrivateArea == null ? new File(cwd, FelixConstants.DEFAULT_FW_PRIVATE_AREA) : fwPrivateArea;
 					//			if (fwPrivateArea.exists())
 					//				Utils.deleteDir(fwPrivateArea);
@@ -132,7 +129,6 @@ public class FelixLauncherImpl {
 
 		String[] cmdarray = new String[cmdList.size()];
 		cmdList.toArray(cmdarray);
-		Log.log(LogService.LOG_DEBUG, "In CWD = " + cwd + "\n\t" + getStringOfCmd(cmdarray));
 
 		return Runtime.getRuntime().exec(cmdarray, null, cwd);
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,14 +12,18 @@ package org.eclipse.equinox.frameworkadmin.felix.internal;
 
 import java.io.File;
 import java.io.IOException;
-
-import org.eclipse.equinox.configuratormanipulator.ConfiguratorManipulator;
-import org.eclipse.equinox.configuratormanipulator.ConfiguratorManipulatorFactory;
-import org.eclipse.equinox.frameworkadmin.*;
+import org.eclipse.equinox.internal.provisional.configuratormanipulator.ConfiguratorManipulator;
+import org.eclipse.equinox.internal.provisional.configuratormanipulator.ConfiguratorManipulatorFactory;
+import org.eclipse.equinox.internal.provisional.frameworkadmin.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 
 public class FelixFwAdminImpl implements FrameworkAdmin {
+
+	BundleContext context = null;
+	boolean active = false;
+	private boolean runningFw = false;
+	private ConfiguratorManipulator configuratorManipulator = null;
 
 	/**
 	 * If the currently running fw launch is the one that the FrameworkAdmin object can handle,
@@ -41,13 +45,6 @@ public class FelixFwAdminImpl implements FrameworkAdmin {
 
 		return false;
 	}
-
-	BundleContext context = null;
-
-	boolean active = false;
-
-	private boolean runningFw = false;
-	private ConfiguratorManipulator configuratorManipulator = null;
 
 	FelixFwAdminImpl() {
 		this(null, false);
@@ -84,23 +81,35 @@ public class FelixFwAdminImpl implements FrameworkAdmin {
 		active = false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.internal.provisional.frameworkadmin.FrameworkAdmin#getManipulator()
+	 */
 	public Manipulator getManipulator() {
 		return new FelixManipulatorImpl(context, this);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.internal.provisional.frameworkadmin.FrameworkAdmin#getRunningManipulator()
+	 */
 	public Manipulator getRunningManipulator() {
 		if (this.runningFw) {
-			//KfManipulatorImpl manipulator = new KfManipulatorImpl(context, this);
-			//TODO using some MAGIC dependent on Kf implementation, set parameters according to the current running fw.
-			return null;
+			//TODO using some MAGIC dependent on Felix implementation, set parameters according to the current running fw.
+			//return null;
+			return new FelixManipulatorImpl(context, this);
 		}
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.internal.provisional.frameworkadmin.FrameworkAdmin#isActive()
+	 */
 	public boolean isActive() {
 		return active;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.internal.provisional.frameworkadmin.FrameworkAdmin#launch(org.eclipse.equinox.internal.provisional.frameworkadmin.Manipulator, java.io.File)
+	 */
 	public Process launch(Manipulator manipulator, File cwd) throws IllegalArgumentException, FrameworkAdminRuntimeException, IOException {
 		return new FelixLauncherImpl(context, this).launch(manipulator, cwd);
 	}
