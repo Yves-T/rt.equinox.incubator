@@ -44,9 +44,14 @@ public class FelixFwConfigFileParser {
 	 * Write the given properties object to the specified file.
 	 */
 	private static void writeProperties(Properties properties, File file) {
-		FileOutputStream output = null;
+		File parent = file.getParentFile();
+		if (parent == null) {
+			// TODO how to handle this?
+		} else
+			parent.mkdirs();
+		OutputStream output = null;
 		try {
-			output = new FileOutputStream(file);
+			output = new BufferedOutputStream(new FileOutputStream(file));
 			properties.store(output, null);
 		} catch (IOException e) {
 			// TODO
