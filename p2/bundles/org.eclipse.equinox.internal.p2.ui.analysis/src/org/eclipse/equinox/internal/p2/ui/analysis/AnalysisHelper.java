@@ -70,7 +70,7 @@ public class AnalysisHelper {
 			while (iterator.hasNext()) {
 				IInstallableUnit iu = (IInstallableUnit) iterator.next();
 				for (int i = 0; i < children.length; i++) {
-					if (children[i].getMessage().contains(iu.toString()) && wouldBeSatisified(iu, iusToRemove))
+					if (children[i].getMessage().indexOf(iu.toString()) >= 0 && wouldBeSatisified(iu, iusToRemove))
 						if (!collector.accept(iu))
 							return slicerStatus;
 				}
