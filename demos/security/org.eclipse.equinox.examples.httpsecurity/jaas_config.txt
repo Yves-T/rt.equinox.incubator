@@ -1,5 +1,0 @@
-SimpleConfig {
-  org.eclipse.equinox.security.auth.module.ExtensionLoginModule required
-  debug="true"
-  extensionId="org.eclipse.equinox.examples.httpsecurity.simpleLogin";
-};

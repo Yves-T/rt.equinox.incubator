@@ -51,7 +51,7 @@ public class InstallServlet extends HttpServlet implements Servlet {
 	private IStatus install(String unitId, String version, IProfile profile, IProgressMonitor progress) throws ProvisionException {
 		if (profile == null)
 			return null;
-		Collector units = ProvisioningHelper.getInstallableUnits(null, new InstallableUnitQuery(unitId, new Version(version)), progress);
+		Collector units = ProvisioningHelper.getInstallableUnits(null, new InstallableUnitQuery(unitId, Version.create(version)), progress);
 		if (units.isEmpty()) {
 			StringBuffer error = new StringBuffer();
 			error.append("Installable unit not found: " + unitId + ' ' + version + '\n');

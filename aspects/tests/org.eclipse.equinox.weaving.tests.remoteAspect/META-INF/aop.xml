@@ -1,5 +1,0 @@
-<aspectj>
-	<aspects>
-		<aspect name="org.eclipse.osgi.aspectj.tests.remoteAspect.RemoteAspect" />
-	</aspects>
-</aspectj>
