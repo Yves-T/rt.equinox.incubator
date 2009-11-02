@@ -28,7 +28,6 @@ Import-Package: org.eclipse.core.runtime,
  org.eclipse.equinox.internal.provisional.p2.ui.policy,
  org.eclipse.equinox.internal.provisional.p2.ui.viewers,
  org.eclipse.osgi.util,
- org.eclipse.pde.internal.ui.wizards.feature,
  org.eclipse.swt.widgets,
  org.osgi.framework
 Bundle-Activator: org.eclipse.equinox.internal.p2.ui.analysis.AnalysisActivator
