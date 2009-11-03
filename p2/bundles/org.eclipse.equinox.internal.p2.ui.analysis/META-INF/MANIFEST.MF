@@ -27,6 +27,7 @@ Import-Package: org.eclipse.core.runtime,
  org.eclipse.equinox.internal.provisional.p2.ui.model,
  org.eclipse.equinox.internal.provisional.p2.ui.policy,
  org.eclipse.equinox.internal.provisional.p2.ui.viewers,
+ org.eclipse.equinox.p2.metadata.query,
  org.eclipse.osgi.util,
  org.eclipse.swt.widgets,
  org.osgi.framework

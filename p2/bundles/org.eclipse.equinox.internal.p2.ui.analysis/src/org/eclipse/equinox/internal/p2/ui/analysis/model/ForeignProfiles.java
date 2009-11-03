@@ -13,7 +13,7 @@ import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
 import org.eclipse.equinox.internal.provisional.p2.engine.ProfileEvent;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.Collector;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.IQueryable;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.Query;
+import org.eclipse.equinox.p2.metadata.query.IQuery;
 
 public class ForeignProfiles implements IQueryable {
 
@@ -39,7 +39,7 @@ public class ForeignProfiles implements IQueryable {
 		return (ForeignProfile) profileMap.get(profileid);
 	}
 
-	public Collector query(Query query, Collector collector, IProgressMonitor monitor) {
+	public Collector query(IQuery query, Collector collector, IProgressMonitor monitor) {
 		List profiles = new ArrayList(profileMap.size());
 		Iterator keys = profileMap.keySet().iterator();
 

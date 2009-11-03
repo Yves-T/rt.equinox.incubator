@@ -23,12 +23,12 @@ import org.eclipse.equinox.internal.p2.engine.ProfileWriter;
 import org.eclipse.equinox.internal.p2.engine.ProfileXMLConstants;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisActivator;
 import org.eclipse.equinox.internal.p2.ui.analysis.Messages;
-import org.eclipse.equinox.internal.provisional.p2.metadata.Version;
 import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
 import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.internal.provisional.p2.metadata.Version;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.Collector;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.IQueryable;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.Query;
+import org.eclipse.equinox.p2.metadata.query.IQuery;
 import org.eclipse.osgi.util.NLS;
 import org.osgi.framework.BundleContext;
 import org.xml.sax.InputSource;
@@ -58,7 +58,7 @@ public class ForeignProfile implements IQueryable, IProfile {
 		return profileFile;
 	}
 
-	public Collector query(Query query, Collector collector, IProgressMonitor monitor) {
+	public Collector query(IQuery query, Collector collector, IProgressMonitor monitor) {
 		return profile.query(query, collector, monitor);
 	}
 
@@ -234,7 +234,7 @@ public class ForeignProfile implements IQueryable, IProfile {
 		}
 	}
 
-	public Collector available(Query query, Collector collector, IProgressMonitor monitor) {
+	public Collector available(IQuery query, Collector collector, IProgressMonitor monitor) {
 		return profile.available(query, collector, monitor);
 	}
 
