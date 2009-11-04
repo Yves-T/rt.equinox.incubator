@@ -34,7 +34,7 @@ public class AnalysisHelper {
 
 	// Get the root IUs of a profile
 	public static IInstallableUnit[] getProfileRoots(IProfile profile, IProgressMonitor monitor) {
-		return (IInstallableUnit[]) profile.query(new IUProfilePropertyQuery(IInstallableUnit.PROP_PROFILE_ROOT_IU, Boolean.TRUE.toString()), new Collector(), monitor).toArray(IInstallableUnit.class);
+		return (IInstallableUnit[]) profile.query(new IUProfilePropertyQuery(IProfile.PROP_PROFILE_ROOT_IU, Boolean.TRUE.toString()), new Collector(), monitor).toArray(IInstallableUnit.class);
 	}
 
 	// Determine if the profile is valid (ie, all dependencies met)

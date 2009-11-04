@@ -75,7 +75,7 @@ public class InstallServlet extends HttpServlet implements Servlet {
 		ProvisioningContext context = new ProvisioningContext();
 		ProfileChangeRequest request = new ProfileChangeRequest(profile);
 		request.addInstallableUnits(toInstall);
-		request.setInstallableUnitProfileProperty(toInstall[0], IInstallableUnit.PROP_PROFILE_ROOT_IU, "true");
+		request.setInstallableUnitProfileProperty(toInstall[0], IProfile.PROP_PROFILE_ROOT_IU, "true");
 		ProvisioningPlan result = planner.getProvisioningPlan(request, context, progress);
 		if (!result.getStatus().isOK())
 			return result.getStatus();
