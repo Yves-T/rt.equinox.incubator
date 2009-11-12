@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.equinox.internal.p2.afterthefact;
 
+import org.eclipse.equinox.p2.engine.IProvisioningPlan;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -28,7 +30,6 @@ import org.eclipse.equinox.internal.provisional.p2.core.ProvisionException;
 import org.eclipse.equinox.internal.provisional.p2.director.IPlanner;
 import org.eclipse.equinox.internal.provisional.p2.director.PlannerHelper;
 import org.eclipse.equinox.internal.provisional.p2.director.ProfileChangeRequest;
-import org.eclipse.equinox.internal.provisional.p2.director.ProvisioningPlan;
 import org.eclipse.equinox.internal.provisional.p2.engine.DefaultPhaseSet;
 import org.eclipse.equinox.internal.provisional.p2.engine.IEngine;
 import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
@@ -76,7 +77,7 @@ public class Install {
 		//Create a request to install the IUs and compute a plan to install those
 		ProfileChangeRequest request = new ProfileChangeRequest(profile);
 		request.addInstallableUnits(iusToInstall);
-		ProvisioningPlan plan = planner.getProvisioningPlan(request, new ProvisioningContext(), null);
+		IProvisioningPlan plan = planner.getProvisioningPlan(request, new ProvisioningContext(), null);
 		
 		//Execute the plan. This causes the files to be downloaded and the bundles to be installed
 		System.out.println(engine.perform(profile, new DefaultPhaseSet(), plan.getOperands(), null, null));

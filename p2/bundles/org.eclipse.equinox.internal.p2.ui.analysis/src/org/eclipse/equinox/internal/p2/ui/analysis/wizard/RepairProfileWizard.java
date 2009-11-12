@@ -1,5 +1,7 @@
 package org.eclipse.equinox.internal.p2.ui.analysis.wizard;
 
+import org.eclipse.equinox.p2.engine.IProvisioningPlan;
+
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -19,7 +21,6 @@ import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisHelper;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfile;
 import org.eclipse.equinox.internal.provisional.p2.director.IPlanner;
 import org.eclipse.equinox.internal.provisional.p2.director.ProfileChangeRequest;
-import org.eclipse.equinox.internal.provisional.p2.director.ProvisioningPlan;
 import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
 import org.eclipse.equinox.internal.provisional.p2.engine.InstallableUnitOperand;
 import org.eclipse.equinox.internal.provisional.p2.engine.InstallableUnitPropertyOperand;
@@ -70,7 +71,7 @@ public class RepairProfileWizard extends Wizard {
 
 		IPlanner planner = (IPlanner) ServiceHelper.getService(DirectorActivator.context, IPlanner.class.getName());
 
-		ProvisioningPlan plan = planner.getProvisioningPlan(request, getProvisioningContext(), new NullProgressMonitor());
+		IProvisioningPlan plan = planner.getProvisioningPlan(request, getProvisioningContext(), new NullProgressMonitor());
 		if (plan.getStatus().isOK() && profile instanceof ForeignProfile) {
 			ForeignProfile profile = (ForeignProfile) this.profile;
 			Operand[] o = plan.getOperands();

@@ -8,6 +8,8 @@
  ******************************************************************************/
 package org.eclipse.equinox.p2.weblistener;
 
+import org.eclipse.equinox.p2.engine.IProvisioningPlan;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -76,7 +78,7 @@ public class InstallServlet extends HttpServlet implements Servlet {
 		ProfileChangeRequest request = new ProfileChangeRequest(profile);
 		request.addInstallableUnits(toInstall);
 		request.setInstallableUnitProfileProperty(toInstall[0], IProfile.PROP_PROFILE_ROOT_IU, "true");
-		ProvisioningPlan result = planner.getProvisioningPlan(request, context, progress);
+		IProvisioningPlan result = planner.getProvisioningPlan(request, context, progress);
 		if (!result.getStatus().isOK())
 			return result.getStatus();
 
