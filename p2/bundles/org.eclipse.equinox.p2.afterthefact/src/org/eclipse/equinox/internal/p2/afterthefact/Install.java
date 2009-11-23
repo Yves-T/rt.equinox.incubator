@@ -10,38 +10,31 @@
  *******************************************************************************/
 package org.eclipse.equinox.internal.p2.afterthefact;
 
-import org.eclipse.equinox.p2.engine.IProvisioningPlan;
+import org.eclipse.equinox.p2.engine.IEngine;
+
+import org.eclipse.core.runtime.Status;
+
+import org.eclipse.equinox.internal.provisional.p2.engine.ProvisioningPlan;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-
+import java.util.*;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.internal.p2.artifact.repository.simple.SimpleArtifactRepository;
 import org.eclipse.equinox.internal.provisional.p2.artifact.repository.IArtifactRepository;
 import org.eclipse.equinox.internal.provisional.p2.artifact.repository.IArtifactRepositoryManager;
 import org.eclipse.equinox.internal.provisional.p2.core.ProvisionException;
-import org.eclipse.equinox.internal.provisional.p2.director.IPlanner;
-import org.eclipse.equinox.internal.provisional.p2.director.PlannerHelper;
-import org.eclipse.equinox.internal.provisional.p2.director.ProfileChangeRequest;
-import org.eclipse.equinox.internal.provisional.p2.engine.DefaultPhaseSet;
-import org.eclipse.equinox.internal.provisional.p2.engine.IEngine;
-import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
-import org.eclipse.equinox.internal.provisional.p2.engine.IProfileRegistry;
-import org.eclipse.equinox.internal.provisional.p2.engine.InstallableUnitOperand;
-import org.eclipse.equinox.internal.provisional.p2.engine.InstallableUnitPropertyOperand;
-import org.eclipse.equinox.internal.provisional.p2.engine.Operand;
-import org.eclipse.equinox.internal.provisional.p2.engine.ProvisioningContext;
+import org.eclipse.equinox.internal.provisional.p2.director.*;
+import org.eclipse.equinox.internal.provisional.p2.engine.*;
 import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.Collector;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.InstallableUnitQuery;
 import org.eclipse.equinox.internal.provisional.p2.metadata.repository.IMetadataRepositoryManager;
+import org.eclipse.equinox.p2.engine.IPhaseSet;
+import org.eclipse.equinox.p2.engine.IProvisioningPlan;
 import org.eclipse.osgi.service.resolver.PlatformAdmin;
 import org.osgi.service.packageadmin.PackageAdmin;
 
@@ -80,7 +73,7 @@ public class Install {
 		IProvisioningPlan plan = planner.getProvisioningPlan(request, new ProvisioningContext(), null);
 		
 		//Execute the plan. This causes the files to be downloaded and the bundles to be installed
-		System.out.println(engine.perform(profile, new DefaultPhaseSet(), plan.getOperands(), null, null));
+		System.out.println(engine.perform(plan, null));
 		
 		//Refresh the framework to get the bundles installed
 		PackageAdmin packageAdmin = (PackageAdmin) ServiceHelper.getService(Activator.getContext(), PackageAdmin.class.getName());
@@ -114,7 +107,9 @@ public class Install {
 			operands[i++] = new InstallableUnitOperand(null, iu);
 			operands[i++] = new InstallableUnitPropertyOperand(iu, "org.eclipse.equinox.p2.internal.inclusion.rules", null, PlannerHelper.createOptionalInclusionRule(iu));
 		}
-		IStatus status = engine.perform(profile, DefaultPhaseSet.createDefaultPhaseSet(DefaultPhaseSet.PHASE_CHECK_TRUST | DefaultPhaseSet.PHASE_COLLECT | DefaultPhaseSet.PHASE_CONFIGURE | DefaultPhaseSet.PHASE_UNCONFIGURE | DefaultPhaseSet.PHASE_UNINSTALL), operands, new ProvisioningContext(), null);
+		IPhaseSet phaseSet = engine.createPhaseSetExcluding(new String[] {IPhaseSet.PHASE_CHECK_TRUST, IPhaseSet.PHASE_COLLECT, IPhaseSet.PHASE_CONFIGURE, IPhaseSet.PHASE_UNCONFIGURE, IPhaseSet.PHASE_UNINSTALL});
+		IProvisioningPlan plan = engine.createCustomPlan(profile, operands, new ProvisioningContext());
+		IStatus status = engine.perform(plan, phaseSet, null);
 		if (!status.isOK())
 			return null;
 		return profile;
