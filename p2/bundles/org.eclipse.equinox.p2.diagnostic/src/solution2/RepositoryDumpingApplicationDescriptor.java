@@ -2,9 +2,9 @@ package solution2;
 
 import java.util.Map;
 
-import org.eclipse.equinox.internal.provisional.p2.metadata.repository.IMetadataRepositoryManager;
 import org.eclipse.equinox.p2.diagnostic.Activator;
 import org.eclipse.equinox.p2.diagnostic.RepositoryDumper;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.osgi.service.application.ApplicationDescriptor;
 import org.osgi.service.application.ApplicationHandle;
 import org.osgi.service.component.ComponentContext;

@@ -2,10 +2,10 @@ package org.eclipse.equinox.internal.p2.ui.analysis.viewers;
 
 import java.util.Collection;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.equinox.internal.p2.ui.ProvUIImages;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.IUElement;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.RequirementElement;
-import org.eclipse.equinox.internal.provisional.p2.ui.ProvUIImages;
-import org.eclipse.equinox.internal.provisional.p2.ui.viewers.ProvElementLabelProvider;
+import org.eclipse.equinox.internal.p2.ui.viewers.ProvElementLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
