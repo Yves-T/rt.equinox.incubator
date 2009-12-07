@@ -1,5 +1,7 @@
 package org.eclipse.equinox.internal.p2.ui.analysis;
 
+import org.eclipse.equinox.p2.engine.IProfile;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +20,6 @@ import org.eclipse.equinox.internal.p2.director.QueryableArray;
 import org.eclipse.equinox.internal.p2.director.Slicer;
 import org.eclipse.equinox.internal.p2.metadata.repository.CompositeMetadataRepository;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.TreeElement;
-import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
 import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.internal.provisional.p2.metadata.IRequiredCapability;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.CapabilityQuery;

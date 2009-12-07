@@ -1,5 +1,7 @@
 package org.eclipse.equinox.internal.p2.ui.analysis;
 
+import org.eclipse.equinox.p2.engine.IProfile;
+
 import org.eclipse.equinox.internal.p2.ui.ElementQueryDescriptor;
 import org.eclipse.equinox.internal.p2.ui.ProvUI;
 import org.eclipse.equinox.internal.p2.ui.QueryProvider;
@@ -10,7 +12,6 @@ import org.eclipse.equinox.internal.p2.ui.model.IIUElement;
 import org.eclipse.equinox.internal.p2.ui.model.QueriedElement;
 import org.eclipse.equinox.internal.p2.ui.query.IUViewQueryContext;
 import org.eclipse.equinox.internal.p2.ui.query.InstalledIUElementWrapper;
-import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.Collector;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.IQueryable;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.MatchQuery;

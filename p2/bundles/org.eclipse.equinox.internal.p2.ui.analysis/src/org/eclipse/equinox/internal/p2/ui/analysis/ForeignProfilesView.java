@@ -1,5 +1,7 @@
 package org.eclipse.equinox.internal.p2.ui.analysis;
 
+import org.eclipse.equinox.p2.engine.IProfile;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.equinox.internal.p2.ui.ProvUI;
@@ -10,7 +12,6 @@ import org.eclipse.equinox.internal.p2.ui.analysis.dialogs.AddForeignProfileDial
 import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfileElement;
 import org.eclipse.equinox.internal.p2.ui.analysis.wizard.RepairProfileWizard;
 import org.eclipse.equinox.internal.p2.ui.model.Profiles;
-import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.IStructuredSelection;

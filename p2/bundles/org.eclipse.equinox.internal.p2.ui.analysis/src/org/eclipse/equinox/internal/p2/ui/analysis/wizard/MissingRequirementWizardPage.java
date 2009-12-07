@@ -1,5 +1,7 @@
 package org.eclipse.equinox.internal.p2.ui.analysis.wizard;
 
+import org.eclipse.equinox.p2.engine.IProfile;
+
 import java.util.Hashtable;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.internal.p2.ui.ProvUIImages;
@@ -7,7 +9,6 @@ import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisHelper;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.RequirementElement;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.AnalysisTreeViewer;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.TreeElement;
-import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
 import org.eclipse.equinox.internal.provisional.p2.metadata.IRequiredCapability;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.ImageDescriptor;

@@ -1,5 +1,7 @@
 package org.eclipse.equinox.internal.p2.ui.analysis.viewers;
 
+import org.eclipse.equinox.p2.engine.IProfile;
+
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -11,7 +13,6 @@ import org.eclipse.equinox.internal.p2.director.QueryableArray;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisActivator;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisHelper;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.IUElement;
-import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
 import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.Collector;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.IQueryable;
