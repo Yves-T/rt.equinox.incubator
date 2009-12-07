@@ -15,9 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.internal.provisional.p2.metadata.IProvidedCapability;
-import org.eclipse.equinox.internal.provisional.p2.metadata.IRequiredCapability;
 import org.eclipse.equinox.internal.provisional.p2.metadata.ITouchpointType;
 import org.eclipse.equinox.internal.provisional.p2.metadata.MetadataFactory;
 import org.eclipse.equinox.internal.provisional.p2.metadata.Version;
@@ -25,6 +23,8 @@ import org.eclipse.equinox.internal.provisional.p2.metadata.VersionRange;
 import org.eclipse.equinox.internal.provisional.p2.metadata.MetadataFactory.InstallableUnitDescription;
 import org.eclipse.equinox.internal.provisional.p2.metadata.MetadataFactory.InstallableUnitFragmentDescription;
 import org.eclipse.equinox.p2.metadata.IArtifactKey;
+import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.metadata.IRequirement;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.eclipse.osgi.service.resolver.ExportPackageDescription;
@@ -75,7 +75,7 @@ public class Reify {
 			//TODO this needs to be refined to take into account all the attribute handled by imports
 			reqsDeps.add(MetadataFactory.createRequiredCapability(CAPABILITY_NS_JAVA_PACKAGE, importPackageName, versionRange, null, isOptional(importSpec), false));
 		}
-		iu.setRequiredCapabilities((IRequiredCapability[]) reqsDeps.toArray(new IRequiredCapability[reqsDeps.size()]));
+		iu.setRequiredCapabilities((IRequirement[]) reqsDeps.toArray(new IRequirement[reqsDeps.size()]));
 
 		// Create set of provided capabilities
 		ArrayList providedCapabilities = new ArrayList();
@@ -118,7 +118,7 @@ public class Reify {
 		cu.setCapabilities(new IProvidedCapability[] {MetadataFactory.createProvidedCapability(IInstallableUnit.NAMESPACE_IU_ID, configUnitId, configUnitVersion)});
 	
 		// Create a required capability on bundles
-		IRequiredCapability[] reqs = new IRequiredCapability[] {MetadataFactory.createRequiredCapability("org.eclipse.equinox.p2.eclipse.type", "bundle", VersionRange.emptyRange, null, false, true, false)};
+		IRequirement[] reqs = new IRequirement[] {MetadataFactory.createRequiredCapability("org.eclipse.equinox.p2.eclipse.type", "bundle", VersionRange.emptyRange, null, false, true, false)};
 		cu.setHost(reqs);
 		Map touchpointData = new HashMap();
 	
