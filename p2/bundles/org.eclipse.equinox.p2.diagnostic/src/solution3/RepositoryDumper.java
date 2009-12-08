@@ -20,7 +20,7 @@ public class RepositoryDumper {
 	public void dump(URI targetRepository) throws ProvisionException {
 		IMetadataRepository repo = mgr.createRepository(targetRepository, "Dumped repository", IMetadataRepositoryManager.TYPE_SIMPLE_REPOSITORY, new Properties());
 		mgr.removeRepository(targetRepository);
-		Collector c = mgr.query(InstallableUnitQuery.ANY, new Collector(), null);
+		Collector c = mgr.query(InstallableUnitQuery.ANY, null);
 		repo.addInstallableUnits((IInstallableUnit[]) c.toArray(IInstallableUnit.class));
 	}
 

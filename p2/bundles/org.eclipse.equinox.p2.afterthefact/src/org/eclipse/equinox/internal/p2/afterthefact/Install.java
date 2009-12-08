@@ -95,7 +95,7 @@ public class Install {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		Collector c = repoMgr.query(new InstallableUnitQuery("org.eclipse.emf"), new Collector(), new NullProgressMonitor());
+		Collector c = repoMgr.query(new InstallableUnitQuery("org.eclipse.emf"), new NullProgressMonitor());
 		return new IInstallableUnit[] {(IInstallableUnit) c.iterator().next(), Reify.createDefaultBundleConfigurationUnit()};
 	}
 
