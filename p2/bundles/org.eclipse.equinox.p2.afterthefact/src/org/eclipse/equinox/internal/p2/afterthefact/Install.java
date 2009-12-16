@@ -38,6 +38,7 @@ import org.eclipse.equinox.p2.engine.InstallableUnitPropertyOperand;
 import org.eclipse.equinox.p2.engine.Operand;
 import org.eclipse.equinox.p2.engine.ProvisioningContext;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.metadata.query.IQueryResult;
 import org.eclipse.equinox.p2.repository.artifact.IArtifactRepository;
 import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
@@ -95,7 +96,7 @@ public class Install {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		Collector c = repoMgr.query(new InstallableUnitQuery("org.eclipse.emf"), new NullProgressMonitor());
+		IQueryResult c = repoMgr.query(new InstallableUnitQuery("org.eclipse.emf"), new NullProgressMonitor());
 		return new IInstallableUnit[] {(IInstallableUnit) c.iterator().next(), Reify.createDefaultBundleConfigurationUnit()};
 	}
 
