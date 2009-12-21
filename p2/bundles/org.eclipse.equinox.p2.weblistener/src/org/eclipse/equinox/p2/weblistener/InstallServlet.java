@@ -72,11 +72,10 @@ public class InstallServlet extends HttpServlet implements Servlet {
 		IEngine engine = (IEngine) ServiceHelper.getService(WebListenerActivator.getContext(), IEngine.SERVICE_NAME);
 		if (engine == null)
 			throw new ProvisionException("No engine service found.");
-		IInstallableUnit[] toInstall = (IInstallableUnit[]) units.toArray(IInstallableUnit.class);
 		ProvisioningContext context = new ProvisioningContext();
 		ProfileChangeRequest request = new ProfileChangeRequest(profile);
-		request.addInstallableUnits(toInstall);
-		request.setInstallableUnitProfileProperty(toInstall[0], IProfile.PROP_PROFILE_ROOT_IU, "true");
+		request.addInstallableUnits(units);
+		request.setInstallableUnitProfileProperty((IInstallableUnit) units.iterator().next(), IProfile.PROP_PROFILE_ROOT_IU, "true");
 		IProvisioningPlan result = planner.getProvisioningPlan(request, context, progress);
 		if (!result.getStatus().isOK())
 			return result.getStatus();
