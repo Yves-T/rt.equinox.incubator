@@ -32,8 +32,8 @@ public class GenericOSGiTouchpoint extends Touchpoint {
 	public static final String PARM_BUNDLE = "bundle"; //$NON-NLS-1$
 	
 	//TODO This needs to be put in some sort of table mapped by Profile, otherwise we can run into problems when multiple threads are performing changes
-	public static Collection toAdd = new HashSet();
-	public static Collection toRemove = new HashSet();
+	public static Collection<String> toAdd = new HashSet<String>();
+	public static Collection<String> toRemove = new HashSet<String>();
 
 	/** NOT API -- this is for backwards compatibility only */
 	public String qualifyAction(String actionId) {
@@ -44,21 +44,21 @@ public class GenericOSGiTouchpoint extends Touchpoint {
 		return actionId;
 	}
 
-	public IStatus initializePhase(IProgressMonitor monitor, IProfile profile, String phaseId, Map touchpointParameters) {
+	public IStatus initializePhase(IProgressMonitor monitor, IProfile profile, String phaseId, Map<String,Object> touchpointParameters) {
 		touchpointParameters.put(BUNDLES_TO_ADD, toAdd);
 		touchpointParameters.put(BUNDLES_TO_REMOVE, toRemove);
 		return Status.OK_STATUS;
 	}
 
-	public IStatus completePhase(IProgressMonitor monitor, IProfile profile, String phaseId, Map touchpointParameters) {
+	public IStatus completePhase(IProgressMonitor monitor, IProfile profile, String phaseId, Map<String,Object> touchpointParameters) {
 		return Status.OK_STATUS;
 	}
 
-	public IStatus initializeOperand(IProfile profile, Operand operand, Map parameters) {
+	public IStatus initializeOperand(IProfile profile, Operand operand, Map<String,Object> parameters) {
 		return Status.OK_STATUS;
 	}
 
-	public IStatus completeOperand(IProfile profile, Operand operand, Map parameters) {
+	public IStatus completeOperand(IProfile profile, Operand operand, Map<String,Object> parameters) {
 		return Status.OK_STATUS;
 	}
 
@@ -67,9 +67,9 @@ public class GenericOSGiTouchpoint extends Touchpoint {
 	}
 
 	public IStatus commit(IProfile profile) {
-		for (Iterator iterator = toAdd.iterator(); iterator.hasNext();) {
+		for (Iterator<String> iterator = toAdd.iterator(); iterator.hasNext();) {
 			try {
-				Activator.ctx.installBundle((String) iterator.next());
+				Activator.ctx.installBundle(iterator.next());
 			} catch (BundleException e) {
 				return Util.createError("Failing installation", e);
 			}

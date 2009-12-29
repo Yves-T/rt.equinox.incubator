@@ -9,6 +9,7 @@
 package org.eclipse.equinox.p2.osgi.actions;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,25 +24,25 @@ import org.eclipse.equinox.p2.touchpoint.osgi.GenericOSGiTouchpoint;
 public class InstallBundleAction extends ProvisioningAction {
 	public static final String ID = "installBundle"; //$NON-NLS-1$
 
-	public IStatus execute(Map parameters) {
+	public IStatus execute(Map<String,Object> parameters) {
 		return InstallBundleAction.installBundle(parameters);
 	}
 
-	public IStatus undo(Map parameters) {
+	public IStatus undo(Map<String,Object> parameters) {
 		//Nothing to do because the action only take effect on commit 
 		return Status.OK_STATUS;
 	}
 
-	public static IStatus installBundle(Map parameters) {
+	public static IStatus installBundle(Map<String,Object> parameters) {
 		IProfile profile = (IProfile) parameters.get(GenericOSGiTouchpoint.PARM_PROFILE);
 		IInstallableUnit iu = (IInstallableUnit) parameters.get(GenericOSGiTouchpoint.PARM_IU);
 
-		IArtifactKey[] artifacts = iu.getArtifacts();
-		if (artifacts == null || artifacts.length == 0) {
+		List<IArtifactKey> artifacts = iu.getArtifacts();
+		if (artifacts == null || artifacts.isEmpty()) {
 			return Status.OK_STATUS;
 		}
 		
-		IArtifactKey artifactKey = artifacts[0];
+		IArtifactKey artifactKey = artifacts.get(0);
 		if (artifactKey == null)
 			throw new IllegalArgumentException("No matching artifact");
 
@@ -49,7 +50,9 @@ public class InstallBundleAction extends ProvisioningAction {
 		if (bundleFile == null || !bundleFile.exists())
 			return Util.createError("The file can not be found for " + artifactKey);
 
-		((Set) parameters.get(GenericOSGiTouchpoint.BUNDLES_TO_ADD)).add("reference:" + bundleFile.toURI().toString());
+		@SuppressWarnings("unchecked")
+		Set<String> set = (Set<String>) parameters.get(GenericOSGiTouchpoint.BUNDLES_TO_ADD);
+		set.add("reference:" + bundleFile.toURI().toString());
 		return Status.OK_STATUS;
 	}
 }

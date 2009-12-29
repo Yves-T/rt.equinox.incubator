@@ -1,7 +1,7 @@
 package solution3;
 
 import java.net.URI;
-import java.util.Properties;
+import java.util.HashMap;
 
 import org.eclipse.equinox.internal.provisional.p2.core.ProvisionException;
 import org.eclipse.equinox.internal.provisional.p2.metadata.query.InstallableUnitQuery;
@@ -18,10 +18,10 @@ public class RepositoryDumper {
 	}
 	
 	public void dump(URI targetRepository) throws ProvisionException {
-		IMetadataRepository repo = mgr.createRepository(targetRepository, "Dumped repository", IMetadataRepositoryManager.TYPE_SIMPLE_REPOSITORY, new Properties());
+		IMetadataRepository repo = mgr.createRepository(targetRepository, "Dumped repository", IMetadataRepositoryManager.TYPE_SIMPLE_REPOSITORY, new HashMap<String,String>());
 		mgr.removeRepository(targetRepository);
-		IQueryResult c = mgr.query(InstallableUnitQuery.ANY, null);
-		repo.addInstallableUnits((IInstallableUnit[]) c.toArray(IInstallableUnit.class));
+		IQueryResult<IInstallableUnit> c = mgr.query(InstallableUnitQuery.ANY, null);
+		repo.addInstallableUnits(c.toArray(IInstallableUnit.class));
 	}
 
 }
