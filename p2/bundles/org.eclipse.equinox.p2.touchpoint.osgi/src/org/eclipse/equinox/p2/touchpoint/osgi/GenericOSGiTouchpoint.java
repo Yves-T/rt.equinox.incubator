@@ -67,9 +67,9 @@ public class GenericOSGiTouchpoint extends Touchpoint {
 	}
 
 	public IStatus commit(IProfile profile) {
-		for (Iterator<String> iterator = toAdd.iterator(); iterator.hasNext();) {
+		for (String id : toAdd) {
 			try {
-				Activator.ctx.installBundle(iterator.next());
+				Activator.ctx.installBundle(id);
 			} catch (BundleException e) {
 				return Util.createError("Failing installation", e);
 			}
