@@ -9,7 +9,7 @@
 package org.eclipse.equinox.p2.osgi.actions;
 
 import java.io.File;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,12 +37,12 @@ public class InstallBundleAction extends ProvisioningAction {
 		IProfile profile = (IProfile) parameters.get(GenericOSGiTouchpoint.PARM_PROFILE);
 		IInstallableUnit iu = (IInstallableUnit) parameters.get(GenericOSGiTouchpoint.PARM_IU);
 
-		List<IArtifactKey> artifacts = iu.getArtifacts();
+		Collection<IArtifactKey> artifacts = iu.getArtifacts();
 		if (artifacts == null || artifacts.isEmpty()) {
 			return Status.OK_STATUS;
 		}
 		
-		IArtifactKey artifactKey = artifacts.get(0);
+		IArtifactKey artifactKey = artifacts.iterator().next();
 		if (artifactKey == null)
 			throw new IllegalArgumentException("No matching artifact");
 

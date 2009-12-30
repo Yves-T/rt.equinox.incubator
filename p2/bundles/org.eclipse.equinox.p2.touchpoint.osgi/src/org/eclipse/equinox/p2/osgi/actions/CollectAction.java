@@ -77,7 +77,7 @@ public class CollectAction extends ProvisioningAction {
 	}
 
 	public static IArtifactRequest[] collect(IInstallableUnit installableUnit, IProfile profile) throws ProvisionException {
-		List<IArtifactKey> toDownload = installableUnit.getArtifacts();
+		Collection<IArtifactKey> toDownload = installableUnit.getArtifacts();
 		if (toDownload == null || toDownload.isEmpty())
 			return IArtifactRepositoryManager.NO_ARTIFACT_REQUEST;
 
@@ -86,9 +86,8 @@ public class CollectAction extends ProvisioningAction {
 		if (bundlePool == null)
 			throw new ProvisionException("no bundle pool");
 
-		List<IArtifactRequest> requests = new ArrayList<IArtifactRequest>();
-		for (int i = 0; i < toDownload.size(); i++) {
-			IArtifactKey key = toDownload.get(i);
+		List<IArtifactRequest> requests = new ArrayList<IArtifactRequest>(toDownload.size());
+		for (IArtifactKey key : toDownload) {
 			if (!bundlePool.contains(key)) {
 				Map<String,String> repositoryProperties = CollectAction.createArtifactDescriptorProperties(installableUnit);
 				requests.add(getArtifactRepositoryManager().createMirrorRequest(key, bundlePool, null, repositoryProperties));
