@@ -52,7 +52,7 @@ public class Install {
 		Collection ius = new Reify().reify(platformAdmin);
 		IProfile profile = null;
 		try {
-			profile = spoofUpProfile(registry, engine, ius);
+			profile = spoofUpProfile(registry, engine, planner, ius);
 		} catch (ProvisionException e) {
 			e.printStackTrace();
 		}
@@ -85,22 +85,22 @@ public class Install {
 		return new IInstallableUnit[] {(IInstallableUnit) c.iterator().next(), Reify.createDefaultBundleConfigurationUnit()};
 	}
 
-	private IProfile spoofUpProfile(IProfileRegistry registry, IEngine engine, Collection ius) throws ProvisionException {
+	private IProfile spoofUpProfile(IProfileRegistry registry, IEngine engine, IPlanner planner, Collection ius) throws ProvisionException {
 		Properties prop = new Properties();
 		// prop.setProperty("org.eclipse.bund, value)
 		// set the bundle pool
 		// create the artifact repository
 		prop.setProperty("org.eclipse.equinox.p2.bundlepool", repo.getLocation().toString());
 		IProfile profile = registry.addProfile("foobar" + System.currentTimeMillis(), prop);
-		Operand[] operands = new Operand[ius.size() * 2];
-		int i = 0;
+		ProfileChangeRequest pcr = new ProfileChangeRequest(profile);
+		pcr.setAbsoluteMode(true);
+		pcr.addInstallableUnits(ius);
 		for (Iterator iter = ius.iterator(); iter.hasNext();) {
 			IInstallableUnit iu = (IInstallableUnit) iter.next();
-			operands[i++] = new InstallableUnitOperand(null, iu);
-			operands[i++] = new InstallableUnitPropertyOperand(iu, "org.eclipse.equinox.p2.internal.inclusion.rules", null, PlannerHelper.createOptionalInclusionRule(iu));
+			pcr.setInstallableUnitInclusionRules(iu, PlannerHelper.createOptionalInclusionRule(iu));
 		}
+		IProvisioningPlan plan = planner.getProvisioningPlan(pcr, new ProvisioningContext(), null);
 		IPhaseSet phaseSet = engine.createPhaseSetExcluding(new String[] {IPhaseSet.PHASE_CHECK_TRUST, IPhaseSet.PHASE_COLLECT, IPhaseSet.PHASE_CONFIGURE, IPhaseSet.PHASE_UNCONFIGURE, IPhaseSet.PHASE_UNINSTALL});
-		IProvisioningPlan plan = engine.createCustomPlan(profile, operands, new ProvisioningContext());
 		IStatus status = engine.perform(plan, phaseSet, null);
 		if (!status.isOK())
 			return null;
