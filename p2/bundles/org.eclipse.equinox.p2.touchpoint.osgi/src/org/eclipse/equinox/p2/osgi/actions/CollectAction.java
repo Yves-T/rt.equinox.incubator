@@ -8,6 +8,8 @@
  ******************************************************************************/
 package org.eclipse.equinox.p2.osgi.actions;
 
+import org.eclipse.equinox.p2.metadata.ITouchpointData;
+
 import org.eclipse.equinox.p2.core.ProvisionException;
 
 import java.net.URI;
@@ -20,7 +22,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.equinox.internal.provisional.p2.metadata.ITouchpointData;
 import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.engine.InstallableUnitOperand;
 import org.eclipse.equinox.p2.engine.spi.ProvisioningAction;
