@@ -5,16 +5,17 @@ Bundle-SymbolicName: org.eclipse.equinox.p2.diagnostic;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.equinox.p2.diagnostic.Activator
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.equinox.p2.metadata.repository,
  org.eclipse.equinox.p2.repository;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Service-Component: OSGI-INF/application_component.xml, OSGI-INF/component.xml, OSGI-INF/dumper3.xml
 Import-Package: org.eclipse.equinox.internal.p2.metadata.repository,
  org.eclipse.equinox.internal.p2.repository,
- org.eclipse.equinox.internal.provisional.p2.core,
  org.eclipse.equinox.internal.provisional.p2.metadata,
- org.eclipse.equinox.internal.provisional.p2.metadata.query,
+ org.eclipse.equinox.p2.core,
+ org.eclipse.equinox.p2.metadata,
+ org.eclipse.equinox.p2.metadata.query,
+ org.eclipse.equinox.p2.query,
  org.osgi.service.component;version="1.1.0"
 Export-Package: org.eclipse.equinox.p2.diagnostic;x-internal:=true,
  solution2;x-internal:=true,

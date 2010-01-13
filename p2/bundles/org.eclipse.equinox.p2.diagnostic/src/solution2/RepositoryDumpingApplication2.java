@@ -3,6 +3,7 @@ package solution2;
 import java.io.File;
 import java.net.URI;
 import java.util.Map;
+
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.p2.diagnostic.RepositoryDumper;
 import org.osgi.service.application.ApplicationDescriptor;
