@@ -8,6 +8,8 @@
  ******************************************************************************/
 package org.eclipse.equinox.p2.weblistener;
 
+import org.eclipse.equinox.p2.metadata.Version;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,14 +19,14 @@ import javax.servlet.http.*;
 import org.eclipse.core.runtime.*;
 import org.eclipse.equinox.internal.p2.console.ProvisioningHelper;
 import org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper;
-import org.eclipse.equinox.internal.provisional.p2.core.ProvisionException;
-import org.eclipse.equinox.internal.provisional.p2.director.*;
-import org.eclipse.equinox.internal.provisional.p2.engine.*;
-import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.internal.provisional.p2.metadata.Version;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.Collector;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.InstallableUnitQuery;
+import org.eclipse.equinox.internal.provisional.p2.director.IPlanner;
+import org.eclipse.equinox.internal.provisional.p2.director.ProfileChangeRequest;
+import org.eclipse.equinox.p2.core.ProvisionException;
+import org.eclipse.equinox.p2.engine.*;
 import org.eclipse.equinox.p2.internal.weblistener.WebListenerActivator;
+import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.metadata.query.InstallableUnitQuery;
+import org.eclipse.equinox.p2.query.IQueryResult;
 
 public class InstallServlet extends HttpServlet implements Servlet {
 
@@ -51,7 +53,7 @@ public class InstallServlet extends HttpServlet implements Servlet {
 	private IStatus install(String unitId, String version, IProfile profile, IProgressMonitor progress) throws ProvisionException {
 		if (profile == null)
 			return null;
-		Collector units = ProvisioningHelper.getInstallableUnits(null, new InstallableUnitQuery(unitId, new Version(version)), progress);
+		IQueryResult units = ProvisioningHelper.getInstallableUnits((URI) null, new InstallableUnitQuery(unitId, Version.create(version)), progress);
 		if (units.isEmpty()) {
 			StringBuffer error = new StringBuffer();
 			error.append("Installable unit not found: " + unitId + ' ' + version + '\n');
@@ -71,16 +73,15 @@ public class InstallServlet extends HttpServlet implements Servlet {
 		IEngine engine = (IEngine) ServiceHelper.getService(WebListenerActivator.getContext(), IEngine.SERVICE_NAME);
 		if (engine == null)
 			throw new ProvisionException("No engine service found.");
-		IInstallableUnit[] toInstall = (IInstallableUnit[]) units.toArray(IInstallableUnit.class);
 		ProvisioningContext context = new ProvisioningContext();
 		ProfileChangeRequest request = new ProfileChangeRequest(profile);
-		request.addInstallableUnits(toInstall);
-		request.setInstallableUnitProfileProperty(toInstall[0], IInstallableUnit.PROP_PROFILE_ROOT_IU, "true");
-		ProvisioningPlan result = planner.getProvisioningPlan(request, context, progress);
+		request.addInstallableUnits(units);
+		request.setInstallableUnitProfileProperty((IInstallableUnit) units.iterator().next(), IProfile.PROP_PROFILE_ROOT_IU, "true");
+		IProvisioningPlan result = planner.getProvisioningPlan(request, context, progress);
 		if (!result.getStatus().isOK())
 			return result.getStatus();
 
-		return engine.perform(profile, new DefaultPhaseSet(), result.getOperands(), context, progress);
+		return engine.perform(result, progress);
 	}
 
 }

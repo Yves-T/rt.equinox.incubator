@@ -8,26 +8,28 @@
  ******************************************************************************/
 package org.eclipse.equinox.p2.osgi.actions;
 
+import org.eclipse.equinox.p2.metadata.ITouchpointData;
+
+import org.eclipse.equinox.p2.core.ProvisionException;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.equinox.internal.provisional.p2.artifact.repository.IArtifactRepository;
-import org.eclipse.equinox.internal.provisional.p2.artifact.repository.IArtifactRepositoryManager;
-import org.eclipse.equinox.internal.provisional.p2.artifact.repository.IArtifactRequest;
-import org.eclipse.equinox.internal.provisional.p2.core.ProvisionException;
-import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
-import org.eclipse.equinox.internal.provisional.p2.engine.InstallableUnitOperand;
-import org.eclipse.equinox.internal.provisional.p2.engine.ProvisioningAction;
-import org.eclipse.equinox.internal.provisional.p2.metadata.IArtifactKey;
-import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.internal.provisional.p2.metadata.ITouchpointData;
+import org.eclipse.equinox.p2.engine.IProfile;
+import org.eclipse.equinox.p2.engine.InstallableUnitOperand;
+import org.eclipse.equinox.p2.engine.spi.ProvisioningAction;
+import org.eclipse.equinox.p2.metadata.IArtifactKey;
+import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.repository.artifact.IArtifactRepository;
+import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
+import org.eclipse.equinox.p2.repository.artifact.IArtifactRequest;
 import org.eclipse.equinox.p2.touchpoint.osgi.Activator;
 import org.eclipse.equinox.p2.touchpoint.osgi.GenericOSGiTouchpoint;
 import org.eclipse.equinox.p2.touchpoint.osgi.ServiceHelper;
@@ -36,7 +38,7 @@ public class CollectAction extends ProvisioningAction {
 	public static final String ID = "collect"; //$NON-NLS-1$
 	public static final String ARTIFACT_FOLDER = "artifact.folder"; //$NON-NLS-1$
 
-	public IStatus execute(Map parameters) {
+	public IStatus execute(Map<String,Object> parameters) {
 		IProfile profile = (IProfile) parameters.get(GenericOSGiTouchpoint.PARM_PROFILE);
 		InstallableUnitOperand operand = (InstallableUnitOperand) parameters.get(GenericOSGiTouchpoint.PARM_OPERAND);
 		IArtifactRequest[] requests;
@@ -46,38 +48,39 @@ public class CollectAction extends ProvisioningAction {
 			return e.getStatus();
 		}
 
-		Collection artifactRequests = (Collection) parameters.get(GenericOSGiTouchpoint.PARM_ARTIFACT_REQUESTS);
+		@SuppressWarnings("unchecked")
+		Collection<IArtifactRequest[]> artifactRequests = (Collection<IArtifactRequest[]>) parameters.get(GenericOSGiTouchpoint.PARM_ARTIFACT_REQUESTS);
 		artifactRequests.add(requests);
 		return Status.OK_STATUS;
 	}
 
-	public IStatus undo(Map parameters) {
+	public IStatus undo(Map<String,Object> parameters) {
 		// nothing to do the GC usually takes care of that
 		return Status.OK_STATUS;
 	}
 
-	public static boolean isZipped(ITouchpointData[] data) {
-		if (data == null || data.length == 0)
+	public static boolean isZipped(List<ITouchpointData> data) {
+		if (data == null || data.size() == 0)
 			return false;
-		for (int i = 0; i < data.length; i++) {
-			if (data[i].getInstruction("zipped") != null) //$NON-NLS-1$
+		for (int i = 0; i < data.size(); i++) {
+			if (data.get(i).getInstruction("zipped") != null) //$NON-NLS-1$
 				return true;
 		}
 		return false;
 	}
 
-	public static Properties createArtifactDescriptorProperties(IInstallableUnit installableUnit) {
-		Properties descriptorProperties = null;
+	public static Map<String,String> createArtifactDescriptorProperties(IInstallableUnit installableUnit) {
+		Map<String,String> descriptorProperties = null;
 		if (CollectAction.isZipped(installableUnit.getTouchpointData())) {
-			descriptorProperties = new Properties();
-			descriptorProperties.setProperty(CollectAction.ARTIFACT_FOLDER, Boolean.TRUE.toString());
+			descriptorProperties = new HashMap<String,String>();
+			descriptorProperties.put(CollectAction.ARTIFACT_FOLDER, Boolean.TRUE.toString());
 		}
 		return descriptorProperties;
 	}
 
 	public static IArtifactRequest[] collect(IInstallableUnit installableUnit, IProfile profile) throws ProvisionException {
-		IArtifactKey[] toDownload = installableUnit.getArtifacts();
-		if (toDownload == null || toDownload.length == 0)
+		Collection<IArtifactKey> toDownload = installableUnit.getArtifacts();
+		if (toDownload == null || toDownload.isEmpty())
 			return IArtifactRepositoryManager.NO_ARTIFACT_REQUEST;
 
 		IArtifactRepository bundlePool = getRepo(profile);
@@ -85,11 +88,10 @@ public class CollectAction extends ProvisioningAction {
 		if (bundlePool == null)
 			throw new ProvisionException("no bundle pool");
 
-		List requests = new ArrayList();
-		for (int i = 0; i < toDownload.length; i++) {
-			IArtifactKey key = toDownload[i];
+		List<IArtifactRequest> requests = new ArrayList<IArtifactRequest>(toDownload.size());
+		for (IArtifactKey key : toDownload) {
 			if (!bundlePool.contains(key)) {
-				Properties repositoryProperties = CollectAction.createArtifactDescriptorProperties(installableUnit);
+				Map<String,String> repositoryProperties = CollectAction.createArtifactDescriptorProperties(installableUnit);
 				requests.add(getArtifactRepositoryManager().createMirrorRequest(key, bundlePool, null, repositoryProperties));
 			}
 		}
