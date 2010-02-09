@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Resource Monitoring Common Bundle (Incubation)
 Bundle-SymbolicName: org.eclipse.equinox.jmx.common
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.100.qualifier
 Bundle-Localization: plugin
 Eclipse-LazyStart: true
 Bundle-Activator: org.eclipse.equinox.jmx.internal.common.Activator
