@@ -1,8 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: ExtraSpareBundle Plug-in (Incubation)
-Bundle-SymbolicName: org.eclipse.equinox.weaving.tests.bundles.extraSpareBundle
-Bundle-Version: 1.0.0
-Bundle-Localization: plugin
-Import-Package: org.eclipse.osgi.aspectj.tests.bundles.spareBundle.second
-Export-Package: org.eclipse.osgi.aspectj.tests.bundles.extraSpareBundle

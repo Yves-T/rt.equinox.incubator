@@ -1,8 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Spare Bundle - acts as intermediate for Eclipse-SupplementImporter (Incubation)
-Bundle-SymbolicName: org.eclipse.equinox.weaving.tests.bundles.spareBundle
-Bundle-Version: 1.0.0
-Bundle-Localization: plugin
-Export-Package: org.eclipse.osgi.aspectj.tests.bundles.spareBundle,
- org.eclipse.osgi.aspectj.tests.bundles.spareBundle.second
