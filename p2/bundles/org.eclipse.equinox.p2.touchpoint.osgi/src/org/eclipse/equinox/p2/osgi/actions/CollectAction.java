@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others. All rights reserved. This
+ * Copyright (c) 2009, 2010 IBM Corporation and others. All rights reserved. This
  * program and the accompanying materials are made available under the terms of
  * the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -8,42 +8,32 @@
  ******************************************************************************/
 package org.eclipse.equinox.p2.osgi.actions;
 
-import org.eclipse.equinox.p2.metadata.ITouchpointData;
-
-import org.eclipse.equinox.p2.core.ProvisionException;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.equinox.p2.core.IProvisioningAgent;
+import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.engine.InstallableUnitOperand;
 import org.eclipse.equinox.p2.engine.spi.ProvisioningAction;
-import org.eclipse.equinox.p2.metadata.IArtifactKey;
-import org.eclipse.equinox.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.p2.repository.artifact.IArtifactRepository;
-import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
-import org.eclipse.equinox.p2.repository.artifact.IArtifactRequest;
-import org.eclipse.equinox.p2.touchpoint.osgi.Activator;
+import org.eclipse.equinox.p2.metadata.*;
+import org.eclipse.equinox.p2.repository.artifact.*;
 import org.eclipse.equinox.p2.touchpoint.osgi.GenericOSGiTouchpoint;
-import org.eclipse.equinox.p2.touchpoint.osgi.ServiceHelper;
 
 public class CollectAction extends ProvisioningAction {
 	public static final String ID = "collect"; //$NON-NLS-1$
 	public static final String ARTIFACT_FOLDER = "artifact.folder"; //$NON-NLS-1$
+	private IProvisioningAgent agent;
 
-	public IStatus execute(Map<String,Object> parameters) {
+	public IStatus execute(Map<String, Object> parameters) {
 		IProfile profile = (IProfile) parameters.get(GenericOSGiTouchpoint.PARM_PROFILE);
+		agent = (IProvisioningAgent) parameters.get("agent"); //$NON-NLS-1$
 		InstallableUnitOperand operand = (InstallableUnitOperand) parameters.get(GenericOSGiTouchpoint.PARM_OPERAND);
 		IArtifactRequest[] requests;
 		try {
-			requests = CollectAction.collect(operand.second(), profile);
+			requests = collect(operand.second(), profile);
 		} catch (ProvisionException e) {
 			return e.getStatus();
 		}
@@ -54,12 +44,12 @@ public class CollectAction extends ProvisioningAction {
 		return Status.OK_STATUS;
 	}
 
-	public IStatus undo(Map<String,Object> parameters) {
+	public IStatus undo(Map<String, Object> parameters) {
 		// nothing to do the GC usually takes care of that
 		return Status.OK_STATUS;
 	}
 
-	public static boolean isZipped(List<ITouchpointData> data) {
+	public boolean isZipped(List<ITouchpointData> data) {
 		if (data == null || data.size() == 0)
 			return false;
 		for (int i = 0; i < data.size(); i++) {
@@ -69,29 +59,29 @@ public class CollectAction extends ProvisioningAction {
 		return false;
 	}
 
-	public static Map<String,String> createArtifactDescriptorProperties(IInstallableUnit installableUnit) {
-		Map<String,String> descriptorProperties = null;
-		if (CollectAction.isZipped(installableUnit.getTouchpointData())) {
-			descriptorProperties = new HashMap<String,String>();
+	public Map<String, String> createArtifactDescriptorProperties(IInstallableUnit installableUnit) {
+		Map<String, String> descriptorProperties = null;
+		if (isZipped(installableUnit.getTouchpointData())) {
+			descriptorProperties = new HashMap<String, String>();
 			descriptorProperties.put(CollectAction.ARTIFACT_FOLDER, Boolean.TRUE.toString());
 		}
 		return descriptorProperties;
 	}
 
-	public static IArtifactRequest[] collect(IInstallableUnit installableUnit, IProfile profile) throws ProvisionException {
+	public IArtifactRequest[] collect(IInstallableUnit installableUnit, IProfile profile) throws ProvisionException {
 		Collection<IArtifactKey> toDownload = installableUnit.getArtifacts();
 		if (toDownload == null || toDownload.isEmpty())
 			return IArtifactRepositoryManager.NO_ARTIFACT_REQUEST;
 
 		IArtifactRepository bundlePool = getRepo(profile);
-		
+
 		if (bundlePool == null)
 			throw new ProvisionException("no bundle pool");
 
 		List<IArtifactRequest> requests = new ArrayList<IArtifactRequest>(toDownload.size());
 		for (IArtifactKey key : toDownload) {
 			if (!bundlePool.contains(key)) {
-				Map<String,String> repositoryProperties = CollectAction.createArtifactDescriptorProperties(installableUnit);
+				Map<String, String> repositoryProperties = createArtifactDescriptorProperties(installableUnit);
 				requests.add(getArtifactRepositoryManager().createMirrorRequest(key, bundlePool, null, repositoryProperties));
 			}
 		}
@@ -102,15 +92,18 @@ public class CollectAction extends ProvisioningAction {
 		IArtifactRequest[] result = (IArtifactRequest[]) requests.toArray(new IArtifactRequest[requests.size()]);
 		return result;
 	}
-	
-	public static IArtifactRepositoryManager getArtifactRepositoryManager() {
-		return (IArtifactRepositoryManager) org.eclipse.equinox.p2.touchpoint.osgi.ServiceHelper.getService(org.eclipse.equinox.p2.touchpoint.osgi.Activator.ctx, IArtifactRepositoryManager.class.getName());
+
+	public IArtifactRepositoryManager getArtifactRepositoryManager() {
+		return (IArtifactRepositoryManager) agent.getService(IArtifactRepositoryManager.SERVICE_NAME);
 	}
-	
-	private static IArtifactRepository getRepo(IProfile profile) {
-		IArtifactRepositoryManager artifactRepoMgr = (IArtifactRepositoryManager) ServiceHelper.getService(Activator.ctx, IArtifactRepositoryManager.class.getName());
+
+	private IArtifactRepository getRepo(IProfile profile) {
+		IArtifactRepositoryManager artifactRepoMgr = getArtifactRepositoryManager();
 		try {
-			return artifactRepoMgr.loadRepository(new URI(profile.getProperty("org.eclipse.equinox.p2.bundlepool")), null);
+			final String poolProp = profile.getProperty("org.eclipse.equinox.p2.bundlepool");
+			if (poolProp == null)
+				return null;
+			return artifactRepoMgr.loadRepository(new URI(poolProp), null);
 		} catch (ProvisionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
