@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009-2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Sonatype, Inc. - ongoing development
  *******************************************************************************/
 package org.eclipse.equinox.internal.p2.afterthefact;
 
@@ -14,15 +15,27 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.internal.p2.artifact.repository.simple.SimpleArtifactRepository;
-import org.eclipse.equinox.internal.provisional.p2.director.*;
+import org.eclipse.equinox.internal.provisional.p2.director.PlannerHelper;
+import org.eclipse.equinox.internal.provisional.p2.director.ProfileChangeRequest;
 import org.eclipse.equinox.p2.core.ProvisionException;
-import org.eclipse.equinox.p2.engine.*;
+import org.eclipse.equinox.p2.engine.IEngine;
+import org.eclipse.equinox.p2.engine.IPhaseSet;
+import org.eclipse.equinox.p2.engine.IProfile;
+import org.eclipse.equinox.p2.engine.IProfileRegistry;
+import org.eclipse.equinox.p2.engine.IProvisioningPlan;
+import org.eclipse.equinox.p2.engine.ProvisioningContext;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.metadata.query.InstallableUnitQuery;
+import org.eclipse.equinox.p2.planner.IPlanner;
 import org.eclipse.equinox.p2.query.IQueryResult;
 import org.eclipse.equinox.p2.repository.artifact.IArtifactRepository;
 import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
@@ -46,10 +59,10 @@ public class Install {
 		repo = createBundlePool(artifactRepoMgr);
 
 		//Get the IU to install
-		IInstallableUnit[] iusToInstall = getRandomIUToInstall(repoMgr, artifactRepoMgr);
+		Collection<IInstallableUnit> iusToInstall = getRandomIUToInstall(repoMgr, artifactRepoMgr);
 		
 		//Create a representation of what is already installed into the running system
-		Collection ius = new Reify().reify(platformAdmin);
+		Collection<IInstallableUnit> ius = new Reify().reify(platformAdmin);
 		IProfile profile = null;
 		try {
 			profile = spoofUpProfile(registry, engine, planner, ius);
@@ -61,7 +74,7 @@ public class Install {
 
 		//Create a request to install the IUs and compute a plan to install those
 		ProfileChangeRequest request = new ProfileChangeRequest(profile);
-		request.addInstallableUnits(iusToInstall);
+		request.addAll(iusToInstall);
 		IProvisioningPlan plan = planner.getProvisioningPlan(request, new ProvisioningContext(), null);
 		
 		//Execute the plan. This causes the files to be downloaded and the bundles to be installed
@@ -73,7 +86,7 @@ public class Install {
 	}
 
 	//Helper method to get IUs to install
-	private IInstallableUnit[] getRandomIUToInstall(IMetadataRepositoryManager repoMgr, IArtifactRepositoryManager artifactMgr) {
+	private Collection<IInstallableUnit> getRandomIUToInstall(IMetadataRepositoryManager repoMgr, IArtifactRepositoryManager artifactMgr) {
 		try {
 			repoMgr.addRepository(new URI("http://download.eclipse.org/releases/galileo"));
 			artifactMgr.addRepository(new URI("http://download.eclipse.org/releases/galileo"));
@@ -81,20 +94,23 @@ public class Install {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		IQueryResult c = repoMgr.query(new InstallableUnitQuery("org.eclipse.emf"), new NullProgressMonitor());
-		return new IInstallableUnit[] {(IInstallableUnit) c.iterator().next(), Reify.createDefaultBundleConfigurationUnit()};
+		IQueryResult<IInstallableUnit> c = repoMgr.query(new InstallableUnitQuery("org.eclipse.emf"), new NullProgressMonitor());
+		Collection<IInstallableUnit> result = new ArrayList<IInstallableUnit>(2);
+		result.add(c.iterator().next());
+		result.add(Reify.createDefaultBundleConfigurationUnit());
+		return result;
 	}
 
-	private IProfile spoofUpProfile(IProfileRegistry registry, IEngine engine, IPlanner planner, Collection ius) throws ProvisionException {
-		Properties prop = new Properties();
+	private IProfile spoofUpProfile(IProfileRegistry registry, IEngine engine, IPlanner planner, Collection<IInstallableUnit> ius) throws ProvisionException {
+		Map<String, String> prop = new HashMap<String, String>();
 		// prop.setProperty("org.eclipse.bund, value)
 		// set the bundle pool
 		// create the artifact repository
-		prop.setProperty("org.eclipse.equinox.p2.bundlepool", repo.getLocation().toString());
+		prop.put("org.eclipse.equinox.p2.bundlepool", repo.getLocation().toString());
 		IProfile profile = registry.addProfile("foobar" + System.currentTimeMillis(), prop);
 		ProfileChangeRequest pcr = new ProfileChangeRequest(profile);
 		pcr.setAbsoluteMode(true);
-		pcr.addInstallableUnits(ius);
+		pcr.addAll(ius);
 		for (Iterator iter = ius.iterator(); iter.hasNext();) {
 			IInstallableUnit iu = (IInstallableUnit) iter.next();
 			pcr.setInstallableUnitInclusionRules(iu, PlannerHelper.createOptionalInclusionRule(iu));
