@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.p2.engine.IProfile;
-import org.eclipse.equinox.p2.engine.Operand;
 import org.eclipse.equinox.p2.engine.spi.Touchpoint;
 import org.eclipse.equinox.p2.osgi.actions.Util;
 import org.osgi.framework.BundleException;
@@ -54,13 +53,6 @@ public class GenericOSGiTouchpoint extends Touchpoint {
 		return Status.OK_STATUS;
 	}
 
-	public IStatus initializeOperand(IProfile profile, Operand operand, Map<String,Object> parameters) {
-		return Status.OK_STATUS;
-	}
-
-	public IStatus completeOperand(IProfile profile, Operand operand, Map<String,Object> parameters) {
-		return Status.OK_STATUS;
-	}
 
 	public IStatus prepare(IProfile profile) {
 		return Status.OK_STATUS;

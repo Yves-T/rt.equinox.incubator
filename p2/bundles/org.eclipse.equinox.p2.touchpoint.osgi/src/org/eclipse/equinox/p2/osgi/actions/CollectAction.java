@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.equinox.p2.engine.IProfile;
-import org.eclipse.equinox.p2.engine.InstallableUnitOperand;
 import org.eclipse.equinox.p2.engine.spi.ProvisioningAction;
 import org.eclipse.equinox.p2.metadata.*;
 import org.eclipse.equinox.p2.repository.artifact.*;
@@ -30,10 +29,10 @@ public class CollectAction extends ProvisioningAction {
 	public IStatus execute(Map<String, Object> parameters) {
 		IProfile profile = (IProfile) parameters.get(GenericOSGiTouchpoint.PARM_PROFILE);
 		agent = (IProvisioningAgent) parameters.get("agent"); //$NON-NLS-1$
-		InstallableUnitOperand operand = (InstallableUnitOperand) parameters.get(GenericOSGiTouchpoint.PARM_OPERAND);
+		IInstallableUnit iu = (IInstallableUnit) parameters.get("iu");
 		IArtifactRequest[] requests;
 		try {
-			requests = collect(operand.second(), profile);
+			requests = collect(iu, profile);
 		} catch (ProvisionException e) {
 			return e.getStatus();
 		}
