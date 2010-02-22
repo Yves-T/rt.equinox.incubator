@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009-2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,24 +15,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
+import java.util.*;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.internal.p2.artifact.repository.simple.SimpleArtifactRepository;
 import org.eclipse.equinox.internal.provisional.p2.director.PlannerHelper;
 import org.eclipse.equinox.internal.provisional.p2.director.ProfileChangeRequest;
 import org.eclipse.equinox.p2.core.ProvisionException;
-import org.eclipse.equinox.p2.engine.IEngine;
-import org.eclipse.equinox.p2.engine.IPhaseSet;
-import org.eclipse.equinox.p2.engine.IProfile;
-import org.eclipse.equinox.p2.engine.IProfileRegistry;
-import org.eclipse.equinox.p2.engine.IProvisioningPlan;
-import org.eclipse.equinox.p2.engine.ProvisioningContext;
+import org.eclipse.equinox.p2.engine.*;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.metadata.query.InstallableUnitQuery;
 import org.eclipse.equinox.p2.planner.IPlanner;
@@ -60,7 +50,7 @@ public class Install {
 
 		//Get the IU to install
 		Collection<IInstallableUnit> iusToInstall = getRandomIUToInstall(repoMgr, artifactRepoMgr);
-		
+
 		//Create a representation of what is already installed into the running system
 		Collection<IInstallableUnit> ius = new Reify().reify(platformAdmin);
 		IProfile profile = null;
@@ -76,10 +66,10 @@ public class Install {
 		ProfileChangeRequest request = new ProfileChangeRequest(profile);
 		request.addAll(iusToInstall);
 		IProvisioningPlan plan = planner.getProvisioningPlan(request, new ProvisioningContext(), null);
-		
+
 		//Execute the plan. This causes the files to be downloaded and the bundles to be installed
 		System.out.println(engine.perform(plan, null));
-		
+
 		//Refresh the framework to get the bundles installed
 		PackageAdmin packageAdmin = (PackageAdmin) ServiceHelper.getService(Activator.getContext(), PackageAdmin.class.getName());
 		packageAdmin.refreshPackages(null);
@@ -116,7 +106,7 @@ public class Install {
 			pcr.setInstallableUnitInclusionRules(iu, PlannerHelper.createOptionalInclusionRule(iu));
 		}
 		IProvisioningPlan plan = planner.getProvisioningPlan(pcr, new ProvisioningContext(), null);
-		IPhaseSet phaseSet = engine.createPhaseSetExcluding(new String[] {IPhaseSet.PHASE_CHECK_TRUST, IPhaseSet.PHASE_COLLECT, IPhaseSet.PHASE_CONFIGURE, IPhaseSet.PHASE_UNCONFIGURE, IPhaseSet.PHASE_UNINSTALL});
+		IPhaseSet phaseSet = DefaultPhaseSet.createExcluding(new String[] {DefaultPhaseSet.PHASE_CHECK_TRUST, DefaultPhaseSet.PHASE_COLLECT, DefaultPhaseSet.PHASE_CONFIGURE, DefaultPhaseSet.PHASE_UNCONFIGURE, DefaultPhaseSet.PHASE_UNINSTALL});
 		IStatus status = engine.perform(plan, phaseSet, null);
 		if (!status.isOK())
 			return null;
@@ -124,7 +114,7 @@ public class Install {
 	}
 
 	private IArtifactRepository createBundlePool(IArtifactRepositoryManager mgr) {
-		final String[][] DEFAULT_MAPPING_RULES = { { "(& (classifier=osgi.bundle))", "${repoUrl}/lib/${id}_${version}.jar" } };//$NON-NLS-1$
+		final String[][] DEFAULT_MAPPING_RULES = {{"(& (classifier=osgi.bundle))", "${repoUrl}/lib/${id}_${version}.jar"}};//$NON-NLS-1$
 		IArtifactRepository repo;
 		try {
 			try {
