@@ -1,7 +1,16 @@
+/*******************************************************************************
+ *  Copyright (c) 2010 IBM Corporation and others.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ * 
+ *  Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package solution2;
 
 import java.util.Map;
-
 import org.eclipse.equinox.p2.diagnostic.Activator;
 import org.eclipse.equinox.p2.diagnostic.RepositoryDumper;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
@@ -9,14 +18,12 @@ import org.osgi.service.application.ApplicationDescriptor;
 import org.osgi.service.application.ApplicationHandle;
 import org.osgi.service.component.ComponentContext;
 
-public class RepositoryDumpingApplicationDescriptor extends
-		ApplicationDescriptor {
+public class RepositoryDumpingApplicationDescriptor extends ApplicationDescriptor {
 
 	private RepositoryDumper repositoryDumper;
 
 	protected void activate(ComponentContext context) {
-		IMetadataRepositoryManager repoMgr = (IMetadataRepositoryManager) context
-				.locateService("repoMgr");
+		IMetadataRepositoryManager repoMgr = (IMetadataRepositoryManager) context.locateService("repoMgr");
 		repositoryDumper = new RepositoryDumper();
 		repositoryDumper.setRepositoryManager(repoMgr);
 
@@ -49,8 +56,7 @@ public class RepositoryDumpingApplicationDescriptor extends
 
 	@Override
 	protected ApplicationHandle launchSpecific(Map arguments) throws Exception {
-		RepositoryDumpingApplication2 dump = new RepositoryDumpingApplication2(
-				"org.eclipse.equinox.p2.diagnostic.rd", this);
+		RepositoryDumpingApplication2 dump = new RepositoryDumpingApplication2("org.eclipse.equinox.p2.diagnostic.rd", this);
 		arguments.put("repo_dumper", repositoryDumper);
 		dump.start(arguments);
 		return dump;
