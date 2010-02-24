@@ -4,13 +4,13 @@
 	<extension point="org.eclipse.equinox.p2.engine.touchpoints" id="eclipse" name="Eclipse Touchpoint">
 		<touchpoint 
 			type="org.eclipse.equinox.p2.osgi" 
-			class="org.eclipse.equinox.p2.touchpoint.osgi.GenericOSGiTouchpoint"
+			class="org.eclipse.equinox.internal.p2.touchpoint.osgi.GenericOSGiTouchpoint"
 			version="1.0.0"/>
 	</extension>
 <extension
        point="org.eclipse.equinox.p2.engine.actions">
     <action
-          class="org.eclipse.equinox.p2.osgi.actions.CollectAction"
+          class="org.eclipse.equinox.internal.p2.osgi.actions.CollectAction"
           name="collect"
           touchpointType="org.eclipse.equinox.p2.osgi"
           touchpointVersion="1.0.0"
@@ -20,7 +20,7 @@
  <extension
        point="org.eclipse.equinox.p2.engine.actions">
     <action
-          class="org.eclipse.equinox.p2.osgi.actions.InstallBundleAction"
+          class="org.eclipse.equinox.internal.p2.osgi.actions.InstallBundleAction"
           name="installBundle"
           touchpointType="org.eclipse.equinox.p2.osgi"
           touchpointVersion="1.0.0"
@@ -30,7 +30,7 @@
   <extension
        point="org.eclipse.equinox.p2.engine.actions">
     <action
-          class="org.eclipse.equinox.p2.osgi.actions.CollectAction"
+          class="org.eclipse.equinox.internal.p2.osgi.actions.CollectAction"
           name="collect"
           touchpointType="org.eclipse.equinox.p2.osgi"
           touchpointVersion="1.0.0"

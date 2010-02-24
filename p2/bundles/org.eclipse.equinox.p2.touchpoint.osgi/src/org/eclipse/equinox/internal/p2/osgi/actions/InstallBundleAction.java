@@ -6,7 +6,7 @@
  * 
  * Contributors: IBM Corporation - initial API and implementation
  ******************************************************************************/
-package org.eclipse.equinox.p2.osgi.actions;
+package org.eclipse.equinox.internal.p2.osgi.actions;
 
 import java.io.File;
 import java.util.Collection;
@@ -15,11 +15,11 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.equinox.internal.p2.touchpoint.osgi.GenericOSGiTouchpoint;
 import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.engine.spi.ProvisioningAction;
 import org.eclipse.equinox.p2.metadata.IArtifactKey;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.p2.touchpoint.osgi.GenericOSGiTouchpoint;
 
 public class InstallBundleAction extends ProvisioningAction {
 	public static final String ID = "installBundle"; //$NON-NLS-1$

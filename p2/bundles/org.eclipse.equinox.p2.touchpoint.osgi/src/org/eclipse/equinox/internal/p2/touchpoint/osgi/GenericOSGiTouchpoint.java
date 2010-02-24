@@ -6,7 +6,7 @@
  * 
  * Contributors: IBM Corporation - initial API and implementation
  ******************************************************************************/
-package org.eclipse.equinox.p2.touchpoint.osgi;
+package org.eclipse.equinox.internal.p2.touchpoint.osgi;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -16,9 +16,9 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.equinox.internal.p2.osgi.actions.Util;
 import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.engine.spi.Touchpoint;
-import org.eclipse.equinox.p2.osgi.actions.Util;
 import org.osgi.framework.BundleException;
 
 public class GenericOSGiTouchpoint extends Touchpoint {

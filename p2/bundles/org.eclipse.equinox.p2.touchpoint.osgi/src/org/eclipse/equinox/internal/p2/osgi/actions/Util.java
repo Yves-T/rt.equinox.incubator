@@ -7,8 +7,10 @@
  * Contributors: IBM Corporation - initial API and implementation
  ******************************************************************************/
 
-package org.eclipse.equinox.p2.osgi.actions;
+package org.eclipse.equinox.internal.p2.osgi.actions;
 
+import org.eclipse.equinox.internal.p2.touchpoint.osgi.Activator;
+import org.eclipse.equinox.internal.p2.touchpoint.osgi.ServiceHelper;
 import org.eclipse.equinox.p2.core.ProvisionException;
 
 import java.io.File;
@@ -21,8 +23,6 @@ import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.metadata.IArtifactKey;
 import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
 import org.eclipse.equinox.p2.repository.artifact.IFileArtifactRepository;
-import org.eclipse.equinox.p2.touchpoint.osgi.Activator;
-import org.eclipse.equinox.p2.touchpoint.osgi.ServiceHelper;
 
 public class Util {
 	public static IStatus createError(String message) {
