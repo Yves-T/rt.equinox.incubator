@@ -24,9 +24,9 @@ import org.eclipse.equinox.internal.provisional.p2.director.ProfileChangeRequest
 import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.equinox.p2.engine.*;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.p2.metadata.query.InstallableUnitQuery;
 import org.eclipse.equinox.p2.planner.IPlanner;
 import org.eclipse.equinox.p2.query.IQueryResult;
+import org.eclipse.equinox.p2.query.QueryUtil;
 import org.eclipse.equinox.p2.repository.artifact.IArtifactRepository;
 import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
@@ -84,7 +84,7 @@ public class Install {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		IQueryResult<IInstallableUnit> c = repoMgr.query(new InstallableUnitQuery("org.eclipse.emf"), new NullProgressMonitor());
+		IQueryResult<IInstallableUnit> c = repoMgr.query(QueryUtil.createIUQuery("org.eclipse.emf"), new NullProgressMonitor());
 		Collection<IInstallableUnit> result = new ArrayList<IInstallableUnit>(2);
 		result.add(c.iterator().next());
 		result.add(Reify.createDefaultBundleConfigurationUnit());
