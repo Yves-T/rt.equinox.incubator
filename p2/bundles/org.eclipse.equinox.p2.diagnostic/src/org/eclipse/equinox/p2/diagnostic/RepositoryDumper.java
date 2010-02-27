@@ -30,7 +30,7 @@ public class RepositoryDumper {
 		IMetadataRepository repo = mgr.createRepository(targetRepository, "Dumped repository", IMetadataRepositoryManager.TYPE_SIMPLE_REPOSITORY, new HashMap<String, String>());
 		mgr.removeRepository(targetRepository);
 		IQueryResult<IInstallableUnit> c = mgr.query(QueryUtil.createIUAnyQuery(), null);
-		repo.addInstallableUnits(c.toSet());
+		repo.addInstallableUnits(c.unmodifiableSet());
 	}
 
 }
