@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,13 +11,14 @@
 package org.eclipse.equinox.frameworkadmin.knopflerfish.internal;
 
 import java.io.*;
+import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import org.eclipse.equinox.frameworkadmin.BundleInfo;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.equinox.frameworkadmin.knopflerfish.KfConfigData;
 import org.eclipse.equinox.internal.frameworkadmin.utils.Utils;
+import org.eclipse.equinox.internal.provisional.frameworkadmin.BundleInfo;
 import org.osgi.service.log.LogService;
 
 public class KfFwConfigFileParser {
@@ -54,7 +55,7 @@ public class KfFwConfigFileParser {
 					//					//KF doesn't support "../".
 					//					if (cmd.startsWith("../"))
 					//						cmd = bInfo.getLocation();
-					String cmd = bInfo.getLocation();
+					String cmd = bInfo.getLocation().toString();
 
 					if (bInfo.isMarkedAsStarted())
 						lines.add("-istart " + cmd);
@@ -196,8 +197,10 @@ public class KfFwConfigFileParser {
 				}
 				tokenizer.nextToken();
 				String value = tokenizer.nextToken();
-				URL url = Utils.formatUrl(value, Utils.getUrl("file", null, inputFile.getAbsolutePath()));
-				File file = new File(url.getFile());
+				// todo this might not be right... here is the old code just in case
+				// URL url = Utils.formatUrl(value, Utils.getUrl("file", null, inputFile.getAbsolutePath()));
+				URI location = URIUtil.fromString(inputFile.getAbsolutePath());
+				File file = URIUtil.toFile(location);
 				configData.setXargsFile(file);
 				this.readFwConfigFile(configData, file);
 			} else if (line.startsWith("-initlevel")) {
@@ -215,23 +218,23 @@ public class KfFwConfigFileParser {
 				if (tokenizer.countTokens() != 2)
 					Log.log(LogService.LOG_WARNING, "Illegal Format:line=" + line);
 				tokenizer.nextToken();
-				String value = tokenizer.nextToken();
-				configData.addBundle(new BundleInfo(value, startlevel, false));
+				URI location = URIUtil.fromString(tokenizer.nextToken());
+				configData.addBundle(new BundleInfo(location, startlevel, false));
 			} else if (line.startsWith("-istart")) {
 				if (tokenizer.countTokens() != 2)
 					Log.log(LogService.LOG_WARNING, "Illegal Format:line=" + line);
 				tokenizer.nextToken();
-				String value = tokenizer.nextToken();
-				configData.addBundle(new BundleInfo(value, startlevel, true));
+				URI location = URIUtil.fromString(tokenizer.nextToken());
+				configData.addBundle(new BundleInfo(location, startlevel, true));
 			} else if (line.startsWith("-start")) {
 				if (tokenizer.countTokens() != 2)
 					Log.log(LogService.LOG_WARNING, "Illegal Format:line=" + line);
 				tokenizer.nextToken();
-				String value = tokenizer.nextToken();
-				if (this.isIncludedInInstallingBundles(configData, value))
-					configData.addBundle(new BundleInfo(value, startlevel, false));
+				URI location = URIUtil.fromString(tokenizer.nextToken());
+				if (this.isIncludedInInstallingBundles(configData, location.toString()))
+					configData.addBundle(new BundleInfo(location, startlevel, false));
 				else
-					Log.log(LogService.LOG_WARNING, "location(" + value + ") is NOT included in InstallingBundles.");
+					Log.log(LogService.LOG_WARNING, "location(" + location + ") is NOT included in InstallingBundles.");
 			} else if (line.startsWith("-D")) {
 				String tmp = line.substring("-D".length());
 				StringTokenizer tok = new StringTokenizer(tmp, "=");
