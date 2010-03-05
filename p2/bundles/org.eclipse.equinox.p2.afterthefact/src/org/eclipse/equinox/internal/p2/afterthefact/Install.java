@@ -106,7 +106,7 @@ public class Install {
 			pcr.setInstallableUnitInclusionRules(iu, ProfileInclusionRules.createOptionalInclusionRule(iu));
 		}
 		IProvisioningPlan plan = planner.getProvisioningPlan(pcr, new ProvisioningContext(), null);
-		IPhaseSet phaseSet = DefaultPhaseSet.createExcluding(new String[] {DefaultPhaseSet.PHASE_CHECK_TRUST, DefaultPhaseSet.PHASE_COLLECT, DefaultPhaseSet.PHASE_CONFIGURE, DefaultPhaseSet.PHASE_UNCONFIGURE, DefaultPhaseSet.PHASE_UNINSTALL});
+		IPhaseSet phaseSet = PhaseSetFactory.createDefaultPhaseSetExcluding(new String[] {PhaseSetFactory.PHASE_CHECK_TRUST, PhaseSetFactory.PHASE_COLLECT, PhaseSetFactory.PHASE_CONFIGURE, PhaseSetFactory.PHASE_UNCONFIGURE, PhaseSetFactory.PHASE_UNINSTALL});
 		IStatus status = engine.perform(plan, phaseSet, null);
 		if (!status.isOK())
 			return null;
