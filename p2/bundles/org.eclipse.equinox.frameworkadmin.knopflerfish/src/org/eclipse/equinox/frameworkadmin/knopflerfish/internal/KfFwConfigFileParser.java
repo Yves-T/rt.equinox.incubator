@@ -16,9 +16,9 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.equinox.frameworkadmin.BundleInfo;
 import org.eclipse.equinox.frameworkadmin.knopflerfish.KfConfigData;
 import org.eclipse.equinox.internal.frameworkadmin.utils.Utils;
-import org.eclipse.equinox.internal.provisional.frameworkadmin.BundleInfo;
 import org.osgi.service.log.LogService;
 
 public class KfFwConfigFileParser {

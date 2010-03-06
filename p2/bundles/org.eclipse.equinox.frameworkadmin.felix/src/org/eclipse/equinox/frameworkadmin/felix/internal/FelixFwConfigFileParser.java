@@ -15,6 +15,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.equinox.frameworkadmin.BundleInfo;
 import org.eclipse.equinox.internal.frameworkadmin.utils.Utils;
 import org.eclipse.equinox.internal.provisional.frameworkadmin.*;
 
@@ -181,7 +182,7 @@ public class FelixFwConfigFileParser {
 		// Load the properties from the config.properties file.
 		if (configFile.exists()) {
 			Properties configProperties = readProperties(configFile);
-			
+
 			for (Enumeration enumeration = configProperties.keys(); enumeration.hasMoreElements();) {
 				String key = (String) enumeration.nextElement();
 				String value = configProperties.getProperty(key);

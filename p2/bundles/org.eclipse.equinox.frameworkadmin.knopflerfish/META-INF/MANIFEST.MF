@@ -5,7 +5,8 @@ Bundle-SymbolicName: org.eclipse.equinox.frameworkadmin.knopflerfish
 Bundle-Version: 1.3.0
 Bundle-Activator: org.eclipse.equinox.frameworkadmin.knopflerfish.internal.Activator
 Bundle-Vendor: Eclipse.org
-Import-Package: org.eclipse.equinox.internal.frameworkadmin.utils,
+Import-Package: org.eclipse.equinox.frameworkadmin,
+ org.eclipse.equinox.internal.frameworkadmin.utils,
  org.eclipse.equinox.internal.provisional.configuratormanipulator,
  org.eclipse.equinox.internal.provisional.frameworkadmin,
  org.osgi.framework;version="1.3.0",

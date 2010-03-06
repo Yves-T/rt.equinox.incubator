@@ -12,6 +12,7 @@ package org.eclipse.equinox.frameworkadmin.felix.internal;
 
 import java.io.File;
 import java.io.IOException;
+import org.eclipse.equinox.frameworkadmin.BundleInfo;
 import org.eclipse.equinox.internal.frameworkadmin.utils.SimpleBundlesState;
 import org.eclipse.equinox.internal.frameworkadmin.utils.Utils;
 import org.eclipse.equinox.internal.provisional.configuratormanipulator.ConfiguratorManipulator;
