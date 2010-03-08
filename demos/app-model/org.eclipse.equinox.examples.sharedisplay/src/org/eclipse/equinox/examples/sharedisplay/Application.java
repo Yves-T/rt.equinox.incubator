@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,8 +31,16 @@ public class Application implements IApplication {
 		context.applicationRunning();
 		// do the standard SWT dispatching; we assume this is being called by the main thread
 		while (!display.isDisposed()) {
+			try {
 			if (!display.readAndDispatch())
 				display.sleep();
+			} catch (ThreadDeath th) {
+				throw th;
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			} catch (Error err) {
+				err.printStackTrace();
+			}
 		}
 		return null;
 	}
