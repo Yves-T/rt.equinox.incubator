@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009-2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -60,9 +60,9 @@ public class Reify {
 		BundleSpecification requiredBundles[] = bd.getRequiredBundles();
 		ArrayList<IRequirement> reqsDeps = new ArrayList<IRequirement>();
 		if (isFragment)
-			reqsDeps.add(MetadataFactory.createRequiredCapability(CAPABILITY_NS_OSGI_BUNDLE, bd.getHost().getName(), fromOSGiVersionRange(bd.getHost().getVersionRange()), null, false, false));
+			reqsDeps.add(MetadataFactory.createRequirement(CAPABILITY_NS_OSGI_BUNDLE, bd.getHost().getName(), fromOSGiVersionRange(bd.getHost().getVersionRange()), null, false, false));
 		for (int j = 0; j < requiredBundles.length; j++)
-			reqsDeps.add(MetadataFactory.createRequiredCapability(CAPABILITY_NS_OSGI_BUNDLE, requiredBundles[j].getName(), fromOSGiVersionRange(requiredBundles[j].getVersionRange()), null, requiredBundles[j].isOptional(), false));
+			reqsDeps.add(MetadataFactory.createRequirement(CAPABILITY_NS_OSGI_BUNDLE, requiredBundles[j].getName(), fromOSGiVersionRange(requiredBundles[j].getVersionRange()), null, requiredBundles[j].isOptional(), false));
 
 		// Process the import packages
 		ImportPackageSpecification osgiImports[] = bd.getImportPackages();
@@ -74,7 +74,7 @@ public class Reify {
 				continue;
 			VersionRange versionRange = fromOSGiVersionRange(importSpec.getVersionRange());
 			//TODO this needs to be refined to take into account all the attribute handled by imports
-			reqsDeps.add(MetadataFactory.createRequiredCapability(CAPABILITY_NS_JAVA_PACKAGE, importPackageName, versionRange, null, isOptional(importSpec), false));
+			reqsDeps.add(MetadataFactory.createRequirement(CAPABILITY_NS_JAVA_PACKAGE, importPackageName, versionRange, null, isOptional(importSpec), false));
 		}
 		iu.setRequiredCapabilities(reqsDeps.toArray(new IRequirement[reqsDeps.size()]));
 
@@ -119,7 +119,7 @@ public class Reify {
 		cu.setCapabilities(new IProvidedCapability[] {MetadataFactory.createProvidedCapability(IInstallableUnit.NAMESPACE_IU_ID, configUnitId, configUnitVersion)});
 	
 		// Create a required capability on bundles
-		IRequirement[] reqs = new IRequirement[] {MetadataFactory.createRequiredCapability("org.eclipse.equinox.p2.eclipse.type", "bundle", VersionRange.emptyRange, null, false, true, false)};
+		IRequirement[] reqs = new IRequirement[] {MetadataFactory.createRequirement("org.eclipse.equinox.p2.eclipse.type", "bundle", VersionRange.emptyRange, null, false, true, false)};
 		cu.setHost(reqs);
 		Map<String, String> touchpointData = new HashMap<String, String>();
 	
