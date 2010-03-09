@@ -8,8 +8,6 @@
  ******************************************************************************/
 package org.eclipse.equinox.p2.weblistener;
 
-import org.eclipse.equinox.p2.metadata.Version;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -19,14 +17,16 @@ import javax.servlet.http.*;
 import org.eclipse.core.runtime.*;
 import org.eclipse.equinox.internal.p2.console.ProvisioningHelper;
 import org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper;
-import org.eclipse.equinox.internal.provisional.p2.director.IPlanner;
 import org.eclipse.equinox.internal.provisional.p2.director.ProfileChangeRequest;
+import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.equinox.p2.engine.*;
 import org.eclipse.equinox.p2.internal.weblistener.WebListenerActivator;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.p2.metadata.query.InstallableUnitQuery;
+import org.eclipse.equinox.p2.metadata.Version;
+import org.eclipse.equinox.p2.planner.IPlanner;
 import org.eclipse.equinox.p2.query.IQueryResult;
+import org.eclipse.equinox.p2.query.QueryUtil;
 
 public class InstallServlet extends HttpServlet implements Servlet {
 
@@ -34,14 +34,17 @@ public class InstallServlet extends HttpServlet implements Servlet {
 
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		IProvisioningAgent agent = WebListenerActivator.getDefault().getAgent();
+		if (agent == null)
+			return;
 		String id = req.getParameter("id");
 		String version = req.getParameter("version");
 		String metadataRepo = req.getParameter("metadataRepo");
 		String artifactRepo = req.getParameter("artifactRepo");
 		try {
-			ProvisioningHelper.addMetadataRepository(URIUtil.fromString(metadataRepo));
-			ProvisioningHelper.addArtifactRepository(URIUtil.fromString(artifactRepo));
-			install(id, version, ProvisioningHelper.getProfile(IProfileRegistry.SELF), null);
+			ProvisioningHelper.addMetadataRepository(agent, URIUtil.fromString(metadataRepo));
+			ProvisioningHelper.addArtifactRepository(agent, URIUtil.fromString(artifactRepo));
+			install(id, version, ProvisioningHelper.getProfile(agent, IProfileRegistry.SELF), null);
 		} catch (ProvisionException e) {
 			resp.getWriter().println("alert(\'Problem installing\');");
 		} catch (URISyntaxException e) {
@@ -51,14 +54,17 @@ public class InstallServlet extends HttpServlet implements Servlet {
 	}
 
 	private IStatus install(String unitId, String version, IProfile profile, IProgressMonitor progress) throws ProvisionException {
+		IProvisioningAgent agent = WebListenerActivator.getDefault().getAgent();
+		if (agent == null)
+			return null;
 		if (profile == null)
 			return null;
-		IQueryResult units = ProvisioningHelper.getInstallableUnits((URI) null, new InstallableUnitQuery(unitId, Version.create(version)), progress);
+		IQueryResult units = ProvisioningHelper.getInstallableUnits(agent, (URI) null, QueryUtil.createIUQuery(unitId, Version.create(version)), progress);
 		if (units.isEmpty()) {
 			StringBuffer error = new StringBuffer();
 			error.append("Installable unit not found: " + unitId + ' ' + version + '\n');
 			error.append("Repositories searched:\n");
-			URI[] repos = ProvisioningHelper.getMetadataRepositories();
+			URI[] repos = ProvisioningHelper.getMetadataRepositories(agent);
 			if (repos != null) {
 				for (int i = 0; i < repos.length; i++)
 					error.append(repos[i] + "\n");
@@ -75,7 +81,7 @@ public class InstallServlet extends HttpServlet implements Servlet {
 			throw new ProvisionException("No engine service found.");
 		ProvisioningContext context = new ProvisioningContext();
 		ProfileChangeRequest request = new ProfileChangeRequest(profile);
-		request.addInstallableUnits(units);
+		request.addInstallableUnits((IInstallableUnit[]) units.toArray(IInstallableUnit.class));
 		request.setInstallableUnitProfileProperty((IInstallableUnit) units.iterator().next(), IProfile.PROP_PROFILE_ROOT_IU, "true");
 		IProvisioningPlan result = planner.getProvisioningPlan(request, context, progress);
 		if (!result.getStatus().isOK())
