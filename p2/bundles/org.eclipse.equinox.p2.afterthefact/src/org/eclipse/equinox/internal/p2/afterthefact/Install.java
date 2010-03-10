@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.internal.p2.artifact.repository.simple.SimpleArtifactRepository;
 import org.eclipse.equinox.internal.provisional.p2.director.ProfileChangeRequest;
+import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.equinox.p2.engine.*;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
@@ -38,12 +39,13 @@ public class Install {
 
 	public void doInstall() {
 		//Acquire services that are necessary for the rest of the installation
-		IProfileRegistry registry = (IProfileRegistry) ServiceHelper.getService(Activator.getContext(), IProfileRegistry.class.getName());
 		PlatformAdmin platformAdmin = (PlatformAdmin) ServiceHelper.getService(Activator.getContext(), PlatformAdmin.class.getName());
-		IEngine engine = (IEngine) ServiceHelper.getService(Activator.getContext(), IEngine.class.getName());
-		IPlanner planner = (IPlanner) ServiceHelper.getService(Activator.getContext(), IPlanner.class.getName());
-		IMetadataRepositoryManager repoMgr = (IMetadataRepositoryManager) ServiceHelper.getService(Activator.getContext(), IMetadataRepositoryManager.class.getName());
-		IArtifactRepositoryManager artifactRepoMgr = (IArtifactRepositoryManager) ServiceHelper.getService(Activator.getContext(), IArtifactRepositoryManager.class.getName());
+		IProvisioningAgent agent = (IProvisioningAgent) ServiceHelper.getService(Activator.getContext(), IProvisioningAgent.class.getName());
+		IProfileRegistry registry = (IProfileRegistry) agent.getService(IProfileRegistry.class.getName());
+		IEngine engine = (IEngine) agent.getService(IEngine.class.getName());
+		IPlanner planner = (IPlanner) agent.getService(IPlanner.class.getName());
+		IMetadataRepositoryManager repoMgr = (IMetadataRepositoryManager) agent.getService(IMetadataRepositoryManager.class.getName());
+		IArtifactRepositoryManager artifactRepoMgr = (IArtifactRepositoryManager) agent.getService(IArtifactRepositoryManager.class.getName());
 
 		//Create a bundle pool. This does not have to be done all the time
 		repo = createBundlePool(artifactRepoMgr);
@@ -55,7 +57,7 @@ public class Install {
 		Collection<IInstallableUnit> ius = new Reify().reify(platformAdmin);
 		IProfile profile = null;
 		try {
-			profile = spoofUpProfile(registry, engine, planner, ius);
+			profile = spoofUpProfile(agent, registry, engine, planner, ius);
 		} catch (ProvisionException e) {
 			e.printStackTrace();
 		}
@@ -65,7 +67,7 @@ public class Install {
 		//Create a request to install the IUs and compute a plan to install those
 		ProfileChangeRequest request = new ProfileChangeRequest(profile);
 		request.addAll(iusToInstall);
-		IProvisioningPlan plan = planner.getProvisioningPlan(request, new ProvisioningContext(), null);
+		IProvisioningPlan plan = planner.getProvisioningPlan(request, new ProvisioningContext(agent), null);
 
 		//Execute the plan. This causes the files to be downloaded and the bundles to be installed
 		System.out.println(engine.perform(plan, null));
@@ -91,7 +93,7 @@ public class Install {
 		return result;
 	}
 
-	private IProfile spoofUpProfile(IProfileRegistry registry, IEngine engine, IPlanner planner, Collection<IInstallableUnit> ius) throws ProvisionException {
+	private IProfile spoofUpProfile(IProvisioningAgent agent, IProfileRegistry registry, IEngine engine, IPlanner planner, Collection<IInstallableUnit> ius) throws ProvisionException {
 		Map<String, String> prop = new HashMap<String, String>();
 		// prop.setProperty("org.eclipse.bund, value)
 		// set the bundle pool
@@ -105,7 +107,7 @@ public class Install {
 			IInstallableUnit iu = (IInstallableUnit) iter.next();
 			pcr.setInstallableUnitInclusionRules(iu, ProfileInclusionRules.createOptionalInclusionRule(iu));
 		}
-		IProvisioningPlan plan = planner.getProvisioningPlan(pcr, new ProvisioningContext(), null);
+		IProvisioningPlan plan = planner.getProvisioningPlan(pcr, new ProvisioningContext(agent), null);
 		IPhaseSet phaseSet = PhaseSetFactory.createDefaultPhaseSetExcluding(new String[] {PhaseSetFactory.PHASE_CHECK_TRUST, PhaseSetFactory.PHASE_COLLECT, PhaseSetFactory.PHASE_CONFIGURE, PhaseSetFactory.PHASE_UNCONFIGURE, PhaseSetFactory.PHASE_UNINSTALL});
 		IStatus status = engine.perform(plan, phaseSet, null);
 		if (!status.isOK())
