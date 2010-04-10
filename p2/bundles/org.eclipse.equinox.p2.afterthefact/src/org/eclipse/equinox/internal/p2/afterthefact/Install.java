@@ -19,6 +19,7 @@ import java.util.*;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.internal.p2.artifact.repository.simple.SimpleArtifactRepository;
+import org.eclipse.equinox.internal.p2.director.SimplePlanner;
 import org.eclipse.equinox.internal.provisional.p2.director.ProfileChangeRequest;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.core.ProvisionException;
@@ -100,14 +101,12 @@ public class Install {
 		// create the artifact repository
 		prop.put("org.eclipse.equinox.p2.bundlepool", repo.getLocation().toString());
 		IProfile profile = registry.addProfile("foobar" + System.currentTimeMillis(), prop);
-		ProfileChangeRequest pcr = new ProfileChangeRequest(profile);
-		pcr.setAbsoluteMode(true);
-		pcr.addAll(ius);
-		for (Iterator iter = ius.iterator(); iter.hasNext();) {
+		IProvisioningPlan plan = engine.createPlan(profile, new ProvisioningContext(agent));
+		for (Iterator<IInstallableUnit> iter = ius.iterator(); iter.hasNext();) {
 			IInstallableUnit iu = (IInstallableUnit) iter.next();
-			pcr.setInstallableUnitInclusionRules(iu, ProfileInclusionRules.createOptionalInclusionRule(iu));
+			plan.addInstallableUnit(iu);
+			plan.setInstallableUnitProfileProperty(iu, SimplePlanner.INCLUSION_RULES, ProfileInclusionRules.createOptionalInclusionRule(iu));
 		}
-		IProvisioningPlan plan = planner.getProvisioningPlan(pcr, new ProvisioningContext(agent), null);
 		IPhaseSet phaseSet = PhaseSetFactory.createDefaultPhaseSetExcluding(new String[] {PhaseSetFactory.PHASE_CHECK_TRUST, PhaseSetFactory.PHASE_COLLECT, PhaseSetFactory.PHASE_CONFIGURE, PhaseSetFactory.PHASE_UNCONFIGURE, PhaseSetFactory.PHASE_UNINSTALL});
 		IStatus status = engine.perform(plan, phaseSet, null);
 		if (!status.isOK())
