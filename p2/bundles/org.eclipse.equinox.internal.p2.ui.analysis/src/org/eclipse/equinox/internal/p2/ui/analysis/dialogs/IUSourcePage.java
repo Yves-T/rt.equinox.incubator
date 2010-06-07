@@ -8,17 +8,15 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper;
-import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisActivator;
+import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisHelper;
 import org.eclipse.equinox.internal.p2.ui.analysis.Messages;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.AnalysisTreeViewer;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.TreeElement;
-import org.eclipse.equinox.internal.provisional.p2.core.ProvisionException;
-import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.Collector;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.InstallableUnitQuery;
-import org.eclipse.equinox.internal.provisional.p2.metadata.repository.IMetadataRepository;
-import org.eclipse.equinox.internal.provisional.p2.metadata.repository.IMetadataRepositoryManager;
+import org.eclipse.equinox.p2.core.ProvisionException;
+import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.query.QueryUtil;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -51,15 +49,15 @@ public class IUSourcePage extends AbstractAnalysisPropertyPage {
 
 			protected IStatus run(IProgressMonitor pMonitor) {
 				try {
-					IMetadataRepositoryManager manager = (IMetadataRepositoryManager) ServiceHelper.getService(AnalysisActivator.getDefault().getContext(), IMetadataRepositoryManager.class.getName());
+					IMetadataRepositoryManager manager = AnalysisHelper.getMetadataRepositoryManager();
 					URI[] addresses = manager.getKnownRepositories(IMetadataRepositoryManager.REPOSITORIES_NON_SYSTEM);
 					SubMonitor monitor = SubMonitor.convert(pMonitor, addresses.length);
-					final ArrayList sources = new ArrayList(addresses.length);
+					final ArrayList<IMetadataRepository> sources = new ArrayList<IMetadataRepository>(addresses.length);
 					for (int i = 0; i < addresses.length; i++) {
 						IMetadataRepository repo;
 						try {
 							repo = manager.loadRepository(addresses[i], monitor);
-							if (!repo.query(new InstallableUnitQuery(iu.getId(), iu.getVersion()), new Collector(), monitor).isEmpty())
+							if (!repo.query(QueryUtil.createIUQuery(getIU().getId(), getIU().getVersion()), monitor.newChild(1)).toSet().isEmpty())
 								sources.add(repo);
 						} catch (ProvisionException e) {
 							// Should be logged?
@@ -69,7 +67,7 @@ public class IUSourcePage extends AbstractAnalysisPropertyPage {
 					sourceRoot.clear();
 					if (sources.isEmpty())
 						sourceRoot.addChild(new TreeElement(Messages.IUAnalysisPage_NoSources));
-					Iterator iter = sources.iterator();
+					Iterator<IMetadataRepository> iter = sources.iterator();
 					while (iter.hasNext())
 						sourceRoot.addChild(iter.next());
 

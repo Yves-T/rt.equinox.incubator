@@ -1,9 +1,6 @@
 package org.eclipse.equinox.internal.p2.ui.analysis.wizard;
 
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -14,21 +11,21 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper;
 import org.eclipse.equinox.internal.p2.director.DirectorActivator;
+import org.eclipse.equinox.internal.p2.engine.InstallableUnitOperand;
+import org.eclipse.equinox.internal.p2.engine.InstallableUnitPropertyOperand;
+import org.eclipse.equinox.internal.p2.engine.Operand;
+import org.eclipse.equinox.internal.p2.engine.ProvisioningPlan;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisActivator;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisHelper;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfile;
-import org.eclipse.equinox.internal.provisional.p2.director.IPlanner;
 import org.eclipse.equinox.internal.provisional.p2.director.ProfileChangeRequest;
-import org.eclipse.equinox.internal.provisional.p2.director.ProvisioningPlan;
-import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
-import org.eclipse.equinox.internal.provisional.p2.engine.InstallableUnitOperand;
-import org.eclipse.equinox.internal.provisional.p2.engine.InstallableUnitPropertyOperand;
-import org.eclipse.equinox.internal.provisional.p2.engine.Operand;
-import org.eclipse.equinox.internal.provisional.p2.engine.ProvisioningContext;
-import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.internal.provisional.p2.metadata.IRequiredCapability;
-import org.eclipse.equinox.internal.provisional.p2.metadata.repository.IMetadataRepositoryManager;
-import org.eclipse.equinox.internal.provisional.p2.repository.IRepositoryManager;
+import org.eclipse.equinox.p2.engine.IProfile;
+import org.eclipse.equinox.p2.engine.ProvisioningContext;
+import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.metadata.IRequirement;
+import org.eclipse.equinox.p2.planner.IPlanner;
+import org.eclipse.equinox.p2.repository.IRepositoryManager;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -39,7 +36,7 @@ public class RepairProfileWizard extends Wizard {
 	MissingRequirementWizardPage p1;
 	IUWizardPage p2;
 
-	public RepairProfileWizard(IProfile profile, IRequiredCapability[] req, IInstallableUnit[] newIUs) {
+	public RepairProfileWizard(IProfile profile, IRequirement[] req, IInstallableUnit[] newIUs) {
 		super();
 		this.profile = profile;
 	}
@@ -70,13 +67,13 @@ public class RepairProfileWizard extends Wizard {
 
 		IPlanner planner = (IPlanner) ServiceHelper.getService(DirectorActivator.context, IPlanner.class.getName());
 
-		ProvisioningPlan plan = planner.getProvisioningPlan(request, getProvisioningContext(), new NullProgressMonitor());
+		ProvisioningPlan plan = (ProvisioningPlan) planner.getProvisioningPlan(request, getProvisioningContext(), new NullProgressMonitor());
 		if (plan.getStatus().isOK() && profile instanceof ForeignProfile) {
 			ForeignProfile profile = (ForeignProfile) this.profile;
 			Operand[] o = plan.getOperands();
-			Map side = plan.getSideEffectChanges();
-			List iusToAdd = new ArrayList(o.length + side.size());
-			List iusToRemove = new ArrayList();
+			//			Map side = plan.getSideEffectChanges();
+			List<IInstallableUnit> iusToAdd = new ArrayList<IInstallableUnit>(o.length);
+			List<IInstallableUnit> iusToRemove = new ArrayList<IInstallableUnit>();
 			for (int i = 0; i < o.length; i++) {
 				if (o[i] instanceof InstallableUnitOperand) {
 					InstallableUnitOperand operand = (InstallableUnitOperand) o[i];
@@ -96,11 +93,12 @@ public class RepairProfileWizard extends Wizard {
 						profile.setInstallableUnitProperty(operand.getInstallableUnit(), operand.getKey(), (String) operand.second());
 				}
 			}
-			Iterator keys = side.keySet().iterator();
-			while (keys.hasNext()) {
-				Object key = keys.next();
-				side.get(key);
-			}
+			// TODO This doesn't seem to do anything?
+			//			Iterator keys = side.keySet().iterator();
+			//			while (keys.hasNext()) {
+			//				Object key = keys.next();
+			//				side.get(key);
+			//			}
 			return profile.saveProfile();
 		}
 		return false;
@@ -108,7 +106,8 @@ public class RepairProfileWizard extends Wizard {
 
 	private ProvisioningContext getProvisioningContext() {
 		IMetadataRepositoryManager mgr = (IMetadataRepositoryManager) ServiceHelper.getService(AnalysisActivator.getDefault().getContext(), IMetadataRepositoryManager.class.getName());
-		ProvisioningContext context = new ProvisioningContext(mgr.getKnownRepositories(IRepositoryManager.REPOSITORIES_NON_SYSTEM));
+		ProvisioningContext context = new ProvisioningContext(mgr.getAgent());
+		context.setMetadataRepositories(mgr.getKnownRepositories(IRepositoryManager.REPOSITORIES_NON_SYSTEM));
 		return context;
 	}
 
@@ -117,13 +116,13 @@ public class RepairProfileWizard extends Wizard {
 			protected IStatus run(IProgressMonitor monitor) {
 				SubMonitor sub = SubMonitor.convert(monitor, 3);
 				try {
-					Dictionary properties = new Hashtable(profile.getProperties());
+					Map<String, String> properties = profile.getProperties();
 
 					sub.beginTask("Determining profile roots", 1);
 					final IInstallableUnit[] profileRoots = AnalysisHelper.getProfileRoots(profile, sub.newChild(1));
 
 					sub.beginTask("Calculating missing requirements", 1);
-					final IRequiredCapability[] req = AnalysisHelper.getMissingRequirements(profileRoots, profile, properties, sub.newChild(1));
+					final IRequirement[] req = AnalysisHelper.getMissingRequirements(profileRoots, profile, properties, sub.newChild(1));
 
 					sub.beginTask("Satisfying requirements", 1);
 					final IInstallableUnit[] newIUs = AnalysisHelper.satisfyRequirements(req, properties, sub.newChild(1));

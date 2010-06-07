@@ -1,14 +1,14 @@
 package org.eclipse.equinox.internal.p2.ui.analysis.model;
 
-
+import org.eclipse.equinox.internal.p2.ui.ProvUIImages;
+import org.eclipse.equinox.internal.p2.ui.QueryProvider;
 import org.eclipse.equinox.internal.p2.ui.model.RemoteQueriedElement;
-import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.IQueryable;
-import org.eclipse.equinox.internal.provisional.p2.ui.ProvUIImages;
-import org.eclipse.equinox.internal.provisional.p2.ui.policy.QueryProvider;
+import org.eclipse.equinox.p2.engine.IProfile;
+import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.query.IQueryable;
 
 /*
- * Based on org.eclipse.equinox.internal.provisional.p2.ui.model.ProfileElement
+ * Based on org.eclipse.equinox.p2.ui.model.ProfileElement
  */
 public class ForeignProfileElement extends RemoteQueriedElement {
 	private ForeignProfile profile;
@@ -32,7 +32,7 @@ public class ForeignProfileElement extends RemoteQueriedElement {
 		return QueryProvider.INSTALLED_IUS;
 	}
 
-	public IQueryable getQueryable() {
+	public IQueryable<IInstallableUnit> getQueryable() {
 		return profile;
 	}
 

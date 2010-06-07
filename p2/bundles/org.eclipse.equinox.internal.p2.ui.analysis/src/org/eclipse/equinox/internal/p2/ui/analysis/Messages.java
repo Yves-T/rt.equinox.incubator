@@ -5,6 +5,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.equinox.internal.p2.ui.analysis.messages"; //$NON-NLS-1$
 
+	public static String Planner_Unsatisfied_dependency;
+
 	public static String Parser_Has_Incompatible_Version;
 	public static String Parser_Error_Parsing_Registry;
 
@@ -36,6 +38,10 @@ public class Messages extends NLS {
 
 	public static String ProfilesView2_AddProfileText;
 	public static String ProfilesView2_AddProfileToolTip;
+
+	public static String Explanation_missingRootFilter;
+
+	public static String Planner_Problems_resolving_plan;
 
 	static {
 		// initialize resource bundle

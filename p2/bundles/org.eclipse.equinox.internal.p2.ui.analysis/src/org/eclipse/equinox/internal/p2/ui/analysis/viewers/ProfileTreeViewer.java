@@ -1,8 +1,8 @@
 package org.eclipse.equinox.internal.p2.ui.analysis.viewers;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -11,10 +11,9 @@ import org.eclipse.equinox.internal.p2.director.QueryableArray;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisActivator;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisHelper;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.IUElement;
-import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
-import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.Collector;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.IQueryable;
+import org.eclipse.equinox.p2.engine.IProfile;
+import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.query.IQueryable;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -81,14 +80,14 @@ public class ProfileTreeViewer {
 	private void initialize() {
 		Job job = new Job("Verifying Profile") {
 			protected IStatus run(IProgressMonitor monitor) {
-				Collector collector = new Collector();
-				IStatus status = AnalysisHelper.checkValidity(profile, iusToRemove, collector, monitor);
+				Collection<IInstallableUnit> collection = new ArrayList<IInstallableUnit>();
+				IStatus status = AnalysisHelper.checkValidity(profile, iusToRemove, collection, monitor);
 
 				if (status.isOK() || status.matches(IStatus.CANCEL)) {
 					setToDefault();
 					return status;
 				}
-				brokenIUs = collector.toCollection();
+				brokenIUs = collection;
 				populateList();
 				setToList();
 				populateTree(monitor);
@@ -103,7 +102,7 @@ public class ProfileTreeViewer {
 			private void populateTree(IProgressMonitor monitor) {
 				IInstallableUnit[] roots = AnalysisHelper.getProfileRoots(profile, monitor);
 				profileView = new TreeElement();
-				Dictionary properties = new Hashtable(profile.getProperties());
+				Map<String, String> properties = profile.getProperties();
 				IQueryable queryable = new QueryableArray(AnalysisHelper.subtract(profile, iusToRemove));
 
 				for (int i = 0; i < roots.length; i++) {

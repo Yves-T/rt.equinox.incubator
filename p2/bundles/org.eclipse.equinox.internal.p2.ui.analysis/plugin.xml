@@ -16,7 +16,7 @@
 	            class="org.eclipse.equinox.internal.p2.ui.analysis.dialogs.IURequiredByPage"
 	            id="org.eclipse.equinox.p2.ui.analysis.IURequiredByPage">
 	            <enabledWhen>
-	            <adapt type="org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit">
+	            <adapt type="org.eclipse.equinox.p2.metadata.IInstallableUnit">
 	             </adapt>
 	          </enabledWhen>
 	      </page>
@@ -24,7 +24,7 @@
 	            class="org.eclipse.equinox.internal.p2.ui.analysis.dialogs.IUSourcePage"
 	            id="org.eclipse.equinox.p2.ui.analysis.IUSourcePage">
 	            <enabledWhen>
-	            <adapt type="org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit">
+	            <adapt type="org.eclipse.equinox.p2.metadata.IInstallableUnit">
 	             </adapt>
 	          </enabledWhen>
 	      </page>
@@ -32,7 +32,7 @@
 	            class="org.eclipse.equinox.internal.p2.ui.analysis.dialogs.IURequirementPage"
 	            id="org.eclipse.equinox.p2.ui.analysis.IURequirementPage">
 	            <enabledWhen>
-	            <adapt type="org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit">
+	            <adapt type="org.eclipse.equinox.p2.metadata.IInstallableUnit">
 	             </adapt>
 	          </enabledWhen>
 	      </page>
@@ -40,7 +40,7 @@
 	            class="org.eclipse.equinox.internal.p2.ui.analysis.dialogs.IUComparisonPage"
 	            id="org.eclipse.equinox.p2.ui.analysis.IUComparisonPage">
 	            <enabledWhen>
-	            <adapt type="org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit">
+	            <adapt type="org.eclipse.equinox.p2.metadata.IInstallableUnit">
 	             </adapt>
 	          </enabledWhen>
 	      </page>
@@ -48,7 +48,7 @@
 	            class="org.eclipse.equinox.internal.p2.ui.analysis.dialogs.ProfileInstallabilityPage"
 	            id="org.eclipse.equinox.p2.ui.analysis.ProfileInstallabilityPropertyPage">
 	            <enabledWhen>
-	            <adapt type="org.eclipse.equinox.internal.provisional.p2.engine.IProfile">
+	            <adapt type="org.eclipse.equinox.p2.engine.IProfile">
 	             </adapt>
 	          </enabledWhen>
 	      </page>
@@ -56,7 +56,7 @@
 	            class="org.eclipse.equinox.internal.p2.ui.analysis.dialogs.ProfileValidityPage"
 	            id="org.eclipse.equinox.p2.ui.analysis.ProfileValidityPage">
 	            <enabledWhen>
-	            <adapt type="org.eclipse.equinox.internal.provisional.p2.engine.IProfile">
+	            <adapt type="org.eclipse.equinox.p2.engine.IProfile">
 	             </adapt>
 	          </enabledWhen>
 	      </page>

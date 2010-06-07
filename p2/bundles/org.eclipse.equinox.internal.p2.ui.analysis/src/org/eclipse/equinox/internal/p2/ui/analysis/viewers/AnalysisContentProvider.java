@@ -2,7 +2,7 @@ package org.eclipse.equinox.internal.p2.ui.analysis.viewers;
 
 import java.util.Collection;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.equinox.internal.provisional.p2.ui.viewers.ProvElementContentProvider;
+import org.eclipse.equinox.internal.p2.ui.viewers.ProvElementContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 
 public class AnalysisContentProvider extends ProvElementContentProvider {

@@ -5,10 +5,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisHelper;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.AnalysisTreeViewer;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.TreeElement;
-import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.Collector;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.InstallableUnitQuery;
-import org.eclipse.equinox.internal.provisional.p2.metadata.repository.IMetadataRepository;
+import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.query.IQueryResult;
+import org.eclipse.equinox.p2.query.QueryUtil;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -29,18 +29,20 @@ public class IUComparisonPage extends AbstractAnalysisPropertyPage {
 	private void initialize() {
 		TreeElement root = new TreeElement();
 		IMetadataRepository repo = AnalysisHelper.getMetadataRepository();
-		Collector ius = repo.query(new InstallableUnitQuery(getIU().getId(), getIU().getVersion()), new Collector(), new NullProgressMonitor());
+		IQueryResult<IInstallableUnit> ius = repo.query(QueryUtil.createIUQuery(getIU().getId(), getIU().getVersion()), new NullProgressMonitor());
 
-		Iterator iter = ius.iterator();
+		int iuCount = 0;
+		Iterator<IInstallableUnit> iter = ius.iterator();
 		while (iter.hasNext()) {
-			IInstallableUnit iu = (IInstallableUnit) iter.next();
+			IInstallableUnit iu = iter.next();
 			TreeElement child = AnalysisHelper.diff(getIU(), iu);
 			if (child != null)
 				root.addChild(child);
+			iuCount++;
 		}
 		if (root.getChildren().length == 0)
 			root.addChild("No differences found between profile and source installable unit(s)");
-		else if (ius.size() == 0)
+		else if (iuCount == 0)
 			root.addChild("No source for IU lcoated");
 
 		tree.setInput(root);

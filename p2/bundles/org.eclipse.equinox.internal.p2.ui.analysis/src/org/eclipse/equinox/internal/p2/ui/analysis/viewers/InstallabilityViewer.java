@@ -3,7 +3,6 @@ package org.eclipse.equinox.internal.p2.ui.analysis.viewers;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -11,26 +10,26 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.equinox.internal.p2.artifact.repository.CompositeArtifactRepository;
-import org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper;
 import org.eclipse.equinox.internal.p2.director.Slicer;
 import org.eclipse.equinox.internal.p2.metadata.repository.CompositeMetadataRepository;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisActivator;
+import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisHelper;
 import org.eclipse.equinox.internal.p2.ui.analysis.Messages;
 import org.eclipse.equinox.internal.p2.ui.analysis.query.MissingQuery;
-import org.eclipse.equinox.internal.provisional.p2.artifact.repository.IArtifactRepository;
-import org.eclipse.equinox.internal.provisional.p2.artifact.repository.IArtifactRepositoryManager;
-import org.eclipse.equinox.internal.provisional.p2.core.ProvisionException;
-import org.eclipse.equinox.internal.provisional.p2.metadata.IArtifactKey;
-import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.Collector;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.IQueryable;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.InstallableUnitQuery;
-import org.eclipse.equinox.internal.provisional.p2.metadata.repository.IMetadataRepository;
-import org.eclipse.equinox.internal.provisional.p2.metadata.repository.IMetadataRepositoryManager;
-import org.eclipse.equinox.internal.provisional.p2.repository.IRepositoryManager;
+import org.eclipse.equinox.p2.core.ProvisionException;
+import org.eclipse.equinox.p2.metadata.IArtifactKey;
+import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.query.IQueryable;
+import org.eclipse.equinox.p2.query.QueryUtil;
+import org.eclipse.equinox.p2.repository.IRepositoryManager;
+import org.eclipse.equinox.p2.repository.artifact.IArtifactRepository;
+import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -51,10 +50,10 @@ public class InstallabilityViewer {
 	private GridData gdList, gdFull;
 	private Display display;
 	private IInstallableUnit[] ius;
-	private Dictionary properties;
-	private IQueryable queryable;
+	private Map<String, String> properties;
+	private IQueryable<IInstallableUnit> queryable;
 
-	public InstallabilityViewer(Composite parent, IQueryable queryable, IInstallableUnit[] ius, Dictionary properties) {
+	public InstallabilityViewer(Composite parent, IQueryable<IInstallableUnit> queryable, IInstallableUnit[] ius, Map<String, String> properties) {
 		this.ius = ius;
 		this.display = parent.getDisplay();
 		this.properties = properties;
@@ -114,12 +113,10 @@ public class InstallabilityViewer {
 
 		Job job = new Job("Determining Profile Installability") {
 			protected IStatus run(IProgressMonitor monitor) {
-				SubProgressMonitor subMon = new SubProgressMonitor(monitor, 15);
+				SubMonitor subMon = SubMonitor.convert(monitor, "Determining Profile Installability", 15);
 				try {
-					subMon.beginTask("Determining Profile Installability", 15);
-
 					Slicer slicer = new Slicer(queryable, properties, true);
-					Collection iuCollection = slicer.slice(ius, new SubProgressMonitor(subMon, 10)).query(InstallableUnitQuery.ANY, new Collector(), new SubProgressMonitor(subMon, 1)).toCollection();
+					Collection<IInstallableUnit> iuCollection = slicer.slice(ius, subMon.newChild(10)).query(QueryUtil.ALL_UNITS, subMon.newChild(1)).toSet();
 					subMon.worked(1);
 					if (subMon.isCanceled())
 						return Status.CANCEL_STATUS;
@@ -147,8 +144,8 @@ public class InstallabilityViewer {
 		job.schedule();
 	}
 
-	private TreeElement getMissingArtifacts(Collection iuCollection, Object[] repositories, IProgressMonitor monitor) {
-		CompositeArtifactRepository repo = CompositeArtifactRepository.createMemoryComposite();
+	private TreeElement getMissingArtifacts(Collection<IInstallableUnit> iuCollection, Object[] repositories, IProgressMonitor monitor) {
+		CompositeArtifactRepository repo = CompositeArtifactRepository.createMemoryComposite(AnalysisActivator.getDefault().getAgent());
 
 		for (int i = 0; i < repositories.length; i++)
 			repo.addChild(((IArtifactRepository) repositories[i]).getLocation());
@@ -158,11 +155,9 @@ public class InstallabilityViewer {
 		Iterator iuIterator = iuCollection.iterator();
 		while (iuIterator.hasNext()) {
 			IInstallableUnit iu = (IInstallableUnit) iuIterator.next();
-			IArtifactKey[] artifactKeys = iu.getArtifacts();
-			for (int i = 0; i < artifactKeys.length; i++) {
-				if (!repo.contains(artifactKeys[i]))
-					content.addChild(artifactKeys[i]);
-			}
+			for (IArtifactKey key : iu.getArtifacts())
+				if (!repo.contains(key))
+					content.addChild(key);
 		}
 
 		if (!content.hasChildren())
@@ -172,9 +167,9 @@ public class InstallabilityViewer {
 		return content;
 	}
 
-	private TreeElement getMissingIUs(Collection iuCollection, Object[] repositories, IProgressMonitor monitor) {
+	private TreeElement getMissingIUs(Collection<IInstallableUnit> iuCollection, Object[] repositories, IProgressMonitor monitor) {
 		TreeElement content = new TreeElement();
-		CompositeMetadataRepository repo = CompositeMetadataRepository.createMemoryComposite();
+		CompositeMetadataRepository repo = CompositeMetadataRepository.createMemoryComposite(AnalysisActivator.getDefault().getAgent());
 
 		for (int i = 0; i < repositories.length; i++)
 			repo.addChild(((IMetadataRepository) repositories[i]).getLocation());
@@ -234,13 +229,14 @@ public class InstallabilityViewer {
 			});
 	}
 
-	private Collection containsIUs(IMetadataRepository repo, Collection ius, IProgressMonitor monitor) {
-		Map missingIUs = new HashMap(ius.size());
-		Iterator iter = ius.iterator();
+	private Collection<IInstallableUnit> containsIUs(IMetadataRepository repo, Collection<IInstallableUnit> ius, IProgressMonitor monitor) {
+		Map<IInstallableUnit, Boolean> missingIUs = new HashMap<IInstallableUnit, Boolean>(ius.size());
+		Iterator<IInstallableUnit> iter = ius.iterator();
 		while (iter.hasNext())
 			missingIUs.put(iter.next(), Boolean.TRUE);
 		MissingQuery query = new MissingQuery(missingIUs);
-		repo.query(query, new Collector(), monitor);
+
+		repo.query(query, monitor);
 
 		return query.getMissingIUs();
 	}
@@ -251,10 +247,10 @@ public class InstallabilityViewer {
 				metadataRoot.addChild(new TreeElement("Loading Repositories"));
 				refreshTree(availableMetadataRepositories);
 
-				IMetadataRepositoryManager manager = (IMetadataRepositoryManager) ServiceHelper.getService(AnalysisActivator.getDefault().getContext(), IMetadataRepositoryManager.class.getName());
+				IMetadataRepositoryManager manager = AnalysisHelper.getMetadataRepositoryManager();
 				URI[] addresses = manager.getKnownRepositories(IRepositoryManager.REPOSITORIES_NON_SYSTEM);
 
-				ArrayList repoList = new ArrayList();
+				ArrayList<IMetadataRepository> repoList = new ArrayList<IMetadataRepository>();
 				for (int i = 0; i < addresses.length; i++) {
 					try {
 						repoList.add(manager.loadRepository(addresses[i], monitor));
@@ -279,10 +275,10 @@ public class InstallabilityViewer {
 				artifactRoot.addChild(new TreeElement("Loading Repositories"));
 				refreshTree(availableArtifactRepositories);
 
-				IArtifactRepositoryManager aManager = (IArtifactRepositoryManager) ServiceHelper.getService(AnalysisActivator.getDefault().getContext(), IArtifactRepositoryManager.class.getName());
+				IArtifactRepositoryManager aManager = AnalysisHelper.getArtifactRepositoryManager();
 				URI[] addresses = aManager.getKnownRepositories(IRepositoryManager.REPOSITORIES_NON_SYSTEM);
 
-				ArrayList repoList = new ArrayList();
+				ArrayList<IArtifactRepository> repoList = new ArrayList<IArtifactRepository>();
 				for (int i = 0; i < addresses.length; i++) {
 					try {
 						repoList.add(aManager.loadRepository(addresses[i], monitor));

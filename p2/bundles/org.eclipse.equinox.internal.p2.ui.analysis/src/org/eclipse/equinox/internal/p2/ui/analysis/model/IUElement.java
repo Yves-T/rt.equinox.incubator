@@ -4,65 +4,66 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.internal.p2.director.Slicer;
-import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisActivator;
+import org.eclipse.equinox.internal.p2.metadata.IRequiredCapability;
+import org.eclipse.equinox.internal.p2.metadata.InstallableUnit;
 import org.eclipse.equinox.internal.p2.ui.analysis.query.MissingRequirementQuery;
 import org.eclipse.equinox.internal.p2.ui.model.IIUElement;
 import org.eclipse.equinox.internal.p2.ui.model.ProvElement;
-import org.eclipse.equinox.internal.p2.ui.query.AnyRequiredCapabilityQuery;
-import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
-import org.eclipse.equinox.internal.provisional.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.internal.provisional.p2.metadata.IRequiredCapability;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.Collector;
-import org.eclipse.equinox.internal.provisional.p2.metadata.query.IQueryable;
-import org.osgi.framework.InvalidSyntaxException;
+import org.eclipse.equinox.p2.engine.IProfile;
+import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.metadata.IRequirement;
+import org.eclipse.equinox.p2.query.IQuery;
+import org.eclipse.equinox.p2.query.IQueryResult;
+import org.eclipse.equinox.p2.query.IQueryable;
+import org.eclipse.equinox.p2.query.QueryUtil;
 
 public class IUElement extends ProvElement implements IIUElement {
 	private IInstallableUnit iu;
-	private IQueryable queryable;
+	private IQueryable<IInstallableUnit> queryable;
 	private IProfile profile;
-	private Dictionary properties;
+	private Map<String, String> properties;
 	private boolean artifactChildren, iuChildren;
 	private IStatus mark;
 
-	public IUElement(Object parent, IQueryable queryable, IProfile profile, Dictionary properties, IInstallableUnit iu, boolean artifactChildren, boolean iuChildren) {
+	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, IProfile profile, Map<String, String> properties, IInstallableUnit iu, boolean artifactChildren, boolean iuChildren) {
 		super(parent);
 		this.iu = iu;
 		this.artifactChildren = artifactChildren;
 		this.iuChildren = iuChildren;
 		this.queryable = queryable;
-		this.properties = properties;
+		this.properties = profile.getProperties();
 		this.profile = profile;
 	}
 
 	public Object[] getChildren(Object o) {
 		Object[] children = new Object[0];
 		Object[] keys = new Object[0];
-		Collection reqs = null;
-		Collection ius = null;
+		Collection<IRequirement> reqs = null;
+		Collection<IUElement> ius = null;
 
 		if (iuChildren) {
 			ius = getIUChildren();
 		}
 		reqs = getRequirementChildren(ius != null ? ius : new ArrayList());
 		if (artifactChildren)
-			keys = iu.getArtifacts();
+			keys = ((InstallableUnit) iu).getArtifacts().toArray();
 
 		children = new Object[(ius != null ? ius.size() : 0) + reqs.size() + keys.length];
 		int i = 0;
 
 		if (ius != null) {
-			Iterator iter = ius.iterator();
+			Iterator<IUElement> iter = ius.iterator();
 			while (iter.hasNext())
 				children[i++] = iter.next();
 		}
-		Iterator iter = reqs.iterator();
+		Iterator<IRequirement> iter = reqs.iterator();
 		while (iter.hasNext())
 			children[i++] = new RequirementElement(this, (IRequiredCapability) iter.next());
 
@@ -83,37 +84,41 @@ public class IUElement extends ProvElement implements IIUElement {
 		return children;
 	}
 
-	public Collection getIUChildren() {
-		List ius = null;
+	public Collection<IUElement> getIUChildren() {
+		List<IUElement> ius = null;
 
 		if (iuChildren) {
-			Collector ius2 = queryable.query(new AnyRequiredCapabilityQuery(iu.getRequiredCapabilities()), new Collector(), new NullProgressMonitor());
-			ius = new ArrayList(ius2.size());
+			Collection<IRequirement> requirements = iu.getRequirements();
+			List<IQuery<IInstallableUnit>> queries = new ArrayList<IQuery<IInstallableUnit>>();
+			for (IRequirement req : requirements)
+				queries.add(QueryUtil.createMatchQuery(req.getMatches(), new Object[0]));
 
-			Iterator iter = ius2.iterator();
+			IQueryResult<IInstallableUnit> ius2 = queryable.query(QueryUtil.createCompoundQuery(queries, false), new NullProgressMonitor());
+
+			ius = new ArrayList<IUElement>();
+
+			Iterator<IInstallableUnit> iter = ius2.iterator();
 			while (iter.hasNext())
 				ius.add(new IUElement(this, queryable, profile, properties, (IInstallableUnit) iter.next(), artifactChildren, iuChildren));
 		}
 		return ius;
 	}
 
-	public Collection getRequirementChildren(Collection iuChildren) {
-		ArrayList children = new ArrayList();
+	public Collection<IRequirement> getRequirementChildren(Collection iuChildren) {
+		List<IRequirement> children = new ArrayList<IRequirement>();
 		if (isMarked()) {
 			// find missing requirements
-			MissingRequirementQuery query = new MissingRequirementQuery(iu.getRequiredCapabilities(), properties, false);
-			queryable.query(query, new Collector(), new NullProgressMonitor());
-			IRequiredCapability[] req = query.getMissing();
+			MissingRequirementQuery query = new MissingRequirementQuery(iu.getRequirements(), properties, false);
+			queryable.query(query, new NullProgressMonitor());
+			IRequirement[] req = query.getMissing();
 
-			children.ensureCapacity(req.length);
 			for (int i = 0; i < req.length; i++) {
-				try {
-					if (req[i].getFilter() == null || AnalysisActivator.getDefault().getContext().createFilter(req[i].getFilter()).match(properties))
-						children.add(req[i]);
-				} catch (InvalidSyntaxException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				// TODO: What was the filter doing?
+				//	try {
+				//		if (req[i].getFilter() == null || AnalysisActivator.getDefault().getContext().createFilter(req[i].getFilter()).match(properties))
+				children.add(req[i]);
+				//	} catch (InvalidSyntaxException e) {
+				//	}
 			}
 		}
 		return children;
@@ -135,8 +140,8 @@ public class IUElement extends ProvElement implements IIUElement {
 		return iu;
 	}
 
-	public IRequiredCapability[] getRequirements() {
-		return iu.getRequiredCapabilities();
+	public Collection<IRequirement> getRequirements() {
+		return iu.getRequirements();
 	}
 
 	public long getSize() {

@@ -2,15 +2,16 @@ package org.eclipse.equinox.internal.p2.ui.analysis;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.equinox.internal.p2.ui.ProvUI;
+import org.eclipse.equinox.internal.p2.ui.ProvUIImages;
 import org.eclipse.equinox.internal.p2.ui.admin.ProfilesView;
 import org.eclipse.equinox.internal.p2.ui.admin.ProvAdminUIMessages;
 import org.eclipse.equinox.internal.p2.ui.analysis.dialogs.AddForeignProfileDialog;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfileElement;
 import org.eclipse.equinox.internal.p2.ui.analysis.wizard.RepairProfileWizard;
-import org.eclipse.equinox.internal.provisional.p2.engine.IProfile;
-import org.eclipse.equinox.internal.provisional.p2.ui.ProvUI;
-import org.eclipse.equinox.internal.provisional.p2.ui.ProvUIImages;
-import org.eclipse.equinox.internal.provisional.p2.ui.model.Profiles;
+import org.eclipse.equinox.internal.p2.ui.model.Profiles;
+import org.eclipse.equinox.p2.engine.IProfile;
+import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -40,7 +41,7 @@ public class ForeignProfilesView extends ProfilesView {
 
 		public void run() {
 			Object[] selections = getSelection().toArray();
-			List profilesOnly = new ArrayList();
+			List<String> profilesOnly = new ArrayList<String>();
 			for (int i = 0; i < selections.length; i++) {
 				if (selections[i] instanceof ForeignProfileElement)
 					profilesOnly.add(((ForeignProfileElement) selections[i]).getProfileId());
@@ -59,7 +60,7 @@ public class ForeignProfilesView extends ProfilesView {
 
 		public void run() {
 			Object[] selections = getSelection().toArray();
-			List profilesOnly = new ArrayList();
+			List<String> profilesOnly = new ArrayList<String>();
 			for (int i = 0; i < selections.length; i++) {
 				if (selections[i] instanceof ForeignProfileElement)
 					profilesOnly.add(((ForeignProfileElement) selections[i]).getProfileId());
@@ -79,7 +80,7 @@ public class ForeignProfilesView extends ProfilesView {
 	}
 
 	protected Object getInput() {
-		return new Profiles(AnalysisActivator.getDefault().getPolicy());
+		return new Profiles(ProvisioningUI.getDefaultUI());
 	}
 
 	protected void fillContextMenu(IMenuManager manager) {

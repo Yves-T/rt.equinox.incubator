@@ -1,8 +1,10 @@
 package org.eclipse.equinox.internal.p2.ui.analysis;
 
+import org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper;
+import org.eclipse.equinox.internal.p2.ui.ProvUI;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfiles;
-import org.eclipse.equinox.internal.provisional.p2.ui.policy.IUViewQueryContext;
-import org.eclipse.equinox.internal.provisional.p2.ui.policy.Policy;
+import org.eclipse.equinox.p2.core.IProvisioningAgent;
+import org.eclipse.equinox.p2.ui.Policy;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -11,8 +13,10 @@ public class AnalysisActivator extends AbstractUIPlugin {
 	private static AnalysisActivator plugin;
 	public static final String PLUGIN_ID = "org.eclipse.equinox.p2.ui.stuff"; //$NON-NLS-1$
 
-	Policy policy;
-	ForeignProfiles knownProfiles;
+	private Policy policy;
+	private IProvisioningAgent agent;
+	private ForeignProfiles knownProfiles;
+	private AnalysisQueryProvider provider;
 
 	public static AnalysisActivator getDefault() {
 		return plugin;
@@ -24,6 +28,10 @@ public class AnalysisActivator extends AbstractUIPlugin {
 		return policy;
 	}
 
+	public IProvisioningAgent getAgent() {
+		return agent;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -33,23 +41,28 @@ public class AnalysisActivator extends AbstractUIPlugin {
 		super.start(bundleContext);
 		plugin = this;
 		AnalysisActivator.context = bundleContext;
-		initializePolicy();
 		knownProfiles = new ForeignProfiles();
+		agent = (IProvisioningAgent) ServiceHelper.getService(context, IProvisioningAgent.SERVICE_NAME);
+
+		initializePolicy();
 	}
 
 	void initializePolicy() {
 		policy = new Policy();
-		policy.setQueryProvider(new AnalysisQueryProvider(policy));
+		provider = new AnalysisQueryProvider(policy);
+		ProvUI.setQueryProvider(provider);
 
-		IUViewQueryContext queryContext = new IUViewQueryContext(IUViewQueryContext.AVAILABLE_VIEW_BY_REPO);
-		policy.setQueryContext(queryContext);
-
+		// TODO find equivalent
+		//IUViewQueryContext queryContext = new IUViewQueryContext(IUViewQueryContext.AVAILABLE_VIEW_BY_REPO);
+		//policy.setQueryContext(queryContext);
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {
 		plugin = null;
 		super.stop(bundleContext);
 		policy = null;
+		provider = null;
+		agent = null;
 	}
 
 	public ForeignProfiles getKnownProfiles() {
@@ -58,5 +71,9 @@ public class AnalysisActivator extends AbstractUIPlugin {
 
 	public BundleContext getContext() {
 		return context;
+	}
+
+	public void setQueryContext() {
+		ProvUI.setQueryProvider(provider);
 	}
 }
