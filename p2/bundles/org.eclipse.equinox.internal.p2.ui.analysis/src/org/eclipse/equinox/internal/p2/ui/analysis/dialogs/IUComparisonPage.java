@@ -27,7 +27,7 @@ public class IUComparisonPage extends AbstractAnalysisPropertyPage {
 	}
 
 	private void initialize() {
-		TreeElement root = new TreeElement();
+		TreeElement<Object> root = new TreeElement<Object>();
 		IMetadataRepository repo = AnalysisHelper.getMetadataRepository();
 		IQueryResult<IInstallableUnit> ius = repo.query(QueryUtil.createIUQuery(getIU().getId(), getIU().getVersion()), new NullProgressMonitor());
 
@@ -35,7 +35,7 @@ public class IUComparisonPage extends AbstractAnalysisPropertyPage {
 		Iterator<IInstallableUnit> iter = ius.iterator();
 		while (iter.hasNext()) {
 			IInstallableUnit iu = iter.next();
-			TreeElement child = AnalysisHelper.diff(getIU(), iu);
+			TreeElement<TreeElement<String>> child = AnalysisHelper.diff(getIU(), iu);
 			if (child != null)
 				root.addChild(child);
 			iuCount++;

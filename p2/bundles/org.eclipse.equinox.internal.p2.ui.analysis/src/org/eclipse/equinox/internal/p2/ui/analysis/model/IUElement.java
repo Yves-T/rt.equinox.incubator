@@ -3,6 +3,7 @@ package org.eclipse.equinox.internal.p2.ui.analysis.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -11,20 +12,18 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.internal.p2.director.Slicer;
-import org.eclipse.equinox.internal.p2.metadata.IRequiredCapability;
-import org.eclipse.equinox.internal.p2.metadata.InstallableUnit;
+import org.eclipse.equinox.internal.p2.ui.ProvUIImages;
+import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisHelper;
 import org.eclipse.equinox.internal.p2.ui.analysis.query.MissingRequirementQuery;
 import org.eclipse.equinox.internal.p2.ui.model.IIUElement;
-import org.eclipse.equinox.internal.p2.ui.model.ProvElement;
+import org.eclipse.equinox.internal.p2.ui.model.QueriedElement;
 import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.metadata.IRequirement;
-import org.eclipse.equinox.p2.query.IQuery;
 import org.eclipse.equinox.p2.query.IQueryResult;
 import org.eclipse.equinox.p2.query.IQueryable;
-import org.eclipse.equinox.p2.query.QueryUtil;
 
-public class IUElement extends ProvElement implements IIUElement {
+public class IUElement extends QueriedElement implements IIUElement {
 	private IInstallableUnit iu;
 	private IQueryable<IInstallableUnit> queryable;
 	private IProfile profile;
@@ -32,14 +31,18 @@ public class IUElement extends ProvElement implements IIUElement {
 	private boolean artifactChildren, iuChildren;
 	private IStatus mark;
 
-	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, IProfile profile, Map<String, String> properties, IInstallableUnit iu, boolean artifactChildren, boolean iuChildren) {
+	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, IProfile profile, IInstallableUnit iu, boolean artifactChildren, boolean iuChildren) {
 		super(parent);
 		this.iu = iu;
 		this.artifactChildren = artifactChildren;
 		this.iuChildren = iuChildren;
 		this.queryable = queryable;
-		this.properties = profile.getProperties();
 		this.profile = profile;
+		this.properties = profile == null ? Collections.EMPTY_MAP : profile.getProperties();
+	}
+
+	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, IProfile profile, IInstallableUnit iu) {
+		this(parent, queryable, profile, iu, false, true);
 	}
 
 	public Object[] getChildren(Object o) {
@@ -51,9 +54,9 @@ public class IUElement extends ProvElement implements IIUElement {
 		if (iuChildren) {
 			ius = getIUChildren();
 		}
-		reqs = getRequirementChildren(ius != null ? ius : new ArrayList());
+		reqs = getRequirementChildren();
 		if (artifactChildren)
-			keys = ((InstallableUnit) iu).getArtifacts().toArray();
+			keys = ((IInstallableUnit) iu).getArtifacts().toArray();
 
 		children = new Object[(ius != null ? ius.size() : 0) + reqs.size() + keys.length];
 		int i = 0;
@@ -65,7 +68,7 @@ public class IUElement extends ProvElement implements IIUElement {
 		}
 		Iterator<IRequirement> iter = reqs.iterator();
 		while (iter.hasNext())
-			children[i++] = new RequirementElement(this, (IRequiredCapability) iter.next());
+			children[i++] = new RequirementElement(this, iter.next());
 
 		if (i != 0)
 			for (int x = i; x < children.length; x++)
@@ -73,7 +76,7 @@ public class IUElement extends ProvElement implements IIUElement {
 		else
 			children = keys;
 
-		Arrays.sort(children, new Comparator() {
+		Arrays.sort(children, new Comparator<Object>() {
 			public int compare(Object arg0, Object arg1) {
 				if (arg0 != null && arg1 != null)
 					return arg0.toString().compareTo(arg1.toString());
@@ -84,27 +87,24 @@ public class IUElement extends ProvElement implements IIUElement {
 		return children;
 	}
 
-	public Collection<IUElement> getIUChildren() {
-		List<IUElement> ius = null;
+	private Collection<IUElement> getIUChildren() {
+		Collection<IUElement> ius = null;
 
 		if (iuChildren) {
-			Collection<IRequirement> requirements = iu.getRequirements();
-			List<IQuery<IInstallableUnit>> queries = new ArrayList<IQuery<IInstallableUnit>>();
-			for (IRequirement req : requirements)
-				queries.add(QueryUtil.createMatchQuery(req.getMatches(), new Object[0]));
-
-			IQueryResult<IInstallableUnit> ius2 = queryable.query(QueryUtil.createCompoundQuery(queries, false), new NullProgressMonitor());
+			if (iu.getRequirements().isEmpty())
+				return ius;
+			IQueryResult<IInstallableUnit> ius2 = queryable.query(AnalysisHelper.createQuery(iu.getRequirements()), new NullProgressMonitor());
 
 			ius = new ArrayList<IUElement>();
 
 			Iterator<IInstallableUnit> iter = ius2.iterator();
 			while (iter.hasNext())
-				ius.add(new IUElement(this, queryable, profile, properties, (IInstallableUnit) iter.next(), artifactChildren, iuChildren));
+				ius.add(new IUElement(this, queryable, profile, (IInstallableUnit) iter.next(), artifactChildren, iuChildren));
 		}
 		return ius;
 	}
 
-	public Collection<IRequirement> getRequirementChildren(Collection iuChildren) {
+	private Collection<IRequirement> getRequirementChildren() {
 		List<IRequirement> children = new ArrayList<IRequirement>();
 		if (isMarked()) {
 			// find missing requirements
@@ -125,7 +125,7 @@ public class IUElement extends ProvElement implements IIUElement {
 	}
 
 	public String getLabel(Object o) {
-		return iu.getId() + " " + iu.getVersion(); //$NON-NLS-1$
+		return iu.getId(); //$NON-NLS-1$
 	}
 
 	public void setChildren(boolean artifact, boolean iu) {
@@ -160,6 +160,7 @@ public class IUElement extends ProvElement implements IIUElement {
 		return true;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter == IInstallableUnit.class)
 			return iu;
@@ -180,7 +181,21 @@ public class IUElement extends ProvElement implements IIUElement {
 		return !mark.isOK();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.equinox.internal.provisional.p2.ui.model.ProvElement#getImageID(java.lang.Object)
+	 */
+	protected String getImageId(Object obj) {
+		return ProvUIImages.IMG_IU;
+	}
+
 	public String toString() {
 		return iu.toString();
+	}
+
+	@Override
+	protected int getDefaultQueryType() {
+		return 0;
 	}
 }

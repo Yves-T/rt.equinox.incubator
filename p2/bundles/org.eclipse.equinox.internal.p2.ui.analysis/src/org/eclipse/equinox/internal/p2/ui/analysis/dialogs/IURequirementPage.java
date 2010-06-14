@@ -1,6 +1,5 @@
 package org.eclipse.equinox.internal.p2.ui.analysis.dialogs;
 
-import java.util.Hashtable;
 import org.eclipse.equinox.internal.p2.ui.analysis.Messages;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.IUElement;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.AnalysisTreeViewer;
@@ -19,7 +18,7 @@ public class IURequirementPage extends AbstractAnalysisPropertyPage {
 	private IUElement input;
 
 	protected void getContents(Composite parent) {
-		input = new IUElement(null, getProfile(), getProfile(), new Hashtable(getProfile().getProperties()), getIU(), true, false);
+		input = new IUElement(null, getProfile(), getProfile(), getIU(), true, false);
 
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.IUAnalysisPage_Requirements);

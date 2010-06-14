@@ -1,35 +1,33 @@
 package org.eclipse.equinox.internal.p2.ui.analysis;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import org.eclipse.equinox.internal.p2.ui.ElementQueryDescriptor;
 import org.eclipse.equinox.internal.p2.ui.ProvUI;
 import org.eclipse.equinox.internal.p2.ui.QueryProvider;
-import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfile;
-import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfileElement;
-import org.eclipse.equinox.internal.p2.ui.analysis.query.ForeignProfileElementWrapper;
+import org.eclipse.equinox.internal.p2.ui.analysis.query.IUElementWrapper;
+import org.eclipse.equinox.internal.p2.ui.analysis.query.IUQueryableElementWrapper;
+import org.eclipse.equinox.internal.p2.ui.model.CategoryElement;
 import org.eclipse.equinox.internal.p2.ui.model.IIUElement;
+import org.eclipse.equinox.internal.p2.ui.model.MetadataRepositoryElement;
+import org.eclipse.equinox.internal.p2.ui.model.ProfileElement;
 import org.eclipse.equinox.internal.p2.ui.model.QueriedElement;
+import org.eclipse.equinox.internal.p2.ui.query.CategoryElementWrapper;
 import org.eclipse.equinox.internal.p2.ui.query.IUViewQueryContext;
-import org.eclipse.equinox.internal.p2.ui.query.InstalledIUElementWrapper;
 import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.engine.query.IUProfilePropertyQuery;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.p2.metadata.IRequirement;
+import org.eclipse.equinox.p2.metadata.expression.ExpressionUtil;
+import org.eclipse.equinox.p2.metadata.expression.IExpression;
 import org.eclipse.equinox.p2.query.Collector;
 import org.eclipse.equinox.p2.query.IQuery;
 import org.eclipse.equinox.p2.query.IQueryable;
-import org.eclipse.equinox.p2.query.MatchQuery;
 import org.eclipse.equinox.p2.query.QueryUtil;
 import org.eclipse.equinox.p2.ui.Policy;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
 
 public class AnalysisQueryProvider extends QueryProvider {
 	public static final int IU_ARTIFACTS = 201;
+	public static final int IU_QUERYABLES = 128;
 	private Policy policy;
-	private ProvisioningUI ui;
 
 	public AnalysisQueryProvider(Policy policy) {
 		super(ProvisioningUI.getDefaultUI());
@@ -37,43 +35,40 @@ public class AnalysisQueryProvider extends QueryProvider {
 	}
 
 	public ElementQueryDescriptor getQueryDescriptor(QueriedElement element) {
-		IQueryable<?> queryable = element.getQueryable();
 		int queryType = element.getQueryType();
 		IUViewQueryContext context = element.getQueryContext();
 		if (context == null) {
 			context = ProvUI.getQueryContext(policy);
 		}
-		switch (queryType) {
+		IQueryable<?> queryable = element.getQueryable();
+
+		switch (element.getQueryType()) {
+			case AnalysisQueryProvider.IU_QUERYABLES :
+				return new ElementQueryDescriptor(queryable, QueryUtil.createMatchQuery(IQueryable.class, ExpressionUtil.TRUE_EXPRESSION), new Collector(), new IUQueryableElementWrapper(null, element));
 			case QueryProvider.PROFILES :
-				queryable = AnalysisActivator.getDefault().getKnownProfiles();
-				return new ElementQueryDescriptor(queryable, new MatchQuery() {
-					public boolean isMatch(Object candidate) {
-						return ProvUI.getAdapter(candidate, ForeignProfile.class) != null;
-					}
-				}, new Collector(), new ForeignProfileElementWrapper(null, element));
+				return new ElementQueryDescriptor(AnalysisActivator.getDefault().getKnownProfiles(), QueryUtil.createMatchQuery(IProfile.class, ExpressionUtil.TRUE_EXPRESSION), new Collector<IInstallableUnit>(), new IUQueryableElementWrapper(null, element));
 			case QueryProvider.INSTALLED_IUS :
-				ForeignProfile profile = null;
 				// Querying of IU's.  We are drilling down into the requirements.
 				if (element instanceof IIUElement && context.getShowInstallChildren()) {
-					Collection<IRequirement> requirements = ((IIUElement) element).getRequirements();
-
-					List<IQuery<IInstallableUnit>> queries = new ArrayList<IQuery<IInstallableUnit>>();
-
-					Iterator<IRequirement> iter = requirements.iterator();
-
-					while (iter.hasNext()) {
-						queries.add(QueryUtil.createMatchQuery(iter.next().getMatches(), new Object[] {}));
-					}
-
-					return new ElementQueryDescriptor(queryable, QueryUtil.createCompoundQuery(queries, false), new Collector(), new InstalledIUElementWrapper(queryable, element));
-				} else if (element instanceof ForeignProfileElement) {
-					profile = AnalysisActivator.getDefault().getKnownProfiles().getProfile(((ForeignProfileElement) element));
+					if (((IIUElement) element).getRequirements().isEmpty())
+						return null;
+					return new ElementQueryDescriptor(queryable, AnalysisHelper.createQuery(((IIUElement) element).getRequirements()), new Collector<Object>(), new IUElementWrapper((IQueryable<IInstallableUnit>) queryable, element));
+				} else if (element instanceof ProfileElement) {
+					IProfile profile = AnalysisActivator.getDefault().getKnownProfiles().getProfile(((ProfileElement) element).getProfileId());
+					if (profile == null)
+						break;
+					return new ElementQueryDescriptor(profile, new IUProfilePropertyQuery(IProfile.PROP_PROFILE_ROOT_IU, Boolean.TRUE.toString()), new Collector<IInstallableUnit>(), new IUElementWrapper(profile, element));
+				}
+			case QueryProvider.AVAILABLE_IUS :
+				if (element instanceof MetadataRepositoryElement) {
+					return new ElementQueryDescriptor(queryable, QueryUtil.createIUCategoryQuery(), new Collector<Object>(), new CategoryElementWrapper(queryable, element));
+				} else if (element instanceof CategoryElement) {
+					IExpression matchesRequirementsExpression = ExpressionUtil.parse("$0.exists(r | this ~= r)"); //$NON-NLS-1$
+					IQuery<IInstallableUnit> memberOfCategoryQuery = QueryUtil.createMatchQuery(matchesRequirementsExpression, ((CategoryElement) element).getRequirements());
+					return new ElementQueryDescriptor(queryable, memberOfCategoryQuery, new Collector<IInstallableUnit>(), new IUElementWrapper((IQueryable<IInstallableUnit>) queryable, element));
 				}
 
-				if (profile == null)
-					return null;
-				return new ElementQueryDescriptor(profile, new IUProfilePropertyQuery(IProfile.PROP_PROFILE_ROOT_IU, Boolean.TRUE.toString()), new Collector(), new InstalledIUElementWrapper(profile, element));
 		}
-		return null;
+		return super.getQueryDescriptor(element);
 	}
 }

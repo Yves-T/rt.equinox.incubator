@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.equinox.internal.p2.director.QueryableArray;
 import org.eclipse.equinox.internal.p2.director.Slicer;
 import org.eclipse.equinox.internal.p2.metadata.IRequiredCapability;
@@ -45,10 +45,10 @@ public class AnalysisHelper {
 
 	// Check the validity of a profile when some IUs are removed.  (Can be none)
 	public static IStatus checkValidity(IProfile profile, IInstallableUnit[] iusToRemove, Collection<IInstallableUnit> collector, IProgressMonitor monitor) {
+		SubMonitor subMon = SubMonitor.convert(monitor, "Verifying profile", 50);
 		try {
-			monitor.beginTask("Checking profile", 70);
-			Collection<IInstallableUnit> profileRootIUs = new ArrayList<IInstallableUnit>(Arrays.asList(getProfileRoots(profile, new SubProgressMonitor(monitor, 10))));
-			Collection<IInstallableUnit> profileIUs = new ArrayList<IInstallableUnit>(getProfileIUs(profile, new SubProgressMonitor(monitor, 10)));
+			Collection<IInstallableUnit> profileRootIUs = new ArrayList<IInstallableUnit>(Arrays.asList(getProfileRoots(profile, subMon.newChild(10))));
+			Collection<IInstallableUnit> profileIUs = new ArrayList<IInstallableUnit>(getProfileIUs(profile, subMon.newChild(10)));
 
 			// Remove IUs from those collected from the profile
 			for (int i = 0; i < iusToRemove.length; i++) {
@@ -56,8 +56,8 @@ public class AnalysisHelper {
 				profileIUs.remove(iusToRemove[i]);
 			}
 
-			Slicer slicer = new Slicer(new QueryableArray(profileIUs.toArray(new IInstallableUnit[profileIUs.size()])), new Hashtable(profile.getProperties()), true);
-			slicer.slice((IInstallableUnit[]) profileRootIUs.toArray(new IInstallableUnit[profileRootIUs.size()]), new SubProgressMonitor(monitor, 40));
+			Slicer slicer = new Slicer(new QueryableArray(profileIUs.toArray(new IInstallableUnit[profileIUs.size()])), new Hashtable<String, String>(profile.getProperties()), true);
+			slicer.slice((IInstallableUnit[]) profileRootIUs.toArray(new IInstallableUnit[profileRootIUs.size()]), subMon.newChild(40));
 
 			IStatus slicerStatus = slicer.getStatus();
 			if (slicerStatus.isOK())
@@ -67,9 +67,9 @@ public class AnalysisHelper {
 
 			// Something is wrong with the profile, attempt to determine which IUs are broken by the change(s)
 			IStatus[] children = slicerStatus.getChildren();
-			Iterator iterator = profileIUs.iterator();
+			Iterator<IInstallableUnit> iterator = profileIUs.iterator();
 			while (iterator.hasNext()) {
-				IInstallableUnit iu = (IInstallableUnit) iterator.next();
+				IInstallableUnit iu = iterator.next();
 				for (int i = 0; i < children.length; i++) {
 					if (children[i].getMessage().contains(iu.toString()) && wouldBeSatisified(iu, iusToRemove))
 						if (!collector.add(iu))
@@ -101,7 +101,18 @@ public class AnalysisHelper {
 		return getMetadataRepository().query(createQuery(req), monitor).toArray(IInstallableUnit.class);
 	}
 
-	private static IQuery<IInstallableUnit> createQuery(IRequirement[] requirements) {
+	public static IQuery<IInstallableUnit> createQuery(IRequirement[] requirements) {
+		if (requirements.length == 0)
+			return QueryUtil.NO_UNITS;
+		List<IQuery<IInstallableUnit>> queries = new ArrayList<IQuery<IInstallableUnit>>();
+		for (IRequirement req : requirements)
+			queries.add(QueryUtil.createMatchQuery(req.getMatches(), new Object[] {}));
+		return QueryUtil.createCompoundQuery(queries, false);
+	}
+
+	public static IQuery<IInstallableUnit> createQuery(Collection<IRequirement> requirements) {
+		if (requirements.isEmpty())
+			return QueryUtil.NO_UNITS;
 		List<IQuery<IInstallableUnit>> queries = new ArrayList<IQuery<IInstallableUnit>>();
 		for (IRequirement req : requirements)
 			queries.add(QueryUtil.createMatchQuery(req.getMatches(), new Object[] {}));
@@ -146,11 +157,11 @@ public class AnalysisHelper {
 		return repo;
 	}
 
-	public static TreeElement diff(IInstallableUnit iu1, IInstallableUnit iu2) {
-		TreeElement iuElement = new TreeElement(iu1.toString());
+	public static TreeElement<TreeElement<String>> diff(IInstallableUnit iu1, IInstallableUnit iu2) {
+		TreeElement<TreeElement<String>> iuElement = new TreeElement<TreeElement<String>>(iu1.toString());
 
 		for (IRequirement req : iu1.getRequirements()) {
-			TreeElement element = requirementDifference((IRequiredCapability) req, iu2.getRequirements());
+			TreeElement<String> element = requirementDifference(req, iu2.getRequirements());
 			if (element != null)
 				iuElement.addChild(element);
 		}
@@ -160,11 +171,11 @@ public class AnalysisHelper {
 		return iuElement;
 	}
 
-	private static TreeElement requirementDifference(IRequiredCapability req, Collection<IRequirement> reqs) {
-		IRequiredCapability candidate = null;
+	private static TreeElement<String> requirementDifference(IRequirement req, Collection<IRequirement> reqs) {
+		IRequirement candidate = null;
 		for (IRequirement aRequirement : reqs) {
-			if (req.getName().equals(((IRequiredCapability) aRequirement).getName())) {
-				candidate = (IRequiredCapability) aRequirement;
+			if (((IRequiredCapability) req).getName().equals(((IRequiredCapability) aRequirement).getName())) {
+				candidate = aRequirement;
 				if (req.getFilter() != null && req.getFilter().equals(candidate.getFilter()))
 					break;
 			}
@@ -179,7 +190,7 @@ public class AnalysisHelper {
 		if (candidate == null)
 			return null;
 
-		TreeElement element = new TreeElement(req.toString());
+		TreeElement<String> element = new TreeElement<String>(req.toString());
 		if (req.isGreedy() != candidate.isGreedy())
 			element.addChild(req.isGreedy() ? "Profile requirement is greedy while source requirement is not" : "Profile requirement is not greedy while source requirement is");
 		// TODO Determine replacements
@@ -189,10 +200,10 @@ public class AnalysisHelper {
 		//			element.addChild(req.isOptional() ? "Profile requirement is optional while source requirement is not" : "Profile requirement is not optional while source requirement is");
 		if ((req.getFilter() == null && candidate.getFilter() != null) || (req.getFilter() != null && !req.getFilter().equals(candidate.getFilter())))
 			element.addChild("Requirement filter differs profile: " + req.getFilter() + "  source:" + candidate.getFilter());
-		if (!req.getNamespace().equals(candidate.getNamespace()))
-			element.addChild("Requirement namespace differs profile: " + req.getNamespace() + "  source:" + candidate.getNamespace());
-		if (!req.getRange().equals(candidate.getRange()))
-			element.addChild("Requirement version range differs profile: " + req.getRange() + "  source:" + candidate.getRange());
+		if (!((IRequiredCapability) req).getNamespace().equals(((IRequiredCapability) candidate).getNamespace()))
+			element.addChild("Requirement namespace differs profile: " + ((IRequiredCapability) req).getNamespace() + "  source:" + ((IRequiredCapability) candidate).getNamespace());
+		if (!((IRequiredCapability) req).getRange().equals(((IRequiredCapability) candidate).getRange()))
+			element.addChild("Requirement version range differs profile: " + ((IRequiredCapability) req).getRange() + "  source:" + ((IRequiredCapability) candidate).getRange());
 
 		if (element.getChildren().length == 0)
 			return null;

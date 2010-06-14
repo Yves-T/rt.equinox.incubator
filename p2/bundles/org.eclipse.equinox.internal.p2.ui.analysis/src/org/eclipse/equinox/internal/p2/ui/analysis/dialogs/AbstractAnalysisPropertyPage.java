@@ -1,9 +1,7 @@
 package org.eclipse.equinox.internal.p2.ui.analysis.dialogs;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisActivator;
-import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfileElement;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.IUElement;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.AnalysisTreeViewer;
 import org.eclipse.equinox.internal.p2.ui.model.IIUElement;
@@ -47,9 +45,7 @@ public abstract class AbstractAnalysisPropertyPage extends PropertyPage {
 
 	protected IProfile getProfile() {
 		IAdaptable element = getElement();
-		if (element instanceof ForeignProfileElement)
-			return ((ForeignProfileElement) element).getProfile();
-		else if (element instanceof ProfileElement)
+		if (element instanceof ProfileElement)
 			return (IProfile) ((ProfileElement) element).getQueryable();
 		else if (element instanceof InstalledIUElement) {
 			String profileId = ((InstalledIUElement) element).getProfileId();
@@ -57,7 +53,7 @@ public abstract class AbstractAnalysisPropertyPage extends PropertyPage {
 			if (profile != null)
 				return profile;
 
-			IProfileRegistry profileRegistry = (IProfileRegistry) ServiceHelper.getService(AnalysisActivator.getDefault().getContext(), IProfileRegistry.class.getName());
+			IProfileRegistry profileRegistry = (IProfileRegistry) AnalysisActivator.getDefault().getAgent().getService(IProfileRegistry.SERVICE_NAME);
 			if (profileRegistry != null)
 				return profileRegistry.getProfile(profileId);
 		} else if (element instanceof IUElement)

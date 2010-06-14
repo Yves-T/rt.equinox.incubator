@@ -13,7 +13,6 @@ import org.eclipse.equinox.internal.p2.ui.analysis.Messages;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.AnalysisTreeViewer;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.TreeElement;
 import org.eclipse.equinox.p2.core.ProvisionException;
-import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.query.QueryUtil;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
@@ -23,10 +22,10 @@ import org.eclipse.swt.widgets.Label;
 
 public class IUSourcePage extends AbstractAnalysisPropertyPage {
 	private AnalysisTreeViewer sourceList;
-	private TreeElement sourceRoot;
+	private TreeElement<Object> sourceRoot;
 
 	protected void getContents(Composite parent) {
-		sourceRoot = new TreeElement();
+		sourceRoot = new TreeElement<Object>();
 
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.IUAnalysisPage_AvailableIn);
@@ -41,8 +40,7 @@ public class IUSourcePage extends AbstractAnalysisPropertyPage {
 
 	// Populate a list of available sources for this IU
 	private void populateSources() {
-		final IInstallableUnit iu = getIU();
-		sourceRoot.addChild(new TreeElement(Messages.IUAnalysisPage_Searching));
+		sourceRoot.addChild(new TreeElement<Object>(Messages.IUAnalysisPage_Searching));
 		sourceList.refresh();
 
 		Job job = new Job(Messages.IUAnalysisPage_LocatingSources) {
@@ -66,7 +64,7 @@ public class IUSourcePage extends AbstractAnalysisPropertyPage {
 					}
 					sourceRoot.clear();
 					if (sources.isEmpty())
-						sourceRoot.addChild(new TreeElement(Messages.IUAnalysisPage_NoSources));
+						sourceRoot.addChild(new TreeElement<Object>(Messages.IUAnalysisPage_NoSources));
 					Iterator<IMetadataRepository> iter = sources.iterator();
 					while (iter.hasNext())
 						sourceRoot.addChild(iter.next());

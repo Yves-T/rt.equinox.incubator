@@ -3,9 +3,10 @@ package org.eclipse.equinox.internal.p2.ui.analysis.viewers;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -19,7 +20,6 @@ import org.eclipse.equinox.internal.p2.metadata.repository.CompositeMetadataRepo
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisActivator;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisHelper;
 import org.eclipse.equinox.internal.p2.ui.analysis.Messages;
-import org.eclipse.equinox.internal.p2.ui.analysis.query.MissingQuery;
 import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.equinox.p2.metadata.IArtifactKey;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Listener;
 
 public class InstallabilityViewer {
 	protected AnalysisTreeViewer availableArtifactRepositories, availableMetadataRepositories, resultTree;
-	protected TreeElement artifactRoot, metadataRoot, resultRoot;
+	protected TreeElement<Object> artifactRoot, metadataRoot, resultRoot;
 	protected Button query;
 	private GridData gdList, gdFull;
 	private Display display;
@@ -62,8 +62,8 @@ public class InstallabilityViewer {
 	}
 
 	protected void getContents(Composite parent) {
-		artifactRoot = new TreeElement();
-		metadataRoot = new TreeElement();
+		artifactRoot = new TreeElement<Object>();
+		metadataRoot = new TreeElement<Object>();
 
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.ProfileInstallabilityPage_MetadataRepositories);
@@ -88,7 +88,7 @@ public class InstallabilityViewer {
 		resultTree = new AnalysisTreeViewer(parent, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
 		resultTree.getControl().setLayoutData(getFullGridData(parent));
 
-		resultRoot = new TreeElement();
+		resultRoot = new TreeElement<Object>();
 
 		resultTree.setInput(resultRoot);
 
@@ -144,21 +144,19 @@ public class InstallabilityViewer {
 		job.schedule();
 	}
 
-	private TreeElement getMissingArtifacts(Collection<IInstallableUnit> iuCollection, Object[] repositories, IProgressMonitor monitor) {
+	private TreeElement<?> getMissingArtifacts(Collection<IInstallableUnit> iuCollection, Object[] repositories, IProgressMonitor monitor) {
 		CompositeArtifactRepository repo = CompositeArtifactRepository.createMemoryComposite(AnalysisActivator.getDefault().getAgent());
 
 		for (int i = 0; i < repositories.length; i++)
 			repo.addChild(((IArtifactRepository) repositories[i]).getLocation());
 
-		TreeElement content = TreeElement.getIArtifactKeyTreeElement();
+		TreeElement<IArtifactKey> content = TreeElement.getIArtifactKeyTreeElement();
 
-		Iterator iuIterator = iuCollection.iterator();
-		while (iuIterator.hasNext()) {
-			IInstallableUnit iu = (IInstallableUnit) iuIterator.next();
-			for (IArtifactKey key : iu.getArtifacts())
+		Iterator<IInstallableUnit> iuIterator = iuCollection.iterator();
+		while (iuIterator.hasNext())
+			for (IArtifactKey key : iuIterator.next().getArtifacts())
 				if (!repo.contains(key))
 					content.addChild(key);
-		}
 
 		if (!content.hasChildren())
 			content.setText(Messages.ProfileInstallabilityPage_AllArtifactsAvailable);
@@ -167,14 +165,14 @@ public class InstallabilityViewer {
 		return content;
 	}
 
-	private TreeElement getMissingIUs(Collection<IInstallableUnit> iuCollection, Object[] repositories, IProgressMonitor monitor) {
-		TreeElement content = new TreeElement();
+	private TreeElement<?> getMissingIUs(Collection<IInstallableUnit> iuCollection, Object[] repositories, IProgressMonitor monitor) {
+		TreeElement<IInstallableUnit> content = new TreeElement<IInstallableUnit>();
 		CompositeMetadataRepository repo = CompositeMetadataRepository.createMemoryComposite(AnalysisActivator.getDefault().getAgent());
 
 		for (int i = 0; i < repositories.length; i++)
 			repo.addChild(((IMetadataRepository) repositories[i]).getLocation());
 
-		content.addChildren(containsIUs(repo, iuCollection, monitor));
+		content.addAll(containsIUs(repo, iuCollection, monitor));
 
 		if (!content.hasChildren())
 			content.setText(Messages.ProfileInstallabilityPage_AllIUsAvailable);
@@ -230,27 +228,24 @@ public class InstallabilityViewer {
 	}
 
 	private Collection<IInstallableUnit> containsIUs(IMetadataRepository repo, Collection<IInstallableUnit> ius, IProgressMonitor monitor) {
-		Map<IInstallableUnit, Boolean> missingIUs = new HashMap<IInstallableUnit, Boolean>(ius.size());
-		Iterator<IInstallableUnit> iter = ius.iterator();
-		while (iter.hasNext())
-			missingIUs.put(iter.next(), Boolean.TRUE);
-		MissingQuery query = new MissingQuery(missingIUs);
+		Set<IInstallableUnit> missingIUs = new HashSet<IInstallableUnit>();
+		missingIUs.addAll(ius);
 
-		repo.query(query, monitor);
+		missingIUs.removeAll(repo.query(QueryUtil.createIUAnyQuery(), monitor).toSet());
 
-		return query.getMissingIUs();
+		return missingIUs;
 	}
 
 	private void populateRepositories(IProgressMonitor monitor) {
 		Job job = new Job("Loading Metadata Repositories") {
 			protected IStatus run(IProgressMonitor monitor) {
-				metadataRoot.addChild(new TreeElement("Loading Repositories"));
+				metadataRoot.addChild(new TreeElement<String>("Loading Repositories"));
 				refreshTree(availableMetadataRepositories);
 
 				IMetadataRepositoryManager manager = AnalysisHelper.getMetadataRepositoryManager();
 				URI[] addresses = manager.getKnownRepositories(IRepositoryManager.REPOSITORIES_NON_SYSTEM);
 
-				ArrayList<IMetadataRepository> repoList = new ArrayList<IMetadataRepository>();
+				Collection<Object> repoList = new ArrayList<Object>();
 				for (int i = 0; i < addresses.length; i++) {
 					try {
 						repoList.add(manager.loadRepository(addresses[i], monitor));
@@ -259,7 +254,7 @@ public class InstallabilityViewer {
 				}
 
 				metadataRoot.clear();
-				metadataRoot.addChildren(repoList);
+				metadataRoot.addAll(repoList);
 				refreshTree(availableMetadataRepositories);
 
 				return Status.OK_STATUS;
@@ -272,13 +267,13 @@ public class InstallabilityViewer {
 
 		job = new Job("Loading Artifact Repositories") {
 			protected IStatus run(IProgressMonitor monitor) {
-				artifactRoot.addChild(new TreeElement("Loading Repositories"));
+				artifactRoot.addChild(new TreeElement<IArtifactRepository>("Loading Repositories"));
 				refreshTree(availableArtifactRepositories);
 
 				IArtifactRepositoryManager aManager = AnalysisHelper.getArtifactRepositoryManager();
 				URI[] addresses = aManager.getKnownRepositories(IRepositoryManager.REPOSITORIES_NON_SYSTEM);
 
-				ArrayList<IArtifactRepository> repoList = new ArrayList<IArtifactRepository>();
+				Collection<Object> repoList = new ArrayList<Object>();
 				for (int i = 0; i < addresses.length; i++) {
 					try {
 						repoList.add(aManager.loadRepository(addresses[i], monitor));
@@ -287,7 +282,7 @@ public class InstallabilityViewer {
 				}
 
 				artifactRoot.clear();
-				artifactRoot.addChildren(repoList);
+				artifactRoot.addAll(repoList);
 				refreshTree(availableArtifactRepositories);
 
 				return Status.OK_STATUS;

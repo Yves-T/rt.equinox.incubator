@@ -37,8 +37,9 @@ public class ProfileTreeViewer {
 
 	private IProfile profile;
 	private IInstallableUnit[] iusToRemove;
-	private Collection brokenIUs;
-	private TreeElement listView, profileView;
+	private Collection<IInstallableUnit> brokenIUs;
+	private TreeElement<IInstallableUnit> listView;
+	private TreeElement<IUElement> profileView;
 	private String defaultMessage;
 
 	public ProfileTreeViewer(Composite parent, IProfile profile, IInstallableUnit[] iusToRemove) {
@@ -101,22 +102,22 @@ public class ProfileTreeViewer {
 
 			private void populateTree(IProgressMonitor monitor) {
 				IInstallableUnit[] roots = AnalysisHelper.getProfileRoots(profile, monitor);
-				profileView = new TreeElement();
+				profileView = new TreeElement<IUElement>();
 				Map<String, String> properties = profile.getProperties();
-				IQueryable queryable = new QueryableArray(AnalysisHelper.subtract(profile, iusToRemove));
+				IQueryable<IInstallableUnit> queryable = new QueryableArray(AnalysisHelper.subtract(profile, iusToRemove));
 
 				for (int i = 0; i < roots.length; i++) {
-					IUElement iue = new IUElement(profileView, queryable, profile, properties, roots[i], false, true);
+					IUElement iuElement = new IUElement(profileView, queryable, profile, roots[i], false, true);
 
-					profileView.addChild(iue);
+					profileView.addChild(iuElement);
 					if (monitor.isCanceled())
 						break;
 				}
 			}
 
 			private void populateList() {
-				listView = new TreeElement();
-				listView.addChildren(brokenIUs);
+				listView = new TreeElement<IInstallableUnit>();
+				listView.addAll(brokenIUs);
 			}
 		};
 		job.setPriority(Job.INTERACTIVE);
@@ -151,8 +152,8 @@ public class ProfileTreeViewer {
 		if (display != null)
 			display.asyncExec(new Runnable() {
 				public void run() {
-					TreeElement root = new TreeElement();
-					root.addChild(new TreeElement(defaultMessage));
+					TreeElement<TreeElement<?>> root = new TreeElement<TreeElement<?>>();
+					root.addChild(new TreeElement<TreeElement<?>>(defaultMessage));
 					tree.setInput(root);
 					tree.refresh();
 				}

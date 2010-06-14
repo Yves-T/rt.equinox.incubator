@@ -15,17 +15,17 @@ public class AnalysisLabelProvider extends ProvElementLabelProvider {
 		if (obj instanceof IStatus)
 			return ((IStatus) obj).getMessage();
 		else if (obj instanceof TreeElement)
-			return ((TreeElement) obj).getText();
+			return ((TreeElement<?>) obj).getText();
 		return super.getText(obj);
 	}
 
 	public Image getImage(Object obj) {
 		if (obj instanceof TreeElement) {
-			if (((TreeElement) obj).hasChildren())
+			if (((TreeElement<?>) obj).hasChildren())
 				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
 			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_INFO_TSK);
 		} else if (obj instanceof Collection) {
-			if (((Collection) obj).isEmpty())
+			if (((Collection<?>) obj).isEmpty())
 				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_INFO_TSK);
 			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
 		} else if (obj instanceof IStatus) {

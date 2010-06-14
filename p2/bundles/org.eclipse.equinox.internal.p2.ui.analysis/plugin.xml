@@ -6,7 +6,7 @@
 		<view
             name="ProfileAnalysis"
             category="org.eclipse.p2.analysis.ui"
-            class="org.eclipse.equinox.internal.p2.ui.analysis.ForeignProfilesView"
+            class="org.eclipse.equinox.internal.p2.ui.analysis.IUQueryablesView"
             id="org.eclipse.equinox.internal.p2.ui.analysis.ProfilesView2">
 		</view>
 	</extension>

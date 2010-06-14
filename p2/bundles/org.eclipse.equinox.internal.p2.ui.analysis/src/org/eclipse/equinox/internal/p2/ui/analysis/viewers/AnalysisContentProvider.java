@@ -10,9 +10,9 @@ public class AnalysisContentProvider extends ProvElementContentProvider {
 
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof TreeElement)
-			return ((TreeElement) parentElement).getChildren();
+			return ((TreeElement<?>) parentElement).getChildren();
 		else if (parentElement instanceof Collection)
-			return ((Collection) parentElement).toArray();
+			return ((Collection<?>) parentElement).toArray();
 		else if (parentElement instanceof IStatus)
 			return ((IStatus) parentElement).getChildren();
 		return super.getChildren(parentElement);
@@ -20,9 +20,9 @@ public class AnalysisContentProvider extends ProvElementContentProvider {
 
 	public boolean hasChildren(Object element) {
 		if (element instanceof TreeElement)
-			return ((TreeElement) element).hasChildren();
+			return ((TreeElement<?>) element).hasChildren();
 		else if (element instanceof Collection)
-			return !((Collection) element).isEmpty();
+			return !((Collection<?>) element).isEmpty();
 		else if (element instanceof IStatus)
 			return ((IStatus) element).getChildren().length > 0;
 		return super.hasChildren(element);

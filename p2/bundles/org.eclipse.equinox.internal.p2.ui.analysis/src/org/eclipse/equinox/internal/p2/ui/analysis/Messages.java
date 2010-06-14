@@ -43,6 +43,10 @@ public class Messages extends NLS {
 
 	public static String Planner_Problems_resolving_plan;
 
+	public static String ProfilesView2_AddRepositoryText;
+
+	public static String ProfilesView2_AddRepositoryToolTip;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

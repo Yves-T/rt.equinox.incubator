@@ -6,8 +6,8 @@ import java.util.Comparator;
 import java.util.TreeSet;
 import org.eclipse.equinox.p2.metadata.IArtifactKey;
 
-public class TreeElement implements Comparable {
-	private Collection children;
+public class TreeElement<F> implements Comparable<TreeElement<F>> {
+	private Collection<F> children;
 	private String text;
 
 	public TreeElement() {
@@ -16,7 +16,7 @@ public class TreeElement implements Comparable {
 
 	public TreeElement(String text) {
 		this.text = text;
-		children = new TreeSet(new Comparator() {
+		children = new TreeSet<F>(new Comparator<Object>() {
 			public int compare(Object arg0, Object arg1) {
 				if (arg0 != null && arg1 != null)
 					return arg0.toString().compareTo(arg1.toString());
@@ -25,23 +25,23 @@ public class TreeElement implements Comparable {
 		});
 	}
 
-	public TreeElement(Comparator comparator) {
-		children = new TreeSet(comparator);
+	public TreeElement(Comparator<F> comparator) {
+		children = new TreeSet<F>(comparator);
 	}
 
 	public void clear() {
 		children.clear();
 	}
 
-	public void addChild(Object obj) {
+	public void addChild(F obj) {
 		children.add(obj);
 	}
 
-	public void addChildren(Object[] obj) {
+	public void addChildren(F[] obj) {
 		children.addAll(Arrays.asList(obj));
 	}
 
-	public void addChildren(Collection collection) {
+	public void addAll(Collection<F> collection) {
 		children.addAll(collection);
 	}
 
@@ -61,20 +61,19 @@ public class TreeElement implements Comparable {
 		return !children.isEmpty();
 	}
 
-	public static TreeElement getIArtifactKeyTreeElement() {
-		TreeElement element = new TreeElement(new Comparator() {
-			public int compare(Object arg0, Object arg1) {
-				if (arg0 != null && arg1 != null && arg0 instanceof IArtifactKey && arg1 instanceof IArtifactKey)
-					return ((IArtifactKey) arg0).getId().compareTo(((IArtifactKey) arg1).getId());
+	public static TreeElement<IArtifactKey> getIArtifactKeyTreeElement() {
+		return new TreeElement<IArtifactKey>(new Comparator<IArtifactKey>() {
+			public int compare(IArtifactKey arg0, IArtifactKey arg1) {
+				if (arg0 != null && arg1 != null)
+					return arg0.getId().compareTo(arg1.getId());
 				return 0;
 			}
 		});
-		return element;
 	}
 
-	public int compareTo(Object arg0) {
-		if (arg0 != null && arg0 instanceof TreeElement)
-			return text.compareTo(((TreeElement) arg0).text);
+	public int compareTo(TreeElement<F> arg0) {
+		if (arg0 != null)
+			return text.compareTo(arg0.text);
 		return 0;
 	}
 
