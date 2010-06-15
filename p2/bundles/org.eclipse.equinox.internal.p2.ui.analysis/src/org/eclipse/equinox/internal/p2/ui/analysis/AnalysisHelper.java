@@ -32,22 +32,13 @@ import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 
 public class AnalysisHelper {
 
-	// Get the root IUs of a profile
-	public static IInstallableUnit[] getProfileRoots(IProfile profile, IProgressMonitor monitor) {
-		return (IInstallableUnit[]) profile.query(new IUProfilePropertyQuery(IProfile.PROP_PROFILE_ROOT_IU, Boolean.TRUE.toString()), monitor).toArray(IInstallableUnit.class);
-	}
-
+	@SuppressWarnings("unchecked")
 	public static Collection<IInstallableUnit> getRoots(IQueryable<IInstallableUnit> queryable, IProgressMonitor monitor) {
 		if (queryable instanceof IProfile)
 			return queryable.query(new IUProfilePropertyQuery(IProfile.PROP_PROFILE_ROOT_IU, Boolean.TRUE.toString()), monitor).toSet();
 		else if (queryable instanceof IMetadataRepository)
 			return queryable.query(QueryUtil.createIUCategoryQuery(), monitor).toSet();
 		return Collections.EMPTY_LIST;
-	}
-
-	// Determine if the profile is valid (ie, all dependencies met)
-	public static IStatus checkProfileValidity(IProfile profile, Collection<IInstallableUnit> collector, IProgressMonitor monitor) {
-		return checkValidity(profile, new IInstallableUnit[0], collector, monitor);
 	}
 
 	// Check the validity of a profile when some IUs are removed.  (Can be none)
@@ -95,30 +86,15 @@ public class AnalysisHelper {
 	/*
 	 * Find the requirements missing from the given roots
 	 */
-	public static IRequirement[] getMissingRequirements(IInstallableUnit[] roots, IQueryable<IInstallableUnit> queryable, Map<String, String> properties, IProgressMonitor monitor) {
+	public static Collection<IRequirement> getMissingRequirements(IInstallableUnit[] roots, IQueryable<IInstallableUnit> queryable, Map<String, String> properties, IProgressMonitor monitor) {
 		AnalysisSlicer aslicer = new AnalysisSlicer(queryable, properties, true);
 		aslicer.slice(roots, monitor);
-		Collection<IRequirement> req = aslicer.getMissingRequirements();
-
-		return req.toArray(new IRequirement[req.size()]);
+		return aslicer.getMissingRequirements();
 	}
 
 	/*
-	 * Find IUs which satisfy the requirements
+	 * Creates a compound query which will match IUs that provide the requirements 
 	 */
-	public static IInstallableUnit[] satisfyRequirements(IRequirement[] req, Map<String, String> properties, IProgressMonitor monitor) {
-		return getMetadataRepository().query(createQuery(req), monitor).toArray(IInstallableUnit.class);
-	}
-
-	public static IQuery<IInstallableUnit> createQuery(IRequirement[] requirements) {
-		if (requirements.length == 0)
-			return QueryUtil.NO_UNITS;
-		List<IQuery<IInstallableUnit>> queries = new ArrayList<IQuery<IInstallableUnit>>();
-		for (IRequirement req : requirements)
-			queries.add(QueryUtil.createMatchQuery(req.getMatches(), new Object[] {}));
-		return QueryUtil.createCompoundQuery(queries, false);
-	}
-
 	public static IQuery<IInstallableUnit> createQuery(Collection<IRequirement> requirements) {
 		if (requirements.isEmpty())
 			return QueryUtil.NO_UNITS;

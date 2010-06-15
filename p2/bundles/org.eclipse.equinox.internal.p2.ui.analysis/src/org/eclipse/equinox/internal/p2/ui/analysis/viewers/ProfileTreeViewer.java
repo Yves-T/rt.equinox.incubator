@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.equinox.internal.p2.director.QueryableArray;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisActivator;
@@ -79,8 +80,9 @@ public class ProfileTreeViewer {
 	private void initialize() {
 		Job job = new Job("Verifying Profile") {
 			protected IStatus run(IProgressMonitor monitor) {
+				SubMonitor sub = SubMonitor.convert(monitor);
 				Collection<IInstallableUnit> collection = new ArrayList<IInstallableUnit>();
-				IStatus status = AnalysisHelper.checkValidity(profile, iusToRemove, collection, monitor);
+				IStatus status = AnalysisHelper.checkValidity(profile, iusToRemove, collection, sub.newChild(1));
 
 				if (status.isOK() || status.matches(IStatus.CANCEL)) {
 					setToDefault();
@@ -89,7 +91,7 @@ public class ProfileTreeViewer {
 				brokenIUs = collection;
 				populateList();
 				setToList();
-				populateTree(monitor);
+				populateTree(sub.newChild(1));
 
 				if (monitor.isCanceled())
 					return new Status(IStatus.CANCEL, AnalysisActivator.PLUGIN_ID, "Job cancelled");

@@ -27,6 +27,7 @@ import org.eclipse.equinox.p2.ui.ProvisioningUI;
 public class AnalysisQueryProvider extends QueryProvider {
 	public static final int IU_ARTIFACTS = 201;
 	public static final int IU_QUERYABLES = 128;
+	public static final int IU_REQUIREMENTS = 256;
 	private Policy policy;
 
 	public AnalysisQueryProvider(Policy policy) {
@@ -67,7 +68,10 @@ public class AnalysisQueryProvider extends QueryProvider {
 					IQuery<IInstallableUnit> memberOfCategoryQuery = QueryUtil.createMatchQuery(matchesRequirementsExpression, ((CategoryElement) element).getRequirements());
 					return new ElementQueryDescriptor(queryable, memberOfCategoryQuery, new Collector<IInstallableUnit>(), new IUElementWrapper((IQueryable<IInstallableUnit>) queryable, element));
 				}
-
+			case IU_REQUIREMENTS :
+				//				if (element instanceof IUProperties) {
+				//					return new ElementQueryDescriptor(queryable, null, new Collector<Object>(), null);
+				//				}
 		}
 		return super.getQueryDescriptor(element);
 	}

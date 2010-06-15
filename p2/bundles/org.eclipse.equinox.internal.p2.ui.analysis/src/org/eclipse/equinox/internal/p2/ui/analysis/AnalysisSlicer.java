@@ -199,12 +199,12 @@ public class AnalysisSlicer {
 		}
 
 		if (validMatches == 0) {
+			missingRequirements.add(req);
 			if (req.getMin() == 0) {
 				if (DEBUG)
 					System.out.println("No IU found to satisfy optional dependency of " + iu + " on req " + req); //$NON-NLS-1$//$NON-NLS-2$
 			} else {
 				result.add(new Status(IStatus.WARNING, AnalysisActivator.PLUGIN_ID, NLS.bind(Messages.Planner_Unsatisfied_dependency, iu, req)));
-				missingRequirements.add(req);
 			}
 		}
 	}

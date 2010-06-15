@@ -23,12 +23,16 @@ import org.eclipse.equinox.p2.query.QueryUtil;
 import org.eclipse.equinox.p2.repository.IRepositoryManager;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.dialogs.PropertyDialogAction;
 
 public class IUQueryablesView extends ProfilesView {
 	private class AddProfileAction extends Action {
@@ -51,12 +55,12 @@ public class IUQueryablesView extends ProfilesView {
 		}
 
 		public void run() {
-			new AddMetadataRepositoryDialog(getShell(), getProvisioningUI()).open();
+			new AddMetadataRepositoryDialog(viewer.getControl().getShell(), getProvisioningUI()).open();
 		}
 	}
 
-	private class RemoveProfileAction extends Action {
-		RemoveProfileAction() {
+	private class RemoveAction extends Action {
+		RemoveAction() {
 			setText(ProvAdminUIMessages.ProfilesView_RemoveProfileLabel);
 			setToolTipText(ProvAdminUIMessages.ProfilesView_RemoveProfileTooltip);
 			setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
@@ -82,48 +86,70 @@ public class IUQueryablesView extends ProfilesView {
 		ProvUI.addProvisioningListener(listener);
 	}
 
-	private AddRepositoryAction addRepositoryAction;
+	private Action addRepositoryAction, addProfileAction, propertiesAction, removeProfileAction;
 
 	protected void makeActions() {
-		super.makeActions();
+		propertiesAction = new PropertyDialogAction(this.getSite(), viewer);
 		addProfileAction = new AddProfileAction();
 		addRepositoryAction = new AddRepositoryAction();
-		removeProfileAction = new RemoveProfileAction();
+		removeProfileAction = new RemoveAction();
+		super.makeActions();
+		getViewSite().getActionBars().setGlobalActionHandler(ActionFactory.PROPERTIES.getId(), propertiesAction);
+	}
+
+	protected IAction getDoubleClickAction() {
+		return propertiesAction;
 	}
 
 	protected Object getInput() {
 		return new IUQueryables(ProvisioningUI.getDefaultUI());
 	}
 
+	protected void configureViewer(TreeViewer treeViewer) {
+		super.configureViewer(treeViewer);
+		getSite().setSelectionProvider(treeViewer);
+	}
+
 	protected void selectionChanged(IStructuredSelection ss) {
-		super.selectionChanged(ss);
+		propertiesAction.setEnabled(false);
+		removeProfileAction.setEnabled(false);
+		if (ss.size() == 1) {
+			propertiesAction.setEnabled(true);
+		}
 		Object[] selectionArray = ss.toArray();
 		if (selectionArray.length > 0) {
 			removeProfileAction.setEnabled(true);
 		}
 	}
 
-	private Shell getShell() {
-		return viewer.getControl().getShell();
-	}
-
 	protected void fillLocalPullDown(IMenuManager manager) {
-		super.fillLocalPullDown(manager);
+		manager.add(addProfileAction);
 		manager.add(addRepositoryAction);
+		manager.add(removeProfileAction);
+		manager.add(propertiesAction);
 	}
 
 	protected void fillContextMenu(IMenuManager manager) {
-		super.fillContextMenu(manager);
+		manager.add(addProfileAction);
 		manager.add(addRepositoryAction);
+		if (removeProfileAction.isEnabled()) {
+			manager.add(removeProfileAction);
+		}
+		if (propertiesAction.isEnabled()) {
+			manager.add(propertiesAction);
+		}
 	}
 
 	protected void fillLocalToolBar(IToolBarManager manager) {
-		super.fillLocalToolBar(manager);
+		manager.add(new Separator());
+		manager.add(addProfileAction);
 		manager.add(addRepositoryAction);
+		manager.add(removeProfileAction);
 	}
 
 	private static class IUQueryables extends RootElement {
 
+		@SuppressWarnings({"rawtypes", "unchecked"})
 		public IUQueryables(ProvisioningUI ui) {
 			super(ui);
 			Collection queries = new ArrayList();
@@ -148,10 +174,8 @@ public class IUQueryablesView extends ProfilesView {
 	}
 
 	private static class MetadataRepositoryLocations implements IQueryable<URI> {
-
 		public IQueryResult<URI> query(IQuery<URI> query, IProgressMonitor monitor) {
 			return query.perform(Arrays.asList(AnalysisHelper.getMetadataRepositoryManager().getKnownRepositories(IRepositoryManager.REPOSITORIES_ALL)).iterator());
 		}
-
 	}
 }

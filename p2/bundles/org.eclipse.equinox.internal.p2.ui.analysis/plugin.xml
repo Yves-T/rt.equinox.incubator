@@ -7,7 +7,16 @@
             name="ProfileAnalysis"
             category="org.eclipse.p2.analysis.ui"
             class="org.eclipse.equinox.internal.p2.ui.analysis.IUQueryablesView"
-            id="org.eclipse.equinox.internal.p2.ui.analysis.ProfilesView2">
+            id="org.eclipse.equinox.internal.p2.ui.analysis.IUQueryablesView">
+		</view>
+	</extension>
+	<extension point="org.eclipse.ui.views">
+		<category name="p2 IU Properties" id="org.eclipse.p2.analysis.ui" />
+		<view
+            name="IUProperties"
+            category="org.eclipse.p2.analysis.ui"
+            class="org.eclipse.equinox.internal.p2.ui.analysis.IUPropertiesView"
+            id="org.eclipse.equinox.internal.p2.ui.analysis.IUPropertiesView">
 		</view>
 	</extension>
 	  <extension point="org.eclipse.ui.propertyPages">
@@ -61,4 +70,13 @@
 	          </enabledWhen>
 	      </page>
       </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.eclipse.equinox.internal.p2.ui.analysis.P2AnalysisPerspectiveFactory"
+            fixed="false"
+            id="org.eclipse.equinox.internal.p2.ui.analysis.P2AnalysisPerspectiveFactory"
+            name="p2 Analysis">
+      </perspective>
+   </extension>
 </plugin>

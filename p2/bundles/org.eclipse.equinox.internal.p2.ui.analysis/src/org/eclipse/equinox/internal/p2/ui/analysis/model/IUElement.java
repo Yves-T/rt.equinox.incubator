@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -26,7 +25,7 @@ import org.eclipse.equinox.p2.query.IQueryable;
 public class IUElement extends QueriedElement implements IIUElement {
 	private IInstallableUnit iu;
 	Map<String, String> properties;
-	private boolean artifactChildren, iuChildren;
+	private boolean artifactChildren, inverted, iuChildren;
 	private IStatus mark;
 
 	@SuppressWarnings("unchecked")
@@ -41,6 +40,11 @@ public class IUElement extends QueriedElement implements IIUElement {
 
 	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, IInstallableUnit iu) {
 		this(parent, queryable, iu, false, true);
+	}
+
+	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, IInstallableUnit iu, boolean inverted) {
+		this(parent, queryable, iu, false, true);
+		this.inverted = inverted;
 	}
 
 	public Object[] getChildren(Object o) {
@@ -59,14 +63,12 @@ public class IUElement extends QueriedElement implements IIUElement {
 		children = new Object[(ius != null ? ius.size() : 0) + reqs.size() + keys.length];
 		int i = 0;
 
-		if (ius != null) {
-			Iterator<IUElement> iter = ius.iterator();
-			while (iter.hasNext())
-				children[i++] = iter.next();
-		}
-		Iterator<IRequirement> iter = reqs.iterator();
-		while (iter.hasNext())
-			children[i++] = new RequirementElement(this, iter.next());
+		if (ius != null)
+			for (IUElement iu : ius)
+				children[i++] = iu;
+
+		for (IRequirement requirement : reqs)
+			children[i++] = new RequirementElement(this, requirement);
 
 		if (i != 0)
 			for (int x = i; x < children.length; x++)
@@ -89,14 +91,18 @@ public class IUElement extends QueriedElement implements IIUElement {
 		Collection<IUElement> ius = null;
 
 		if (iuChildren) {
-			if (iu.getRequirements().isEmpty())
-				return ius;
-			IQueryResult<IInstallableUnit> ius2 = getMyQueryable().query(AnalysisHelper.createQuery(iu.getRequirements()), new NullProgressMonitor());
+			if (inverted) {
 
-			ius = new ArrayList<IUElement>();
+			} else {
+				if (iu.getRequirements().isEmpty())
+					return ius;
+				IQueryResult<IInstallableUnit> ius2 = getMyQueryable().query(AnalysisHelper.createQuery(iu.getRequirements()), new NullProgressMonitor());
 
-			for (IInstallableUnit iu : ius2.toSet())
-				ius.add(new IUElement(this, getMyQueryable(), iu, artifactChildren, iuChildren));
+				ius = new ArrayList<IUElement>();
+
+				for (IInstallableUnit iu : ius2.toSet())
+					ius.add(new IUElement(this, getMyQueryable(), iu, artifactChildren, iuChildren));
+			}
 		}
 		return ius;
 	}
@@ -122,7 +128,7 @@ public class IUElement extends QueriedElement implements IIUElement {
 	}
 
 	public String getLabel(Object o) {
-		return iu.getId(); //$NON-NLS-1$
+		return iu.getId();
 	}
 
 	public void setChildren(boolean artifact, boolean iu) {
