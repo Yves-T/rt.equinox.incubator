@@ -17,7 +17,7 @@ public class IUElementWrapper extends QueriedElementWrapper {
 
 	protected Object wrap(Object o) {
 		if (o instanceof IInstallableUnit)
-			return new IUElement(parent, (IQueryable<IInstallableUnit>) queryable, null, (IInstallableUnit) o);
+			return new IUElement(parent, (IQueryable<IInstallableUnit>) queryable, (IInstallableUnit) o);
 		return super.wrap(o);
 	}
 }

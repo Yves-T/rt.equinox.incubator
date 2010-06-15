@@ -25,24 +25,22 @@ import org.eclipse.equinox.p2.query.IQueryable;
 
 public class IUElement extends QueriedElement implements IIUElement {
 	private IInstallableUnit iu;
-	private IQueryable<IInstallableUnit> queryable;
-	private IProfile profile;
-	private Map<String, String> properties;
+	Map<String, String> properties;
 	private boolean artifactChildren, iuChildren;
 	private IStatus mark;
 
-	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, IProfile profile, IInstallableUnit iu, boolean artifactChildren, boolean iuChildren) {
+	@SuppressWarnings("unchecked")
+	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, IInstallableUnit iu, boolean artifactChildren, boolean iuChildren) {
 		super(parent);
 		this.iu = iu;
 		this.artifactChildren = artifactChildren;
 		this.iuChildren = iuChildren;
 		this.queryable = queryable;
-		this.profile = profile;
-		this.properties = profile == null ? Collections.EMPTY_MAP : profile.getProperties();
+		this.properties = queryable instanceof IProfile ? ((IProfile) queryable).getProperties() : Collections.EMPTY_MAP;
 	}
 
-	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, IProfile profile, IInstallableUnit iu) {
-		this(parent, queryable, profile, iu, false, true);
+	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, IInstallableUnit iu) {
+		this(parent, queryable, iu, false, true);
 	}
 
 	public Object[] getChildren(Object o) {
@@ -93,13 +91,12 @@ public class IUElement extends QueriedElement implements IIUElement {
 		if (iuChildren) {
 			if (iu.getRequirements().isEmpty())
 				return ius;
-			IQueryResult<IInstallableUnit> ius2 = queryable.query(AnalysisHelper.createQuery(iu.getRequirements()), new NullProgressMonitor());
+			IQueryResult<IInstallableUnit> ius2 = getMyQueryable().query(AnalysisHelper.createQuery(iu.getRequirements()), new NullProgressMonitor());
 
 			ius = new ArrayList<IUElement>();
 
-			Iterator<IInstallableUnit> iter = ius2.iterator();
-			while (iter.hasNext())
-				ius.add(new IUElement(this, queryable, profile, (IInstallableUnit) iter.next(), artifactChildren, iuChildren));
+			for (IInstallableUnit iu : ius2.toSet())
+				ius.add(new IUElement(this, getMyQueryable(), iu, artifactChildren, iuChildren));
 		}
 		return ius;
 	}
@@ -109,7 +106,7 @@ public class IUElement extends QueriedElement implements IIUElement {
 		if (isMarked()) {
 			// find missing requirements
 			MissingRequirementQuery query = new MissingRequirementQuery(iu.getRequirements(), properties, false);
-			queryable.query(query, new NullProgressMonitor());
+			getMyQueryable().query(query, new NullProgressMonitor());
 			IRequirement[] req = query.getMissing();
 
 			for (int i = 0; i < req.length; i++) {
@@ -167,13 +164,9 @@ public class IUElement extends QueriedElement implements IIUElement {
 		return super.getAdapter(adapter);
 	}
 
-	public IProfile getProfile() {
-		return profile;
-	}
-
 	public boolean isMarked() {
 		if (mark == null) {
-			Slicer slicer = new Slicer(queryable, properties, true);
+			Slicer slicer = new Slicer(getMyQueryable(), properties, true);
 			slicer.slice(new IInstallableUnit[] {iu}, new NullProgressMonitor());
 
 			mark = slicer.getStatus();
@@ -197,5 +190,10 @@ public class IUElement extends QueriedElement implements IIUElement {
 	@Override
 	protected int getDefaultQueryType() {
 		return 0;
+	}
+
+	@SuppressWarnings("unchecked")
+	private IQueryable<IInstallableUnit> getMyQueryable() {
+		return (IQueryable<IInstallableUnit>) getQueryable();
 	}
 }

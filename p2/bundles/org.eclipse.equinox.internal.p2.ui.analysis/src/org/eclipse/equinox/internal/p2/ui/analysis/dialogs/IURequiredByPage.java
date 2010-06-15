@@ -14,6 +14,6 @@ public class IURequiredByPage extends AbstractAnalysisPropertyPage {
 		label.setText(Messages.IUAnalysisPage_RequiredBy);
 		label.setLayoutData(getGridData(2));
 
-		new ProfileTreeViewer(parent, getProfile(), new IInstallableUnit[] {getIU()}, "Not Required");
+		new ProfileTreeViewer(parent, getQueryable(), new IInstallableUnit[] {getIU()}, "Not Required");
 	}
 }

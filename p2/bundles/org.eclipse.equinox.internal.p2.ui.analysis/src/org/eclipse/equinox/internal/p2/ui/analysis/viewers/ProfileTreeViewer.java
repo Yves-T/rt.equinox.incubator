@@ -2,7 +2,6 @@ package org.eclipse.equinox.internal.p2.ui.analysis.viewers;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -11,7 +10,6 @@ import org.eclipse.equinox.internal.p2.director.QueryableArray;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisActivator;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisHelper;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.IUElement;
-import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.query.IQueryable;
 import org.eclipse.jface.dialogs.Dialog;
@@ -35,18 +33,18 @@ public class ProfileTreeViewer {
 	protected Button[] radio;
 	protected GridData gdFull;
 
-	private IProfile profile;
+	private IQueryable<IInstallableUnit> profile;
 	private IInstallableUnit[] iusToRemove;
 	private Collection<IInstallableUnit> brokenIUs;
 	private TreeElement<IInstallableUnit> listView;
 	private TreeElement<IUElement> profileView;
 	private String defaultMessage;
 
-	public ProfileTreeViewer(Composite parent, IProfile profile, IInstallableUnit[] iusToRemove) {
+	public ProfileTreeViewer(Composite parent, IQueryable<IInstallableUnit> profile, IInstallableUnit[] iusToRemove) {
 		this(parent, profile, iusToRemove, null);
 	}
 
-	public ProfileTreeViewer(Composite parent, IProfile profile, IInstallableUnit[] iusToRemove, String defaultMessage) {
+	public ProfileTreeViewer(Composite parent, IQueryable<IInstallableUnit> profile, IInstallableUnit[] iusToRemove, String defaultMessage) {
 		display = parent.getDisplay();
 		this.defaultMessage = defaultMessage;
 		this.profile = profile;
@@ -101,18 +99,16 @@ public class ProfileTreeViewer {
 			}
 
 			private void populateTree(IProgressMonitor monitor) {
-				IInstallableUnit[] roots = AnalysisHelper.getProfileRoots(profile, monitor);
+				Collection<IInstallableUnit> roots = AnalysisHelper.getRoots(profile, monitor);
 				profileView = new TreeElement<IUElement>();
-				Map<String, String> properties = profile.getProperties();
+
 				IQueryable<IInstallableUnit> queryable = new QueryableArray(AnalysisHelper.subtract(profile, iusToRemove));
 
-				for (int i = 0; i < roots.length; i++) {
-					IUElement iuElement = new IUElement(profileView, queryable, profile, roots[i], false, true);
+				if (monitor.isCanceled())
+					return;
 
-					profileView.addChild(iuElement);
-					if (monitor.isCanceled())
-						break;
-				}
+				for (IInstallableUnit iu : roots)
+					profileView.addChild(new IUElement(profileView, queryable, iu, false, true));
 			}
 
 			private void populateList() {

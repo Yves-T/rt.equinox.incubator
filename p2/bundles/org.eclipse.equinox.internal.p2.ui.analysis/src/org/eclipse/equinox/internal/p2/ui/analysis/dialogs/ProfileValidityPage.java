@@ -13,6 +13,6 @@ public class ProfileValidityPage extends AbstractAnalysisPropertyPage {
 		label.setText("Results");
 		label.setLayoutData(getGridData(2));
 
-		new ProfileTreeViewer(parent, getProfile(), new IInstallableUnit[] {getIU()}, "Valid Profile");
+		new ProfileTreeViewer(parent, getQueryable(), new IInstallableUnit[] {getIU()}, "Valid Profile");
 	}
 }

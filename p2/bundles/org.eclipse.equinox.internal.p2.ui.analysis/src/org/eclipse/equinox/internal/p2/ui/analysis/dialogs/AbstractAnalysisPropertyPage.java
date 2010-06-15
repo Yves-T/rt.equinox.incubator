@@ -10,6 +10,7 @@ import org.eclipse.equinox.internal.p2.ui.model.ProfileElement;
 import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.engine.IProfileRegistry;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.query.IQueryable;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -43,7 +44,7 @@ public abstract class AbstractAnalysisPropertyPage extends PropertyPage {
 		return composite;
 	}
 
-	protected IProfile getProfile() {
+	protected IQueryable<IInstallableUnit> getQueryable() {
 		IAdaptable element = getElement();
 		if (element instanceof ProfileElement)
 			return (IProfile) ((ProfileElement) element).getQueryable();
@@ -57,7 +58,7 @@ public abstract class AbstractAnalysisPropertyPage extends PropertyPage {
 			if (profileRegistry != null)
 				return profileRegistry.getProfile(profileId);
 		} else if (element instanceof IUElement)
-			return ((IUElement) element).getProfile();
+			return (IQueryable<IInstallableUnit>) ((IUElement) element).getQueryable();
 		return null;
 	}
 

@@ -3,6 +3,7 @@ package org.eclipse.equinox.internal.p2.ui.analysis.viewers;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -49,14 +50,12 @@ public class InstallabilityViewer {
 	protected Button query;
 	private GridData gdList, gdFull;
 	private Display display;
-	private IInstallableUnit[] ius;
-	private Map<String, String> properties;
+	private Collection<IInstallableUnit> ius;
 	private IQueryable<IInstallableUnit> queryable;
 
-	public InstallabilityViewer(Composite parent, IQueryable<IInstallableUnit> queryable, IInstallableUnit[] ius, Map<String, String> properties) {
+	public InstallabilityViewer(Composite parent, IQueryable<IInstallableUnit> queryable, Collection<IInstallableUnit> ius) {
 		this.ius = ius;
 		this.display = parent.getDisplay();
-		this.properties = properties;
 		this.queryable = queryable;
 		getContents(parent);
 	}
@@ -115,8 +114,8 @@ public class InstallabilityViewer {
 			protected IStatus run(IProgressMonitor monitor) {
 				SubMonitor subMon = SubMonitor.convert(monitor, "Determining Profile Installability", 15);
 				try {
-					Slicer slicer = new Slicer(queryable, properties, true);
-					Collection<IInstallableUnit> iuCollection = slicer.slice(ius, subMon.newChild(10)).query(QueryUtil.ALL_UNITS, subMon.newChild(1)).toSet();
+					Slicer slicer = new Slicer(queryable, (Map<String, String>) Collections.EMPTY_MAP, true);
+					Collection<IInstallableUnit> iuCollection = slicer.slice(ius.toArray(new IInstallableUnit[ius.size()]), subMon.newChild(10)).query(QueryUtil.ALL_UNITS, subMon.newChild(1)).toSet();
 					subMon.worked(1);
 					if (subMon.isCanceled())
 						return Status.CANCEL_STATUS;

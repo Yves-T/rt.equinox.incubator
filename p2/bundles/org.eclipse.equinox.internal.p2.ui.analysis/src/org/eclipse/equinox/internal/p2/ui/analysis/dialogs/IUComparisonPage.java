@@ -1,7 +1,9 @@
 package org.eclipse.equinox.internal.p2.ui.analysis.dialogs;
 
-import java.util.Iterator;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisHelper;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.AnalysisTreeViewer;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.TreeElement;
@@ -11,6 +13,7 @@ import org.eclipse.equinox.p2.query.QueryUtil;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 public class IUComparisonPage extends AbstractAnalysisPropertyPage {
@@ -27,24 +30,33 @@ public class IUComparisonPage extends AbstractAnalysisPropertyPage {
 	}
 
 	private void initialize() {
-		TreeElement<Object> root = new TreeElement<Object>();
-		IMetadataRepository repo = AnalysisHelper.getMetadataRepository();
-		IQueryResult<IInstallableUnit> ius = repo.query(QueryUtil.createIUQuery(getIU().getId(), getIU().getVersion()), new NullProgressMonitor());
+		Job job = new Job("Comparing IUs") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				final TreeElement<Object> root = new TreeElement<Object>();
+				IMetadataRepository repo = AnalysisHelper.getMetadataRepository();
+				IQueryResult<IInstallableUnit> ius = repo.query(QueryUtil.createIUQuery(getIU().getId(), getIU().getVersion()), monitor);
 
-		int iuCount = 0;
-		Iterator<IInstallableUnit> iter = ius.iterator();
-		while (iter.hasNext()) {
-			IInstallableUnit iu = iter.next();
-			TreeElement<TreeElement<String>> child = AnalysisHelper.diff(getIU(), iu);
-			if (child != null)
-				root.addChild(child);
-			iuCount++;
-		}
-		if (root.getChildren().length == 0)
-			root.addChild("No differences found between profile and source installable unit(s)");
-		else if (iuCount == 0)
-			root.addChild("No source for IU lcoated");
+				int iuCount = 0;
+				for (IInstallableUnit iu : ius.toSet()) {
+					TreeElement<TreeElement<String>> child = AnalysisHelper.diff(getIU(), iu);
+					if (child != null)
+						root.addChild(child);
+					iuCount++;
+				}
+				if (root.getChildren().length == 0)
+					root.addChild("No differences found between profile and source installable unit(s)");
+				else if (iuCount == 0)
+					root.addChild("No source for IU located");
 
-		tree.setInput(root);
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run() {
+						tree.setInput(root);
+					}
+				});
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
 	}
 }

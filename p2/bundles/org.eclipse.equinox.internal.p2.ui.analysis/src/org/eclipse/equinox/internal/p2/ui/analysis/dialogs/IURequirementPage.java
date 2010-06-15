@@ -3,6 +3,8 @@ package org.eclipse.equinox.internal.p2.ui.analysis.dialogs;
 import org.eclipse.equinox.internal.p2.ui.analysis.Messages;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.IUElement;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.AnalysisTreeViewer;
+import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.query.IQueryable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
@@ -18,7 +20,8 @@ public class IURequirementPage extends AbstractAnalysisPropertyPage {
 	private IUElement input;
 
 	protected void getContents(Composite parent) {
-		input = new IUElement(null, getProfile(), getProfile(), getIU(), true, false);
+		IQueryable<IInstallableUnit> queryable = getQueryable();
+		input = new IUElement(null, queryable, getIU(), true, false);
 
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.IUAnalysisPage_Requirements);

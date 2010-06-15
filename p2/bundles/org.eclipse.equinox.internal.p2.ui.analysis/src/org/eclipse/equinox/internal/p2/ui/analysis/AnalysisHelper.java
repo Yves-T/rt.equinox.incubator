@@ -2,9 +2,8 @@ package org.eclipse.equinox.internal.p2.ui.analysis;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -38,17 +37,25 @@ public class AnalysisHelper {
 		return (IInstallableUnit[]) profile.query(new IUProfilePropertyQuery(IProfile.PROP_PROFILE_ROOT_IU, Boolean.TRUE.toString()), monitor).toArray(IInstallableUnit.class);
 	}
 
+	public static Collection<IInstallableUnit> getRoots(IQueryable<IInstallableUnit> queryable, IProgressMonitor monitor) {
+		if (queryable instanceof IProfile)
+			return queryable.query(new IUProfilePropertyQuery(IProfile.PROP_PROFILE_ROOT_IU, Boolean.TRUE.toString()), monitor).toSet();
+		else if (queryable instanceof IMetadataRepository)
+			return queryable.query(QueryUtil.createIUCategoryQuery(), monitor).toSet();
+		return Collections.EMPTY_LIST;
+	}
+
 	// Determine if the profile is valid (ie, all dependencies met)
 	public static IStatus checkProfileValidity(IProfile profile, Collection<IInstallableUnit> collector, IProgressMonitor monitor) {
 		return checkValidity(profile, new IInstallableUnit[0], collector, monitor);
 	}
 
 	// Check the validity of a profile when some IUs are removed.  (Can be none)
-	public static IStatus checkValidity(IProfile profile, IInstallableUnit[] iusToRemove, Collection<IInstallableUnit> collector, IProgressMonitor monitor) {
+	public static IStatus checkValidity(IQueryable<IInstallableUnit> profile, IInstallableUnit[] iusToRemove, Collection<IInstallableUnit> collector, IProgressMonitor monitor) {
 		SubMonitor subMon = SubMonitor.convert(monitor, "Verifying profile", 50);
 		try {
-			Collection<IInstallableUnit> profileRootIUs = new ArrayList<IInstallableUnit>(Arrays.asList(getProfileRoots(profile, subMon.newChild(10))));
-			Collection<IInstallableUnit> profileIUs = new ArrayList<IInstallableUnit>(getProfileIUs(profile, subMon.newChild(10)));
+			Collection<IInstallableUnit> profileRootIUs = getRoots(profile, subMon.newChild(10));
+			Collection<IInstallableUnit> profileIUs = new ArrayList<IInstallableUnit>(getAllIUs(profile, subMon.newChild(10)));
 
 			// Remove IUs from those collected from the profile
 			for (int i = 0; i < iusToRemove.length; i++) {
@@ -56,7 +63,9 @@ public class AnalysisHelper {
 				profileIUs.remove(iusToRemove[i]);
 			}
 
-			Slicer slicer = new Slicer(new QueryableArray(profileIUs.toArray(new IInstallableUnit[profileIUs.size()])), new Hashtable<String, String>(profile.getProperties()), true);
+			Map<String, String> prop = profile instanceof IProfile ? ((IProfile) profile).getProperties() : Collections.EMPTY_MAP;
+
+			Slicer slicer = new Slicer(new QueryableArray(profileIUs.toArray(new IInstallableUnit[profileIUs.size()])), prop, true);
 			slicer.slice((IInstallableUnit[]) profileRootIUs.toArray(new IInstallableUnit[profileRootIUs.size()]), subMon.newChild(40));
 
 			IStatus slicerStatus = slicer.getStatus();
@@ -142,7 +151,7 @@ public class AnalysisHelper {
 	}
 
 	// Get all the installable units in a profile
-	private static Collection<IInstallableUnit> getProfileIUs(IProfile profile, IProgressMonitor monitor) {
+	private static Collection<IInstallableUnit> getAllIUs(IQueryable<IInstallableUnit> profile, IProgressMonitor monitor) {
 		return profile.query(QueryUtil.ALL_UNITS, monitor).toSet();
 	}
 
