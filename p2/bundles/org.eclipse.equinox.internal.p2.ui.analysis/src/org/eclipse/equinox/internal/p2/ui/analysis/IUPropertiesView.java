@@ -16,6 +16,7 @@ import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.metadata.IRequirement;
 import org.eclipse.equinox.p2.query.IQueryable;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -24,10 +25,32 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 
 public class IUPropertiesView extends ProfilesView {
 	private IUProperties input;
+
+	private class FocusAction extends Action {
+		FocusAction() {
+			setText("Focus on");
+			setToolTipText("Focus on");
+			setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+		}
+
+		public void run() {
+			IUElement element = input.getElement();
+			if (element != null) {
+				QueryableFilterSelectionDialog dialog = new QueryableFilterSelectionDialog(viewer.getControl().getShell(), (IQueryable<IInstallableUnit>) element.getQueryable());
+				dialog.setBlockOnOpen(true);
+				dialog.open();
+				if (dialog.getFirstResult() != null) {
+					input.setIUElement(new IUElement(null, (IQueryable<IInstallableUnit>) element.getQueryable(), (IInstallableUnit) dialog.getFirstResult()));
+				}
+			}
+		}
+	}
 
 	protected Object getInput() {
 		if (input == null)
@@ -54,7 +77,16 @@ public class IUPropertiesView extends ProfilesView {
 	}
 
 	protected void fillLocalToolBar(IToolBarManager manager) {
+		manager.add(focusAction);
+		focusAction.setEnabled(false);
 	}
+
+	protected void makeActions() {
+		super.makeActions();
+		focusAction = new FocusAction();
+	}
+
+	private Action focusAction;
 
 	private void attachSelectionListener() {
 		// get the selection service from our local service locator
@@ -66,6 +98,7 @@ public class IUPropertiesView extends ProfilesView {
 				Object element = structuredSelection.getFirstElement();
 				if ((element == null || element instanceof IUElement) && input != null) {
 					input.setIUElement((IUElement) element);
+					focusAction.setEnabled(element != null);
 				}
 			}
 		});

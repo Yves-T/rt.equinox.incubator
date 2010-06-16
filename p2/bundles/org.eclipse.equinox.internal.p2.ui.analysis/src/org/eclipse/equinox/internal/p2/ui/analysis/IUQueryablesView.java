@@ -13,6 +13,8 @@ import org.eclipse.equinox.internal.p2.ui.admin.ProfilesView;
 import org.eclipse.equinox.internal.p2.ui.admin.ProvAdminUIMessages;
 import org.eclipse.equinox.internal.p2.ui.admin.dialogs.AddMetadataRepositoryDialog;
 import org.eclipse.equinox.internal.p2.ui.analysis.dialogs.AddForeignProfileDialog;
+import org.eclipse.equinox.internal.p2.ui.analysis.model.ForeignProfileElement;
+import org.eclipse.equinox.internal.p2.ui.model.MetadataRepositoryElement;
 import org.eclipse.equinox.internal.p2.ui.model.ProfileElement;
 import org.eclipse.equinox.internal.p2.ui.model.RootElement;
 import org.eclipse.equinox.internal.p2.ui.viewers.StructuredViewerProvisioningListener;
@@ -68,11 +70,13 @@ public class IUQueryablesView extends ProfilesView {
 		}
 
 		public void run() {
-			Object[] selections = getSelection().toArray();
 			List<String> profilesOnly = new ArrayList<String>();
-			for (int i = 0; i < selections.length; i++) {
-				if (selections[i] instanceof ProfileElement)
-					profilesOnly.add(((ProfileElement) selections[i]).getProfileId());
+			for (Object selection : getSelection().toArray()) {
+				if (selection instanceof ProfileElement)
+					profilesOnly.add(((ProfileElement) selection).getProfileId());
+				else if (selection instanceof MetadataRepositoryElement) {
+					AnalysisHelper.getMetadataRepositoryManager().removeRepository(((MetadataRepositoryElement) selection).getLocation());
+				}
 			}
 			AnalysisActivator.getDefault().getKnownProfiles().removeProfile(profilesOnly.toArray(new String[profilesOnly.size()]));
 		}
@@ -113,12 +117,12 @@ public class IUQueryablesView extends ProfilesView {
 	protected void selectionChanged(IStructuredSelection ss) {
 		propertiesAction.setEnabled(false);
 		removeProfileAction.setEnabled(false);
-		if (ss.size() == 1) {
-			propertiesAction.setEnabled(true);
+		if (ss.size() == 1 && (ss.getFirstElement() instanceof ForeignProfileElement) || ss.getFirstElement() instanceof MetadataRepositoryElement) {
+			removeProfileAction.setEnabled(true);
 		}
 		Object[] selectionArray = ss.toArray();
 		if (selectionArray.length > 0) {
-			removeProfileAction.setEnabled(true);
+			propertiesAction.setEnabled(true);
 		}
 	}
 
