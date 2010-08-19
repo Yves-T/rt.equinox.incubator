@@ -10,6 +10,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.equinox.internal.p2.director.SimplePlanner;
 import org.eclipse.equinox.internal.p2.director.Slicer;
 import org.eclipse.equinox.internal.p2.ui.ProvUIImages;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisHelper;
@@ -35,7 +36,7 @@ public class IUElement extends QueriedElement implements IIUElement {
 		this.artifactChildren = artifactChildren;
 		this.iuChildren = iuChildren;
 		this.queryable = queryable;
-		this.properties = queryable instanceof IProfile ? ((IProfile) queryable).getProperties() : Collections.EMPTY_MAP;
+		this.properties = queryable instanceof IProfile ? SimplePlanner.createSelectionContext(((IProfile) queryable).getProperties()) : Collections.EMPTY_MAP;
 	}
 
 	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, IInstallableUnit iu) {
