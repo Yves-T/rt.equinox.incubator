@@ -2,18 +2,20 @@ package org.eclipse.equinox.internal.p2.ui.analysis;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.equinox.internal.p2.director.QueryableArray;
 import org.eclipse.equinox.internal.p2.ui.admin.ProfilesView;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.IUElement;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.RequirementElement;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.AnalysisLabelProvider;
 import org.eclipse.equinox.internal.p2.ui.model.ProvElement;
-import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.metadata.IRequirement;
+import org.eclipse.equinox.p2.metadata.expression.IExpression;
+import org.eclipse.equinox.p2.query.CollectionResult;
+import org.eclipse.equinox.p2.query.IQuery;
+import org.eclipse.equinox.p2.query.IQueryResult;
 import org.eclipse.equinox.p2.query.IQueryable;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.action.Action;
@@ -125,14 +127,11 @@ public class IUPropertiesView extends ProfilesView {
 			if (element == null)
 				return new Object[0];
 			IQueryable<IInstallableUnit> queryable = (IQueryable<IInstallableUnit>) element.getQueryable();
-			Collection<IInstallableUnit> roots = AnalysisHelper.getRoots(queryable, new NullProgressMonitor());
-			roots.remove(element.getIU());
-			IQueryable<IInstallableUnit> queryable2 = new QueryableArray(AnalysisHelper.subtract(queryable, new IInstallableUnit[] {element.getIU()}));
+			RequirementsFullfilledQuery query = new RequirementsFullfilledQuery(element.getIU());
+			queryable.query(query, new NullProgressMonitor());
 
-			Collection<IRequirement> missingRequirements = new HashSet<IRequirement>();
-			missingRequirements.addAll(AnalysisHelper.getMissingRequirements(roots.toArray(new IInstallableUnit[roots.size()]), queryable2, (queryable instanceof IProfile) ? ((IProfile) queryable).getProperties() : Collections.EMPTY_MAP, new NullProgressMonitor()));
-			Collection<RequirementElement> children = new ArrayList<RequirementElement>(missingRequirements.size());
-			for (IRequirement requirement : missingRequirements)
+			Collection<RequirementElement> children = new ArrayList<RequirementElement>(query.getMatchingRequirements().size());
+			for (IRequirement requirement : query.getMatchingRequirements())
 				children.add(new RequirementElement(this, requirement));
 
 			return children.toArray();
@@ -140,6 +139,37 @@ public class IUPropertiesView extends ProfilesView {
 
 		public String getLabel(Object o) {
 			return element.getLabel(o);
+		}
+	}
+
+	private static class RequirementsFullfilledQuery implements IQuery<IInstallableUnit> {
+		private Collection<IRequirement> matchingRequirements = new HashSet<IRequirement>();
+		private IInstallableUnit iu;
+
+		public RequirementsFullfilledQuery(IInstallableUnit iu) {
+			this.iu = iu;
+		}
+
+		public IQueryResult<IInstallableUnit> perform(Iterator<IInstallableUnit> iterator) {
+			Collection<IInstallableUnit> ius = new ArrayList<IInstallableUnit>();
+			while (iterator.hasNext()) {
+				IInstallableUnit candidateIU = iterator.next();
+				for (IRequirement requirement : candidateIU.getRequirements()) {
+					if (requirement.isMatch(iu)) {
+						ius.add(candidateIU);
+						matchingRequirements.add(requirement);
+					}
+				}
+			}
+			return new CollectionResult<IInstallableUnit>(ius);
+		}
+
+		public IExpression getExpression() {
+			return null;
+		}
+
+		Collection<IRequirement> getMatchingRequirements() {
+			return matchingRequirements;
 		}
 	}
 }

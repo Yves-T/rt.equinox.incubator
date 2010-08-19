@@ -95,8 +95,6 @@ public class AddForeignProfileDialog extends StatusDialog {
 			final String msg = "Unable to instantiate p2 agent at location "; //$NON-NLS-1$
 			LogHelper.log(new Status(IStatus.ERROR, AnalysisActivator.PLUGIN_ID, msg, e));
 		}
-		//		String profilePath = profileDialogArea.getProfilePath();
-		//		ForeignProfile profile = new ForeignProfile(new File(profilePath));
 	}
 
 	private URI doLayout() throws IOException {

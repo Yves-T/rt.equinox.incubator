@@ -4,7 +4,8 @@ Bundle-Name: %pluginName
 Bundle-Vendor: %providerName
 Bundle-SymbolicName: org.eclipse.equinox.internal.p2.ui.analysis;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: J2SE-1.5,
+ JavaSE-1.6
 Import-Package: org.eclipse.core.runtime,
  org.eclipse.core.runtime.jobs,
  org.eclipse.equinox.internal.p2.artifact.repository,

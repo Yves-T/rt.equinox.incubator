@@ -13,7 +13,7 @@
 	<extension point="org.eclipse.ui.views">
 		<category name="p2 IU Properties" id="org.eclipse.p2.analysis.ui" />
 		<view
-            name="IUProperties"
+            name="IU Fullfills"
             category="org.eclipse.p2.analysis.ui"
             class="org.eclipse.equinox.internal.p2.ui.analysis.IUPropertiesView"
             id="org.eclipse.equinox.internal.p2.ui.analysis.IUPropertiesView">
