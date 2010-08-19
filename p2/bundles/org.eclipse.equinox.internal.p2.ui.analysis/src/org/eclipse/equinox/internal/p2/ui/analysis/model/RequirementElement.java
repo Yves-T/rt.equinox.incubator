@@ -1,13 +1,16 @@
 package org.eclipse.equinox.internal.p2.ui.analysis.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.equinox.internal.p2.director.SimplePlanner;
 import org.eclipse.equinox.internal.p2.metadata.IRequiredCapability;
 import org.eclipse.equinox.internal.p2.ui.ProvUIImages;
 import org.eclipse.equinox.internal.p2.ui.analysis.IUPropertiesView.IUProperties;
 import org.eclipse.equinox.internal.p2.ui.model.ProvElement;
+import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.metadata.IRequirement;
 import org.eclipse.equinox.p2.query.IQueryable;
@@ -41,7 +44,7 @@ public class RequirementElement extends ProvElement {
 			IQueryable<IInstallableUnit> queryable = (IQueryable<IInstallableUnit>) ((IUProperties) getParent(o)).getElement().getQueryable();
 			Iterator<IInstallableUnit> iter = queryable.query(new OwnsRequirementQuery(capability), new NullProgressMonitor()).iterator();
 			while (iter.hasNext())
-				children.add(new IUElement(this, queryable, iter.next(), false, false));
+				children.add(new IUElement(this, queryable, queryable instanceof IProfile ? SimplePlanner.createSelectionContext(((IProfile) queryable).getProperties()) : Collections.EMPTY_MAP, iter.next(), false, false));
 		}
 		return children.toArray();
 	}

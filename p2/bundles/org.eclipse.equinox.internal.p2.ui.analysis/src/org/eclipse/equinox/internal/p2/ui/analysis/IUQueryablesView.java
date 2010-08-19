@@ -49,20 +49,6 @@ public class IUQueryablesView extends ProfilesView {
 		}
 	}
 
-	//	private class AddFeatureAction extends Action {
-	//		AddFeatureAction() {
-	//			setText("Add feature");
-	//		}
-	//
-	//		public void run() {
-	//			new FileDialog(viewer.getControl().getShell(), new AnalysisDialog(new String[] {"*.feature"}) {
-	//				public void perform() {
-	//
-	//				}
-	//			});
-	//		}
-	//	}
-
 	private class AddRepositoryAction extends Action {
 		AddRepositoryAction() {
 			setText(Messages.ProfilesView2_AddRepositoryText);
@@ -163,7 +149,6 @@ public class IUQueryablesView extends ProfilesView {
 		manager.add(addProfileAction);
 		manager.add(addRepositoryAction);
 		manager.add(removeProfileAction);
-		//manager.add(new AddFeatureAction());
 	}
 
 	private static class IUQueryables extends RootElement {

@@ -3,21 +3,18 @@ package org.eclipse.equinox.internal.p2.ui.analysis.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.equinox.internal.p2.director.SimplePlanner;
 import org.eclipse.equinox.internal.p2.director.Slicer;
 import org.eclipse.equinox.internal.p2.ui.ProvUIImages;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisHelper;
 import org.eclipse.equinox.internal.p2.ui.analysis.query.MissingRequirementQuery;
 import org.eclipse.equinox.internal.p2.ui.model.IIUElement;
 import org.eclipse.equinox.internal.p2.ui.model.QueriedElement;
-import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.metadata.IRequirement;
 import org.eclipse.equinox.p2.query.IQueryResult;
@@ -30,21 +27,21 @@ public class IUElement extends QueriedElement implements IIUElement {
 	private IStatus mark;
 
 	@SuppressWarnings("unchecked")
-	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, IInstallableUnit iu, boolean artifactChildren, boolean iuChildren) {
+	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, Map<String, String> properties, IInstallableUnit iu, boolean artifactChildren, boolean iuChildren) {
 		super(parent);
 		this.iu = iu;
 		this.artifactChildren = artifactChildren;
 		this.iuChildren = iuChildren;
 		this.queryable = queryable;
-		this.properties = queryable instanceof IProfile ? SimplePlanner.createSelectionContext(((IProfile) queryable).getProperties()) : Collections.EMPTY_MAP;
+		this.properties = properties;
 	}
 
-	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, IInstallableUnit iu) {
-		this(parent, queryable, iu, false, true);
+	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, Map<String, String> properties, IInstallableUnit iu) {
+		this(parent, queryable, properties, iu, false, true);
 	}
 
-	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, IInstallableUnit iu, boolean inverted) {
-		this(parent, queryable, iu, false, true);
+	public IUElement(Object parent, IQueryable<IInstallableUnit> queryable, Map<String, String> properties, IInstallableUnit iu, boolean inverted) {
+		this(parent, queryable, properties, iu, false, true);
 		this.inverted = inverted;
 	}
 
@@ -102,7 +99,7 @@ public class IUElement extends QueriedElement implements IIUElement {
 				ius = new ArrayList<IUElement>();
 
 				for (IInstallableUnit iu : ius2.toSet())
-					ius.add(new IUElement(this, getMyQueryable(), iu, artifactChildren, iuChildren));
+					ius.add(new IUElement(this, getMyQueryable(), properties, iu, artifactChildren, iuChildren));
 			}
 		}
 		return ius;

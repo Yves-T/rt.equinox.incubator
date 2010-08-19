@@ -1,8 +1,11 @@
 package org.eclipse.equinox.internal.p2.ui.analysis.dialogs;
 
+import java.util.Collections;
+import org.eclipse.equinox.internal.p2.director.SimplePlanner;
 import org.eclipse.equinox.internal.p2.ui.analysis.Messages;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.IUElement;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.AnalysisTreeViewer;
+import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.query.IQueryable;
 import org.eclipse.swt.SWT;
@@ -21,7 +24,7 @@ public class IURequirementPage extends AbstractAnalysisPropertyPage {
 
 	protected void getContents(Composite parent) {
 		IQueryable<IInstallableUnit> queryable = getQueryable();
-		input = new IUElement(null, queryable, getIU(), true, false);
+		input = new IUElement(null, queryable, queryable instanceof IProfile ? SimplePlanner.createSelectionContext(((IProfile) queryable).getProperties()) : Collections.EMPTY_MAP, getIU(), true, false);
 
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.IUAnalysisPage_Requirements);

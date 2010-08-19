@@ -2,14 +2,17 @@ package org.eclipse.equinox.internal.p2.ui.analysis;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.equinox.internal.p2.director.SimplePlanner;
 import org.eclipse.equinox.internal.p2.ui.admin.ProfilesView;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.IUElement;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.RequirementElement;
 import org.eclipse.equinox.internal.p2.ui.analysis.viewers.AnalysisLabelProvider;
 import org.eclipse.equinox.internal.p2.ui.model.ProvElement;
+import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.metadata.IRequirement;
 import org.eclipse.equinox.p2.metadata.expression.IExpression;
@@ -48,7 +51,8 @@ public class IUPropertiesView extends ProfilesView {
 				dialog.setBlockOnOpen(true);
 				dialog.open();
 				if (dialog.getFirstResult() != null) {
-					input.setIUElement(new IUElement(null, (IQueryable<IInstallableUnit>) element.getQueryable(), (IInstallableUnit) dialog.getFirstResult()));
+					IQueryable<IInstallableUnit> queryable = (IQueryable<IInstallableUnit>) element.getQueryable();
+					input.setIUElement(new IUElement(null, queryable, queryable instanceof IProfile ? SimplePlanner.createSelectionContext(((IProfile) queryable).getProperties()) : Collections.EMPTY_MAP, (IInstallableUnit) dialog.getFirstResult()));
 				}
 			}
 		}

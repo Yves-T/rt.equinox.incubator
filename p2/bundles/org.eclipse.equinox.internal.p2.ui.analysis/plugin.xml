@@ -13,7 +13,7 @@
 	<extension point="org.eclipse.ui.views">
 		<category name="p2 IU Properties" id="org.eclipse.p2.analysis.ui" />
 		<view
-            name="IU Fullfills"
+            name="Requirements Satisfied"
             category="org.eclipse.p2.analysis.ui"
             class="org.eclipse.equinox.internal.p2.ui.analysis.IUPropertiesView"
             id="org.eclipse.equinox.internal.p2.ui.analysis.IUPropertiesView">
@@ -37,7 +37,7 @@
 	             </adapt>
 	          </enabledWhen>
 	      </page>
-	      <page name="IU Requirements"
+	      <page name="IU Dependencies"
 	            class="org.eclipse.equinox.internal.p2.ui.analysis.dialogs.IURequirementPage"
 	            id="org.eclipse.equinox.p2.ui.analysis.IURequirementPage">
 	            <enabledWhen>

@@ -2,15 +2,18 @@ package org.eclipse.equinox.internal.p2.ui.analysis.viewers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.equinox.internal.p2.director.QueryableArray;
+import org.eclipse.equinox.internal.p2.director.SimplePlanner;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisActivator;
 import org.eclipse.equinox.internal.p2.ui.analysis.AnalysisHelper;
 import org.eclipse.equinox.internal.p2.ui.analysis.model.IUElement;
+import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.query.IQueryable;
 import org.eclipse.jface.dialogs.Dialog;
@@ -67,12 +70,12 @@ public class ProfileTreeViewer {
 
 		radio = new Button[2];
 		radio[0] = new Button(group, SWT.RADIO);
-		radio[0].setText("Flat");
+		radio[0].setText("Direct");
 		radio[0].setSelection(true);
 		radio[0].setEnabled(false);
 
 		radio[1] = new Button(group, SWT.RADIO);
-		radio[1].setText("Tree");
+		radio[1].setText("Profile");
 		radio[1].setEnabled(false);
 
 	}
@@ -110,7 +113,7 @@ public class ProfileTreeViewer {
 					return;
 
 				for (IInstallableUnit iu : roots)
-					profileView.addChild(new IUElement(profileView, queryable, iu, false, true));
+					profileView.addChild(new IUElement(profileView, queryable, profile instanceof IProfile ? SimplePlanner.createSelectionContext(((IProfile) profile).getProperties()) : Collections.EMPTY_MAP, iu, false, true));
 			}
 
 			private void populateList() {
