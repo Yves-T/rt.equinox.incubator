@@ -18,6 +18,8 @@ import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.query.IQueryable;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
@@ -56,6 +58,15 @@ public class ProfileTreeViewer {
 
 		tree = new AnalysisTreeViewer(parent, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
 		tree.getControl().setLayoutData(getFullGridData(parent));
+		tree.setComparator(new ViewerComparator() {
+			public int compare(Viewer viewer, Object e1, Object e2) {
+				if (e1 instanceof IUElement && !(e2 instanceof IUElement))
+					return -1;
+				else if (e2 instanceof IUElement && !(e1 instanceof IUElement))
+					return 1;
+				return e1.toString().compareTo(e2.toString());
+			}
+		});
 
 		createRadioButtons(parent);
 
