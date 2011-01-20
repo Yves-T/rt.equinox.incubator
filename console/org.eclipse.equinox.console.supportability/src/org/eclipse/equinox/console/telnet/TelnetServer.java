@@ -12,6 +12,7 @@
 package org.eclipse.equinox.console.telnet;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -28,9 +29,13 @@ public class TelnetServer extends Thread {
     private boolean isRunning = true;
     private CommandProcessor processor;
     
-    public TelnetServer(CommandProcessor processor, int port) throws IOException{
+    public TelnetServer(CommandProcessor processor, String host, int port) throws IOException{
     	this.processor = processor;
-		server = new ServerSocket(port);
+    	if(host != null) {
+    		server = new ServerSocket(port, 0, InetAddress.getByName(host));
+    	} else {
+    		server = new ServerSocket(port);
+    	}
     }
     
 	public void run()

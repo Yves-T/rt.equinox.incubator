@@ -61,15 +61,10 @@ public class Activator implements BundleActivator {
 			properties.put("osgi.command.scope", "equinox");
 			properties.put("osgi.command.function", "telnet");
 			TelnetCommand telnet = new TelnetCommand(processor, context);
-			String telnetPort = context.getProperty("osgi.console");
-			if(telnetPort != null && !"".equals(telnetPort)) {
+			String consolePropValue = context.getProperty("osgi.console");
+			if(consolePropValue != null && !"".equals(consolePropValue)) {
 				try{
-					try {
-						Integer.parseInt(telnetPort);
-						telnet.telnet(new String[]{"start", "-p", telnetPort});
-					} catch (NumberFormatException e1) {
-						telnet.telnet(new String[]{"start"});
-					}
+					telnet.telnet(new String[]{"start"});
 				} catch (Exception e) {
 					System.out.println("Cannot start telnet. Reason: " + e.getMessage());
 					e.printStackTrace();
