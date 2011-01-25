@@ -2,10 +2,10 @@
 <feature
       id="org.eclipse.equinox.jmx.common.feature"
       label="Resource Monitoring Common Feature (Incubation)"
-      version="1.0.0.qualifier"
+      version="1.0.100.qualifier"
       provider-name="Eclipse.org"
       license-feature="org.eclipse.license"
-      license-feature-version="1.0.0.qualifier"> 
+      license-feature-version="1.0.0.qualifier">
 
    <description url="http://www.eclipse.org/equinox/incubator/monitoring/index.php">
       Common infrastructure for managing OSGi-based systems using JMX.

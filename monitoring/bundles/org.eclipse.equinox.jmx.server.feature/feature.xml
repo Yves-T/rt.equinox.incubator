@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.equinox.jmx.server.feature"
       label="Resource Monitoring Server Feature (Incubation)"
-      version="1.0.0.qualifier"
+      version="1.0.100.qualifier"
       provider-name="Eclipse.org"
       license-feature="org.eclipse.license"
       license-feature-version="1.0.0.qualifier">
