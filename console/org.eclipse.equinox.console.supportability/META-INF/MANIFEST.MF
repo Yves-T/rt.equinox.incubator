@@ -2,11 +2,18 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Console supportability plug-in
 Bundle-SymbolicName: org.eclipse.equinox.console.supportability
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.equinox.console.command.adapter.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Import-Package: org.eclipse.osgi.framework.console,
+Import-Package: org.apache.felix.service.command;status=provisional;version="0.6.1",
+ org.eclipse.osgi.framework.console,
+ org.eclipse.osgi.internal.permadmin,
+ org.eclipse.osgi.service.resolver,
+ org.eclipse.osgi.util,
  org.osgi.framework,
- org.osgi.util.tracker,
- org.apache.felix.service.command;status=provisional;version="0.6.1"
+ org.osgi.service.condpermadmin,
+ org.osgi.service.packageadmin,
+ org.osgi.service.permissionadmin,
+ org.osgi.service.startlevel,
+ org.osgi.util.tracker
