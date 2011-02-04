@@ -105,10 +105,10 @@ public class TelnetInputScanner extends Scanner {
     private static final int IS = 0;
 
     private boolean isNegotiation;
-    private boolean isDo;
-    private boolean isDont;
+//    private boolean isDo;
+//    private boolean isDont;
     private boolean isWill;
-    private boolean isWont;
+//    private boolean isWont;
     
     private byte[] tTypeRequest = {(byte)IAC, (byte)SB, (byte)TTYPE, (byte)SEND, (byte)IAC, (byte)SE};
 
@@ -117,9 +117,6 @@ public class TelnetInputScanner extends Scanner {
             scanNegotiation(b);
         } else if (isWill) {
             isWill = false;
-            isWont = false;
-            isDo = false;
-            isDont = false;
             isCommand = false;
             if(b == TTYPE && tTypeNegotiationStarted == false) {
         		sendRequest();
@@ -130,13 +127,10 @@ public class TelnetInputScanner extends Scanner {
                 	isWill = true;
                 	break;
                 case WILL_NOT:
-                	isWont = true;
                 	break;
                 case DO:
-                	isDo = true;
                 	break;
                 case DO_NOT:
-                    isDont = true;
                     break;
                 case SB:
                     isNegotiation = true;
@@ -259,10 +253,7 @@ public class TelnetInputScanner extends Scanner {
     private void startCommand() {
         isCommand = true;
         isNegotiation = false;
-        isDo = false;
-        isDont = false;
         isWill = false;
-        isWont = false;
     }
 
     private void eraseChar() throws IOException {
