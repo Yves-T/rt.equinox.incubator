@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2010 IBM Corporation and others.
+ * Copyright (c) 2003, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,22 +9,12 @@
  *     IBM Corporation - initial API and implementation
  *     Lazar Kirchev, SAP AG - derivative implementation from FrameworkCommandInterpreter
  *******************************************************************************/
-
 package org.eclipse.equinox.console.command.adapter;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.io.*;
+import java.lang.reflect.*;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-
+import java.util.*;
 import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.osgi.framework.Bundle;
 
@@ -92,14 +82,14 @@ public class CustomCommandInterpreter implements CommandInterpreter {
     Method[] methods = t.getClass().getMethods();
 
     int size = methods.length;
-    Class throwable = Throwable.class;
+    Class<Throwable> throwable = Throwable.class;
 
     for (int i = 0; i < size; i++) {
       Method method = methods[i];
 
       if (Modifier.isPublic(method.getModifiers()) && method.getName().startsWith("get") && throwable.isAssignableFrom(method.getReturnType()) && (method.getParameterTypes().length == 0)) { //$NON-NLS-1$
         try {
-          Throwable nested = (Throwable) method.invoke(t, null);
+          Throwable nested = (Throwable) method.invoke(t, (Object) null);
 
           if ((nested != null) && (nested != t)) {
             out.println("Nested Exception");
@@ -152,13 +142,13 @@ public class CustomCommandInterpreter implements CommandInterpreter {
    * @param dic the dictionary to print
    * @param title the header to print above the key/value pairs
    */
-  public void printDictionary(Dictionary dic, String title) {
+  public void printDictionary(Dictionary<?,?> dic, String title) {
     if (dic == null)
       return;
 
     int count = dic.size();
     String[] keys = new String[count];
-    Enumeration keysEnum = dic.keys();
+    Enumeration<?> keysEnum = dic.keys();
     int i = 0;
     while (keysEnum.hasMoreElements()) {
       keys[i++] = (String) keysEnum.nextElement();

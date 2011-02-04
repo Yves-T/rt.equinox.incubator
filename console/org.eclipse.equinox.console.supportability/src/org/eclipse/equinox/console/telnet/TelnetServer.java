@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 SAP AG
+ * Copyright (c) 2010, 2011 SAP AG and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,17 +7,13 @@
  * 
  * Contributors:
  *     Lazar Kirchev, SAP AG - initial API and implementation  
+ *     IBM Corporation - ongoing development
  *******************************************************************************/
-
 package org.eclipse.equinox.console.telnet;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-
+import java.net.*;
 import org.apache.felix.service.command.CommandProcessor;
-import org.osgi.framework.BundleContext;
 
 /**
  * A telnet server, which listens for telnet connections and starts a telnet connection manager
