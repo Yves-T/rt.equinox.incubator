@@ -11,6 +11,8 @@
 package org.eclipse.pde.internal.build.site.compatibility;
 
 import java.util.ArrayList;
+import org.eclipse.equinox.p2.publisher.eclipse.FeatureEntry;
+import org.eclipse.equinox.p2.publisher.eclipse.IPlatformEntry;
 
 /**
  * 

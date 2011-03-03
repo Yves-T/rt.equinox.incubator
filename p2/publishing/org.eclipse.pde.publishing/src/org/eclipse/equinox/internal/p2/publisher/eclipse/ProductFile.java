@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,28 +9,33 @@
  *     IBM Corporation - initial API and implementation
  *     Code 9 - Additional function and fixes
  *     EclipseSource - ongoing development
+ *     Felix Riegger (SAP AG) - consolidation of publishers for PDE formats (bug 331974)
  *******************************************************************************/
 
 package org.eclipse.equinox.internal.p2.publisher.eclipse;
 
 import java.io.*;
 import java.util.*;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import java.util.Map.Entry;
+import javax.xml.parsers.*;
+import org.eclipse.core.runtime.*;
 import org.eclipse.equinox.frameworkadmin.BundleInfo;
 import org.eclipse.equinox.internal.p2.core.helpers.*;
 import org.eclipse.equinox.p2.metadata.IVersionedId;
 import org.eclipse.equinox.p2.metadata.VersionedId;
+import org.eclipse.equinox.p2.publisher.eclipse.FeatureEntry;
 import org.eclipse.osgi.service.datalocation.Location;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.pde.internal.publishing.Activator;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
+import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
  *  Used to parse a .product file.
  */
 public class ProductFile extends DefaultHandler implements IProductDescriptor {
+	public final static String GENERIC_VERSION_NUMBER = "0.0.0"; //$NON-NLS-1$
+
 	private static final String ATTRIBUTE_PATH = "path"; //$NON-NLS-1$
 	private static final String ATTRIBUTE_ICON = "icon"; //$NON-NLS-1$
 	protected static final String ATTRIBUTE_FRAGMENT = "fragment"; //$NON-NLS-1$
@@ -116,6 +121,10 @@ public class ProductFile extends DefaultHandler implements IProductDescriptor {
 	private static final int STATE_LICENSE_URL = 19;
 	private static final int STATE_LICENSE_TEXT = 20;
 
+	private static final String PI_PDEBUILD = "org.eclipse.pde.build"; //$NON-NLS-1$
+	private final static int EXCEPTION_PRODUCT_FORMAT = 23;
+	private final static int EXCEPTION_PRODUCT_FILE = 24;
+
 	private int state = STATE_START;
 
 	private SAXParser parser;
@@ -129,9 +138,9 @@ public class ProductFile extends DefaultHandler implements IProductDescriptor {
 	private String id = null;
 	private String uid = null;
 	private boolean useFeatures = false;
-	protected List<IVersionedId> plugins = null;
-	protected List<IVersionedId> fragments = null;
-	private List<IVersionedId> features = null;
+	protected List<FeatureEntry> plugins = new ArrayList<FeatureEntry>();
+	protected List<FeatureEntry> fragments = new ArrayList<FeatureEntry>();
+	private final List<FeatureEntry> features = new ArrayList<FeatureEntry>();
 	private String splashLocation = null;
 	private String productName = null;
 	private String application = null;
@@ -142,6 +151,7 @@ public class ProductFile extends DefaultHandler implements IProductDescriptor {
 	private Map<String, String> properties;
 	private String licenseURL;
 	private String licenseText = null;
+	private String currentOS;
 
 	private static String normalize(String text) {
 		if (text == null || text.trim().length() == 0)
@@ -164,6 +174,34 @@ public class ProductFile extends DefaultHandler implements IProductDescriptor {
 		return result.toString();
 	}
 
+	public ProductFile(String location, String os) throws CoreException {
+		super();
+		this.currentOS = os;
+		this.location = new File(location);
+		try {
+			parserFactory.setNamespaceAware(true);
+			parser = parserFactory.newSAXParser();
+			InputStream in = new BufferedInputStream(new FileInputStream(location));
+			try {
+				parser.parse(new InputSource(in), this);
+			} finally {
+				try {
+					in.close();
+				} catch (IOException e) {
+					// ignore exception on close (as it was done by Utils.close() before)
+				}
+			}
+		} catch (ParserConfigurationException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PI_PDEBUILD, EXCEPTION_PRODUCT_FORMAT, NLS.bind(Messages.exception_productParse, location), e));
+		} catch (SAXException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PI_PDEBUILD, EXCEPTION_PRODUCT_FORMAT, NLS.bind(Messages.exception_productParse, location), e));
+		} catch (FileNotFoundException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PI_PDEBUILD, EXCEPTION_PRODUCT_FILE, NLS.bind(Messages.exception_missingElement, location), null));
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PI_PDEBUILD, EXCEPTION_PRODUCT_FORMAT, NLS.bind(Messages.exception_productParse, location), e));
+		}
+	}
+
 	/**
 	 * Constructs a product file parser.
 	 */
@@ -177,8 +215,7 @@ public class ProductFile extends DefaultHandler implements IProductDescriptor {
 		try {
 			parser.parse(new InputSource(in), this);
 		} finally {
-			if (in != null)
-				in.close();
+			in.close();
 		}
 		parser = null;
 	}
@@ -217,19 +254,27 @@ public class ProductFile extends DefaultHandler implements IProductDescriptor {
 	 * be included in the list
 	 */
 	public List<IVersionedId> getBundles(boolean includeFragments) {
-		List<IVersionedId> p = plugins != null ? plugins : CollectionUtils.<IVersionedId> emptyList();
-		if (!includeFragments)
-			return p;
+		List<IVersionedId> result = new LinkedList<IVersionedId>();
 
-		List<IVersionedId> f = fragments != null ? fragments : CollectionUtils.<IVersionedId> emptyList();
-		int size = p.size() + f.size();
-		if (size == 0)
-			return CollectionUtils.emptyList();
+		for (FeatureEntry plugin : plugins) {
+			result.add(new VersionedId(plugin.getId(), plugin.getVersion()));
+		}
 
-		List<IVersionedId> both = new ArrayList<IVersionedId>(size);
-		both.addAll(p);
-		both.addAll(f);
-		return both;
+		if (includeFragments) {
+			for (FeatureEntry fragment : fragments) {
+				result.add(new VersionedId(fragment.getId(), fragment.getVersion()));
+			}
+		}
+
+		return result;
+	}
+
+	private List<FeatureEntry> getBundleEntries(boolean includeFragments) {
+		List<FeatureEntry> result = new LinkedList<FeatureEntry>();
+		result.addAll(plugins);
+		if (includeFragments)
+			result.addAll(fragments);
+		return result;
 	}
 
 	/**
@@ -245,20 +290,47 @@ public class ProductFile extends DefaultHandler implements IProductDescriptor {
 	 * Returns a list<VersionedName> of fragments that constitute this product.
 	 */
 	public List<IVersionedId> getFragments() {
-		return fragments != null ? fragments : CollectionUtils.<IVersionedId> emptyList();
+		List<IVersionedId> result = new LinkedList<IVersionedId>();
+
+		for (FeatureEntry fragment : fragments) {
+			result.add(new VersionedId(fragment.getId(), fragment.getVersion()));
+		}
+
+		return result;
 	}
 
 	/**
 	 * Returns a List<VersionedName> of features that constitute this product.
 	 */
 	public List<IVersionedId> getFeatures() {
-		return features != null ? features : CollectionUtils.<IVersionedId> emptyList();
+		List<IVersionedId> result = new LinkedList<IVersionedId>();
+
+		for (FeatureEntry feature : features) {
+			result.add(new VersionedId(feature.getId(), feature.getVersion()));
+		}
+
+		return result;
+	}
+
+	public List<FeatureEntry> getProductEntries() {
+		if (useFeatures()) {
+			return features;
+		}
+		return getBundleEntries(true);
+	}
+
+	public boolean containsPlugin(String plugin) {
+		return getBundles(true).contains(plugin);
+	}
+
+	public String[] getIcons() {
+		return getIcons(currentOS);
 	}
 
 	public String[] getIcons(String os) {
 		Collection<String> result = icons.get(os);
 		if (result == null)
-			return null;
+			return new String[0];
 		return result.toArray(new String[result.size()]);
 	}
 
@@ -269,6 +341,10 @@ public class ProductFile extends DefaultHandler implements IProductDescriptor {
 
 	public String getConfigIniPath() {
 		return configPath;
+	}
+
+	public boolean haveCustomConfig() {
+		return configPath != null || platformSpecificConfigPaths.size() > 0;
 	}
 
 	/**
@@ -318,6 +394,22 @@ public class ProductFile extends DefaultHandler implements IProductDescriptor {
 	 */
 	public String getVersion() {
 		return (version == null || version.length() == 0) ? "0.0.0" : version; //$NON-NLS-1$
+	}
+
+	public Map<String, BundleInfo> getConfigurationInfo() {
+		Map<String, BundleInfo> result = new HashMap<String, BundleInfo>();
+		for (BundleInfo info : getBundleInfos()) {
+			result.put(info.getSymbolicName(), info);
+		}
+		return result;
+	}
+
+	public Properties getConfigProperties() {
+		Properties props = new Properties();
+		for (Entry<String, String> property : getConfigurationProperties().entrySet()) {
+			props.setProperty(property.getKey(), property.getValue());
+		}
+		return props;
 	}
 
 	/**
@@ -643,23 +735,25 @@ public class ProductFile extends DefaultHandler implements IProductDescriptor {
 
 	protected void processPlugin(Attributes attributes) {
 		String fragment = attributes.getValue(ATTRIBUTE_FRAGMENT);
-		IVersionedId name = new VersionedId(attributes.getValue(ATTRIBUTE_ID), attributes.getValue(ATTRIBUTE_VERSION));
+		String pluginId = attributes.getValue(ATTRIBUTE_ID);
+		String pluginVersion = attributes.getValue(ATTRIBUTE_VERSION);
+
+		FeatureEntry entry = new FeatureEntry(pluginId, pluginVersion != null ? pluginVersion : GENERIC_VERSION_NUMBER, true);
+		entry.setFragment(Boolean.valueOf(fragment).booleanValue());
+
 		if (fragment != null && new Boolean(fragment).booleanValue()) {
-			if (fragments == null)
-				fragments = new ArrayList<IVersionedId>();
-			fragments.add(name);
+			fragments.add(entry);
 		} else {
-			if (plugins == null)
-				plugins = new ArrayList<IVersionedId>();
-			plugins.add(name);
+			plugins.add(entry);
 		}
 	}
 
 	private void processFeature(Attributes attributes) {
-		IVersionedId name = new VersionedId(attributes.getValue(ATTRIBUTE_ID), attributes.getValue(ATTRIBUTE_VERSION));
-		if (features == null)
-			features = new ArrayList<IVersionedId>();
-		features.add(name);
+		String featureId = attributes.getValue(ATTRIBUTE_ID);
+		String featureVersion = attributes.getValue(ATTRIBUTE_VERSION);
+		FeatureEntry featureEntry = new FeatureEntry(featureId, featureVersion != null ? featureVersion : GENERIC_VERSION_NUMBER, false);
+
+		features.add(featureEntry);
 	}
 
 	private void processProduct(Attributes attributes) {

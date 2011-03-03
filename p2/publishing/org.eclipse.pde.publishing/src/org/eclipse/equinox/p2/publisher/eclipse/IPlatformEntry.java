@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.pde.internal.build.site.compatibility;
+package org.eclipse.equinox.p2.publisher.eclipse;
 
 public interface IPlatformEntry {
 	public String getOS();

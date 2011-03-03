@@ -16,6 +16,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.zip.ZipFile;
 import org.eclipse.core.runtime.*;
+import org.eclipse.equinox.p2.publisher.eclipse.FeatureEntry;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.VersionRange;
 import org.eclipse.osgi.util.ManifestElement;
@@ -23,7 +24,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.pde.internal.build.ant.AntScript;
 import org.eclipse.pde.internal.build.site.BuildTimeFeature;
 import org.eclipse.pde.internal.build.site.BuildTimeSite;
-import org.eclipse.pde.internal.build.site.compatibility.FeatureEntry;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
 
