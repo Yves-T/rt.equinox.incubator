@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,6 @@ import org.osgi.service.packageadmin.PackageAdmin;
  */
 public class BundleContributionProvider extends ContributionProvider implements BundleListener {
 
-	private static final long serialVersionUID = -8497760387909218802L;
 	private static final String BUNDLE_IMG_PATH = "icons/bundles/bundle.gif"; //$NON-NLS-1$
 	private static Set serverPluginDependencies;
 	private ServiceReference serviceReference;
