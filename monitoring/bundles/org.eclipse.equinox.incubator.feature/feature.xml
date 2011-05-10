@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.equinox.incubator.feature"
+      label="%featureName"
+      version="1.0.0.qualifier"
+      provider-name="%providerName"
+      image="eclipse_update_120.jpg"
+      license-feature="org.eclipse.license"
+      license-feature-version="1.0.0.qualifier">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <includes
+         id="org.eclipse.equinox.jmx.common.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.equinox.jmx.client.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.equinox.jmx.server.feature"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.equinox.initializer"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.region"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.console.supportability"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
