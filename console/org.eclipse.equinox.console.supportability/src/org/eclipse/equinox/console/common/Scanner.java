@@ -14,30 +14,34 @@ package org.eclipse.equinox.console.common;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.equinox.console.telnet.ANSITerminalTypeMappings;
-import org.eclipse.equinox.console.telnet.SCOTerminalTypeMappings;
-import org.eclipse.equinox.console.telnet.TerminalTypeMappings;
-import org.eclipse.equinox.console.telnet.VT100TerminalTypeMappings;
-import org.eclipse.equinox.console.telnet.VT220TerminalTypeMappings;
-import org.eclipse.equinox.console.telnet.VT320TerminalTypeMappings;
+import org.eclipse.equinox.console.common.terminal.ANSITerminalTypeMappings;
+import org.eclipse.equinox.console.common.terminal.SCOTerminalTypeMappings;
+import org.eclipse.equinox.console.common.terminal.TerminalTypeMappings;
+import org.eclipse.equinox.console.common.terminal.VT100TerminalTypeMappings;
+import org.eclipse.equinox.console.common.terminal.VT220TerminalTypeMappings;
+import org.eclipse.equinox.console.common.terminal.VT320TerminalTypeMappings;
 
 /**
  * A common superclass for content processor for the telnet protocol and for command line editing (processing delete,
  * backspace, arrows, command history, etc.).
  */
 public abstract class Scanner {
-    protected static final byte BS = 8;
-    protected byte BACKSPACE;
+
+	private byte BACKSPACE;
+	private byte DEL;
+    protected static final byte BS = 8;  
     protected static final byte LF = 10;
     protected static final byte CR = 13;
     protected static final byte ESC = 27;
     protected static final byte SPACE = 32;
-    protected byte DEL;
     protected static final byte MAX_CHAR = 127;
     protected static final String DEFAULT_TTYPE = File.separatorChar == '/' ? "XTERM" : "ANSI";
+    // shows if user input should be echoed to the console
+    private boolean isEchoEnabled = true;
 
     protected OutputStream toTelnet;
     protected ConsoleInputStream toShell;
@@ -52,7 +56,7 @@ public abstract class Scanner {
         supportedEscapeSequences.put("ANSI", new ANSITerminalTypeMappings());
         supportedEscapeSequences.put("VT100", new VT100TerminalTypeMappings());
         VT220TerminalTypeMappings vtMappings = new VT220TerminalTypeMappings();
-        supportedEscapeSequences.put("VT220", new VT220TerminalTypeMappings());
+        supportedEscapeSequences.put("VT220", vtMappings);
         supportedEscapeSequences.put("XTERM", vtMappings);
         supportedEscapeSequences.put("VT320", new VT320TerminalTypeMappings());
         supportedEscapeSequences.put("SCO", new SCOTerminalTypeMappings());
@@ -60,8 +64,14 @@ public abstract class Scanner {
 
     public abstract void scan(int b) throws IOException;
 
+    public void toggleEchoEnabled(boolean isEnabled) {
+    	isEchoEnabled = isEnabled;
+    }
+    
     protected void echo(int b) throws IOException {
-        toTelnet.write(b);
+    	if (isEchoEnabled) {
+    		toTelnet.write(b);
+    	}
     }
 
     protected void flush() throws IOException {
@@ -116,11 +126,19 @@ public abstract class Scanner {
 	}
 
 	public String[] getEscapes() {
-		return escapes;
+        if (escapes != null) {
+            return Arrays.copyOf(escapes, escapes.length);
+        } else {
+            return null;
+        }
 	}
 
 	public void setEscapes(String[] escapes) {
-		this.escapes = escapes;
+        if (escapes != null) {
+            this.escapes = Arrays.copyOf(escapes, escapes.length);
+        } else {
+            this.escapes = null;
+        }
 	}
 
 }

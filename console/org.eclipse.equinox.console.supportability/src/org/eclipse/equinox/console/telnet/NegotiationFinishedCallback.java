@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 SAP AG
+ * Copyright (c) 2010, 2011 SAP AG
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ package org.eclipse.equinox.console.telnet;
  * This is necessary, because the user input should be interpreted with the correct terminal type.
  */
 public class NegotiationFinishedCallback implements Callback {
+	
 	private TelnetConnection telnetConnection;
 	
 	public NegotiationFinishedCallback(TelnetConnection telnetConnection) {

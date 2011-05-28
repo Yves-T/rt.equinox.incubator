@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 SAP AG
+ * Copyright (c) 2010, 2011 SAP AG
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,9 @@
  *     Lazar Kirchev, SAP AG - initial API and implementation  
  *******************************************************************************/
 
-package org.eclipse.equinox.console.telnet;
+package org.eclipse.equinox.console.common.terminal;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,7 +43,11 @@ public abstract class TerminalTypeMappings {
 	}
 	
 	public String[] getEscapes() {
-		return escapes;
+        if (escapes != null) {
+            return Arrays.copyOf(escapes, escapes.length);
+        } else {
+            return null;
+        }
 	}
 	
 	public byte getBackspace() {

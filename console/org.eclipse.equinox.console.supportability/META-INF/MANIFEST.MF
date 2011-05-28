@@ -6,9 +6,23 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.equinox.console.command.adapter.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Import-Package: org.apache.felix.service.command;status=provisional;version="0.6.1",
+Import-Package: javax.security.auth;resolution:=optional,
+ javax.security.auth.callback;resolution:=optional,
+ javax.security.auth.login;resolution:=optional,
+ javax.security.auth.spi;resolution:=optional,
+ org.apache.felix.service.command;status=provisional;version="0.8.0",
+ org.apache.sshd;version="0.5.0";resolution:=optional,
+ org.apache.sshd.common;version="0.5.0";resolution:=optional,
+ org.apache.sshd.server;version="0.5.0";resolution:=optional,
+ org.apache.sshd.server.jaas;version="0.5.0";resolution:=optional,
+ org.apache.sshd.server.keyprovider;version="0.5.0";resolution:=optional,
+ org.apache.sshd.server.session;version="0.5.0";resolution:=optional,
+ org.apache.sshd.server.shell;version="0.5.0";resolution:=optional,
  org.eclipse.osgi.framework.console,
+ org.eclipse.osgi.framework.internal.core,
  org.eclipse.osgi.internal.permadmin,
+ org.eclipse.osgi.internal.profile,
+ org.eclipse.osgi.service.environment,
  org.eclipse.osgi.service.resolver,
  org.eclipse.osgi.util,
  org.osgi.framework,
@@ -17,3 +31,13 @@ Import-Package: org.apache.felix.service.command;status=provisional;version="0.6
  org.osgi.service.permissionadmin,
  org.osgi.service.startlevel,
  org.osgi.util.tracker
+Export-Package: org.eclipse.equinox.console.command.adapter;x-friends:="org.eclipse.equinox.console.supportability.tests",
+ org.eclipse.equinox.console.commands;x-friends:="org.eclipse.equinox.console.supportability.tests",
+ org.eclipse.equinox.console.common;x-friends:="org.eclipse.equinox.console.supportability.tests",
+ org.eclipse.equinox.console.common.terminal;x-friends:="org.eclipse.equinox.console.supportability.tests",
+ org.eclipse.equinox.console.completion;x-friends:="org.eclipse.equinox.console.supportability.tests",
+ org.eclipse.equinox.console.jaas,
+ org.eclipse.equinox.console.ssh;x-friends:="org.eclipse.equinox.console.supportability.tests",
+ org.eclipse.equinox.console.storage;x-friends:="org.eclipse.equinox.console.supportability.tests",
+ org.eclipse.equinox.console.supportability;x-friends:="org.eclipse.equinox.console.supportability.tests",
+ org.eclipse.equinox.console.telnet;x-friends:="org.eclipse.equinox.console.supportability.tests"

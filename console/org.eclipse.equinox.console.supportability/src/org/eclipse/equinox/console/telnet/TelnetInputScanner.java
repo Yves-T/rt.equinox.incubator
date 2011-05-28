@@ -11,15 +11,21 @@
  *******************************************************************************/
 package org.eclipse.equinox.console.telnet;
 
-import java.io.IOException;
-import java.util.*;
-import org.eclipse.equinox.console.common.*;
+import org.eclipse.equinox.console.common.ConsoleInputStream;
+import org.eclipse.equinox.console.common.ConsoleOutputStream;
+import org.eclipse.equinox.console.common.KEYS;
 import org.eclipse.equinox.console.common.Scanner;
+import org.eclipse.equinox.console.common.terminal.TerminalTypeMappings;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class performs the processing of the telnet commands,
  * and updates respectively what is displayed in the output. Also, it performs 
- * terminal type with the telnet client. This is important for some of the escape sequences, 
+ * terminal type negotiation with the telnet client. This is important for some of the escape sequences, 
  * which are different for the different terminal types. Without such negotiation,
  * some keys (such as backspace, del, insert, home, etc.) may not be correctly
  * interpreted by the telnet server. Currently the supported terminal types are
@@ -44,8 +50,8 @@ public class TelnetInputScanner extends Scanner {
         TerminalTypeMappings currentMapping = supportedEscapeSequences.get(DEFAULT_TTYPE);
     	currentEscapesToKey = currentMapping.getEscapesToKey();
     	escapes = currentMapping.getEscapes();
-    	BACKSPACE = currentMapping.getBackspace();
-    	DEL = currentMapping.getDel();
+    	setBackspace(currentMapping.getBackspace());
+    	setDel(currentMapping.getDel());
     	this.callback = callback;
     }
     
@@ -105,10 +111,7 @@ public class TelnetInputScanner extends Scanner {
     private static final int IS = 0;
 
     private boolean isNegotiation;
-//    private boolean isDo;
-//    private boolean isDont;
     private boolean isWill;
-//    private boolean isWont;
     
     private byte[] tTypeRequest = {(byte)IAC, (byte)SB, (byte)TTYPE, (byte)SEND, (byte)IAC, (byte)SE};
 
@@ -230,8 +233,8 @@ public class TelnetInputScanner extends Scanner {
     	}
     	currentEscapesToKey = currentMapping.getEscapesToKey();
     	escapes = currentMapping.getEscapes();
-    	BACKSPACE = currentMapping.getBackspace();
-    	DEL = currentMapping.getDel();
+    	setBackspace(currentMapping.getBackspace());
+    	setDel(currentMapping.getDel());
     	if(callback != null) {
     		callback.finished();
     	}

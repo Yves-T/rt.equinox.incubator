@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation, SAP AG.
+ * Copyright (c) 2010, 2011 IBM Corporation, SAP AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,8 +39,6 @@ public class CommandProviderAdapter {
 	public Object main(Object[] args) throws Exception {
 		try {
 			// first argument is the command
-			if ("x.bundle".equals(args[0]))
-				args[0] = "bundle"; // This is a hack to work around a current gogo bug
 			Method command = findCommand("_" + args[0]);
 			ArrayList<Object> argList = new ArrayList<Object>();
 			for (int i = 1; i < args.length; i++)

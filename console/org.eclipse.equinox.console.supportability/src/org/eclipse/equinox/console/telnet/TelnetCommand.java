@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 SAP AG
+ * Copyright (c) 2010, 2011 SAP AG
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,10 @@
 
 package org.eclipse.equinox.console.telnet;
 
+import java.net.BindException;
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.Descriptor;
 import org.osgi.framework.BundleContext;
@@ -19,18 +23,20 @@ import org.osgi.framework.BundleContext;
  * This class implements a command for starting/stopping a simple telnet server.
  *
  */
-public class TelnetCommand
-{    
+public class TelnetCommand {
+	
 	private String defaultHost = null;
     private int defaultPort;
     private final CommandProcessor processor;
+    private final BundleContext context;
     private String host = null;
     private int port;
     private TelnetServer telnetServer;
 
-    public TelnetCommand(CommandProcessor procesor, BundleContext context)
+    public TelnetCommand(CommandProcessor processor, BundleContext context)
     {
-        this.processor = procesor;
+        this.processor = processor;
+        this.context = context;
         String telnetPort = null;
         String consolePropValue = context.getProperty("osgi.console");
         if(consolePropValue != null) {
@@ -44,11 +50,24 @@ public class TelnetCommand
         	try {
         		defaultPort = Integer.parseInt(telnetPort);
 			} catch (NumberFormatException e) {
-				defaultPort = 2223;
+				// do nothing
 			}
-        } else {
-        	defaultPort = 2223;
-        }
+        } 
+    }
+    
+    public synchronized void start() {
+    	Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		properties.put("osgi.command.scope", "equinox");
+		properties.put("osgi.command.function", new String[] {"telnet"});
+		if (port > 0 || defaultPort > 0) {
+			try{
+				telnet(new String[]{"start"});
+			} catch (Exception e) {
+				System.out.println("Cannot start telnet. Reason: " + e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		context.registerService(TelnetCommand.class.getName(), this, properties);
     }
 
     @Descriptor("start/stop a telnet server")
@@ -87,6 +106,10 @@ public class TelnetCommand
         	port = defaultPort;
         }
         
+        if (port == 0) {
+        	throw new Exception("No telnet port specified");
+        }
+        
         if (newHost != null) {
         	host = newHost;
         } else {
@@ -98,7 +121,12 @@ public class TelnetCommand
                 throw new IllegalStateException("telnet is already running on port " + port);
             }
             
-            telnetServer = new TelnetServer(processor, host, port);
+            try {
+				telnetServer = new TelnetServer(context, processor, host, port);
+			} catch (BindException e) {
+				throw new Exception("Port " + port + " already in use");
+			}
+			
             telnetServer.setName("equinox telnet");
             telnetServer.start();    
         } else if ("stop".equals(command)) {
@@ -115,7 +143,7 @@ public class TelnetCommand
     	StringBuffer help = new StringBuffer();
     	help.append("telnet - start simple telnet server");
     	help.append("\n");
-    	help.append("Usage: telnet start | stop [-port port]");
+    	help.append("Usage: telnet start | stop [-port port] [-host host]");
     	help.append("\n");
     	help.append("\t");
     	help.append("-port");

@@ -18,6 +18,8 @@ import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 import org.eclipse.equinox.console.common.ConsoleInputStream;
 import org.eclipse.equinox.console.supportability.ConsoleInputHandler;
+import org.eclipse.equinox.console.supportability.ConsoleInputScanner;
+import org.osgi.framework.BundleContext;
 
 /**
  * This class manages a telnet connection. It is responsible for wrapping the original io streams
@@ -25,16 +27,23 @@ import org.eclipse.equinox.console.supportability.ConsoleInputHandler;
  *
  */
 public class TelnetConnection extends Thread {
+	
 	private Socket socket;
 	private CommandProcessor processor;
-	private boolean isTelnetNegotiationFinished = false;
+	private BundleContext context;
+	protected boolean isTelnetNegotiationFinished = false;
     private Callback callback;
-    private static final long WAIT_INTERVAL = 1000;
+    private static final long TIMEOUT = 1000;
     private static final long NEGOTIATION_TIMEOUT = 60000;
+    private static final String PROMPT = "prompt";
+    private static final String OSGI_PROMPT = "osgi> ";
+    private static final String INPUT_SCANNER = "INPUT_SCANNER";
+    private static final String SSH_INPUT_SCANNER = "SSH_INPUT_SCANNER";
 	
-	public TelnetConnection (Socket socket, CommandProcessor processor) {
+	public TelnetConnection (Socket socket, CommandProcessor processor, BundleContext context) {
 		this.socket = socket;
 		this.processor = processor;
+		this.context = context;
 		callback = new NegotiationFinishedCallback(this);
 	}
 	
@@ -48,16 +57,15 @@ public class TelnetConnection extends Thread {
 			
 			long start = System.currentTimeMillis();
 			
-			while(isTelnetNegotiationFinished == false && System.currentTimeMillis() - start < NEGOTIATION_TIMEOUT) {
-				synchronized (this) {
+			synchronized (this) {
+				while (isTelnetNegotiationFinished == false && System.currentTimeMillis() - start < NEGOTIATION_TIMEOUT) {
 					try {
-						wait(WAIT_INTERVAL);
+						wait(TIMEOUT);
 					} catch (InterruptedException e) {
 						// do nothing
 					}
 				}
 			}
-			
 			final CommandSession session;
 			PrintStream output = new PrintStream(out);
 			
@@ -68,11 +76,16 @@ public class TelnetConnection extends Thread {
 	        consoleInputHandler.getScanner().setDel(telnetInputHandler.getScanner().getDel());
 	        consoleInputHandler.getScanner().setCurrentEscapesToKey(telnetInputHandler.getScanner().getCurrentEscapesToKey());
 	        consoleInputHandler.getScanner().setEscapes(telnetInputHandler.getScanner().getEscapes());
+	        ((ConsoleInputScanner)consoleInputHandler.getScanner()).setContext(context);
 	        
 	        consoleInputHandler.start();
 	        
 	        session = processor.createSession(inp, output, output);
-			
+	        session.put(PROMPT, OSGI_PROMPT);
+	        session.put(INPUT_SCANNER, consoleInputHandler.getScanner());
+	        session.put(SSH_INPUT_SCANNER, telnetInputHandler.getScanner());
+	        ((ConsoleInputScanner)consoleInputHandler.getScanner()).setSession(session);
+	        
 			try {
 	            session.execute("gosh --login --noshutdown");
 	        } catch (Exception e) {

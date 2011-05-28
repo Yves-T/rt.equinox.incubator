@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation, SAP AG.
+ * Copyright (c) 2010, 2011 IBM Corporation, SAP AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,11 @@ import java.util.List;
 
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
+import org.apache.felix.service.command.Converter;
+import org.eclipse.equinox.console.commands.EquinoxCommandProvider;
+import org.eclipse.equinox.console.commands.EquinoxCommandsConverter;
+import org.eclipse.equinox.console.commands.HelpCommand;
+import org.eclipse.equinox.console.ssh.SshCommand;
 import org.eclipse.equinox.console.telnet.TelnetCommand;
 import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.osgi.framework.console.CommandProvider;
@@ -31,6 +36,11 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.condpermadmin.ConditionalPermissionAdmin;
+import org.osgi.service.packageadmin.PackageAdmin;
+import org.osgi.service.startlevel.StartLevel;
+import org.osgi.service.permissionadmin.PermissionAdmin;
+import org.eclipse.osgi.service.resolver.PlatformAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
@@ -38,12 +48,19 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  * The activator class controls the plug-in life cycle
  */
 public class Activator implements BundleActivator {
-
+	private ServiceTracker<StartLevel, ?> startLevelManagerTracker;
+	private ServiceTracker<ConditionalPermissionAdmin, ?> condPermAdminTracker;
+	private ServiceTracker<PermissionAdmin, ?> permissionAdminTracker;
+	private ServiceTracker<PackageAdmin, ?> packageAdminTracker;
+	private ServiceTracker<PlatformAdmin, ?> platformAdminTracker;
+	
 	private ServiceTracker<CommandProcessor, ServiceTracker<ConsoleSession, CommandSession>> commandProcessorTracker;
 	// Tracker for Equinox CommandProviders
 	private ServiceTracker<CommandProvider, List<ServiceRegistration<?>>> commandProviderTracker;
+	
+	private EquinoxCommandProvider equinoxCmdProvider;
 
-	public class ProcessorCustomizer implements
+	public static class ProcessorCustomizer implements
 			ServiceTrackerCustomizer<CommandProcessor, ServiceTracker<ConsoleSession, CommandSession>> {
 
 		private final BundleContext context;
@@ -57,20 +74,12 @@ public class Activator implements BundleActivator {
 			CommandProcessor processor = context.getService(reference);
 			if (processor == null)
 				return null;
-			Dictionary<String, Object> properties = new Hashtable<String, Object>();
-			properties.put("osgi.command.scope", "equinox");
-			properties.put("osgi.command.function", "telnet");
+			
 			TelnetCommand telnet = new TelnetCommand(processor, context);
-			String consolePropValue = context.getProperty("osgi.console");
-			if(consolePropValue != null && !"".equals(consolePropValue)) {
-				try{
-					telnet.telnet(new String[]{"start"});
-				} catch (Exception e) {
-					System.out.println("Cannot start telnet. Reason: " + e.getMessage());
-					e.printStackTrace();
-				}
-			}
-			context.registerService(TelnetCommand.class.getName(), telnet, properties);
+			telnet.start();
+			SshCommand sshCommand = new SshCommand(processor, context);
+			sshCommand.start();
+			
 			ServiceTracker<ConsoleSession, CommandSession> tracker = new ServiceTracker<ConsoleSession, CommandSession>(context, ConsoleSession.class, new SessionCustomizer(context, processor));
 			tracker.open();
 			return tracker;
@@ -86,12 +95,11 @@ public class Activator implements BundleActivator {
 			ServiceReference<CommandProcessor> reference,
 			ServiceTracker<ConsoleSession, CommandSession> tracker) {
 			tracker.close();
-		}
-
+		}	
 	}
 
-	// Privedes support for Equinox ConsoleSessions
-	public class SessionCustomizer implements
+	// Provides support for Equinox ConsoleSessions
+	public static class SessionCustomizer implements
 			ServiceTrackerCustomizer<ConsoleSession, CommandSession> {
 		private final BundleContext context;
 		final CommandProcessor processor;
@@ -111,6 +119,7 @@ public class Activator implements BundleActivator {
 			new Thread(new Runnable(){
 				public void run() {
                     try {
+                    	gogoSession.put("prompt", "osgi> ");
                         gogoSession.execute("gosh --login --noshutdown");
                     }
                     catch (Exception e) {
@@ -187,6 +196,57 @@ public class Activator implements BundleActivator {
 		commandProviderTracker.open();
 		commandProcessorTracker = new ServiceTracker<CommandProcessor, ServiceTracker<ConsoleSession,CommandSession>>(context, CommandProcessor.class, new ProcessorCustomizer(context));
 		commandProcessorTracker.open();
+		
+		condPermAdminTracker = new ServiceTracker<ConditionalPermissionAdmin, Object>(context, ConditionalPermissionAdmin.class.getName(), null);
+		condPermAdminTracker.open();
+
+		// grab permission admin
+		permissionAdminTracker = new ServiceTracker<PermissionAdmin, Object>(context, PermissionAdmin.class.getName(), null);
+		permissionAdminTracker.open();
+
+		startLevelManagerTracker = new ServiceTracker<StartLevel, Object>(context, StartLevel.class.getName(), null);
+		startLevelManagerTracker.open();
+
+		packageAdminTracker = new ServiceTracker<PackageAdmin, Object>(context, PackageAdmin.class.getName(), null);
+		packageAdminTracker.open();
+
+		platformAdminTracker = new ServiceTracker<PlatformAdmin, Object>(context, PlatformAdmin.class.getName(), null);
+		platformAdminTracker.open();
+		
+		equinoxCmdProvider = new EquinoxCommandProvider(context, this);
+		equinoxCmdProvider.start();
+		
+		HelpCommand helpCommand = new HelpCommand(context); 
+		helpCommand.start();
+	}
+	
+	public StartLevel getStartLevel() {
+		return (StartLevel) getServiceFromTracker(startLevelManagerTracker, StartLevel.class.getName());
+	}
+
+	public PermissionAdmin getPermissionAdmin() {
+		return (PermissionAdmin) getServiceFromTracker(permissionAdminTracker, PermissionAdmin.class.getName());
+	}
+
+	public ConditionalPermissionAdmin getConditionalPermissionAdmin() {
+		return (ConditionalPermissionAdmin) getServiceFromTracker(condPermAdminTracker, ConditionalPermissionAdmin.class.getName());
+	}
+
+	public PackageAdmin getPackageAdmin() {
+		return (PackageAdmin) getServiceFromTracker(packageAdminTracker, PackageAdmin.class.getName());
+	}
+
+	public PlatformAdmin getPlatformAdmin() {
+		return (PlatformAdmin) getServiceFromTracker(platformAdminTracker, PlatformAdmin.class.getName());
+	}
+	
+	private static Object getServiceFromTracker(ServiceTracker tracker, String serviceClass) {
+		if (tracker == null)
+			throw new IllegalStateException("Missing service: " + serviceClass);
+		Object result = tracker.getService();
+		if (result == null)
+			throw new IllegalStateException("Missing service: " + serviceClass);
+		return result;
 	}
 
 	Method[] getCommandMethods(Object command) {
@@ -212,8 +272,6 @@ public class Activator implements BundleActivator {
 		String[] methodNames = new String[commandMethods.length];
 		for (int i = 0; i < commandMethods.length; i++) {
 			String methodName = "" + commandMethods[i].getName().substring(1);
-			if (methodName.equals("bundle"))
-				methodName = "x." + methodName;
 			methodNames[i] = methodName;
 		}
 
@@ -224,5 +282,8 @@ public class Activator implements BundleActivator {
 	public void stop(BundleContext context) throws Exception {
 		commandProviderTracker.close();
 		commandProcessorTracker.close();
+		if (equinoxCmdProvider != null) {
+			equinoxCmdProvider.stop();
+		}
 	}
 }

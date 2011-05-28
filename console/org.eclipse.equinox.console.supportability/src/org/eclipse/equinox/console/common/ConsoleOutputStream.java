@@ -92,8 +92,13 @@ public class ConsoleOutputStream extends OutputStream {
      */
     public synchronized void flush() throws IOException {
         if (pos > 0) {
-            out.write(buffer, 0, pos);
-            pos = 0;
+            try {
+				out.write(buffer, 0, pos);
+				out.flush();
+			} finally {
+				pos = 0;
+			}
+            
         }
     }
 

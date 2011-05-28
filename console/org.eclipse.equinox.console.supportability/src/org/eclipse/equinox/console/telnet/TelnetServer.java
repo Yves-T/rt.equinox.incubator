@@ -12,8 +12,12 @@
 package org.eclipse.equinox.console.telnet;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 import org.apache.felix.service.command.CommandProcessor;
+import org.osgi.framework.BundleContext;
 
 /**
  * A telnet server, which listens for telnet connections and starts a telnet connection manager
@@ -21,11 +25,14 @@ import org.apache.felix.service.command.CommandProcessor;
  *
  */
 public class TelnetServer extends Thread {
+	
 	private ServerSocket server;
     private boolean isRunning = true;
     private CommandProcessor processor;
+    private BundleContext context;
     
-    public TelnetServer(CommandProcessor processor, String host, int port) throws IOException{
+    public TelnetServer(BundleContext context, CommandProcessor processor, String host, int port) throws IOException {
+    	this.context = context;
     	this.processor = processor;
     	if(host != null) {
     		server = new ServerSocket(port, 0, InetAddress.getByName(host));
@@ -41,7 +48,7 @@ public class TelnetServer extends Thread {
             while (isRunning)
             {
                 final Socket socket = server.accept();
-                TelnetConnection telnetConnection = new TelnetConnection(socket, processor);
+                TelnetConnection telnetConnection = new TelnetConnection(socket, processor, context);
                 telnetConnection.start();
             }
         } catch (IOException e) {

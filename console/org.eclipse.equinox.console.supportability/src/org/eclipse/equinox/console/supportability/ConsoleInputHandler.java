@@ -13,6 +13,7 @@ package org.eclipse.equinox.console.supportability;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import org.eclipse.equinox.console.common.ConsoleInputStream;
 import org.eclipse.equinox.console.common.InputHandler;
 
@@ -21,9 +22,9 @@ import org.eclipse.equinox.console.common.InputHandler;
  * which provides command line editing.
  */
 public class ConsoleInputHandler extends InputHandler {
+	
     public ConsoleInputHandler(InputStream input, ConsoleInputStream in, OutputStream out) {
         super(input, in, out);
         inputScanner = new ConsoleInputScanner(in, out);
-    }
-    
+    } 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 SAP AG
+ * Copyright (c) 2010, 2011 SAP AG
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,7 @@ import java.io.OutputStream;
  * eventually writing to an output stream. This handler should be customized with a concrete content processor.
  */
 public abstract class InputHandler extends Thread {
+
     protected Scanner inputScanner;
     protected OutputStream out;
     protected ConsoleInputStream in;
@@ -45,7 +46,7 @@ public abstract class InputHandler extends Thread {
             }
         } catch (IOException e) {
             // Printing stack trace is not needed since the streams are closed immediately
-            e.printStackTrace();
+            // do nothing
         } finally {
         	try {
                 in.close();
