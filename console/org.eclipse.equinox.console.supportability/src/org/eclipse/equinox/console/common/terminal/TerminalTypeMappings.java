@@ -44,7 +44,9 @@ public abstract class TerminalTypeMappings {
 	
 	public String[] getEscapes() {
         if (escapes != null) {
-            return Arrays.copyOf(escapes, escapes.length);
+        	String[] copy = new String[escapes.length];
+        	System.arraycopy(escapes, 0, copy, 0, escapes.length);
+        	return copy;
         } else {
             return null;
         }

@@ -58,8 +58,11 @@ public class SecureUserStore {
 				throw new IllegalArgumentException("Cannot load properties from file " + userFileLoc);
 			}
 			Set<String> userNames = new HashSet<String>();
-			for (String key : users.stringPropertyNames()) {
-				String[] parts = key.split(DELIMITER);
+			for (Object key : users.keySet()) {
+				if (!(key instanceof String)) {
+					continue;
+				}
+				String[] parts = ((String) key).split(DELIMITER);
 				// since the key starts with DELIMITER, the first element of key.split(DELIMITER) is an empty string
 				// that is why the result is {"", "ssh", "<username>", "password"} or {"", "ssh", "<username>", "roles"}
 				if (parts.length < KEY_ELEMENTS_COUNT) {
@@ -329,9 +332,9 @@ public class SecureUserStore {
 				throw new IllegalArgumentException("The user does not exist!");
 			}
 			
-			for (String key : users.stringPropertyNames()) {
-				if (key.contains(DELIMITER + username + DELIMITER)) {
-					users.remove(key);
+			for (Object key : users.keySet()) {
+				if ((key instanceof String) && ((String) key).contains(DELIMITER + username + DELIMITER)) {
+						users.remove(key);
 				}
 			}
 			
@@ -387,8 +390,8 @@ public class SecureUserStore {
 				throw new IllegalArgumentException("The user does not exist!");
 			}
 			
-			for (String key : users.stringPropertyNames()) {
-				if (key.contains(DELIMITER + username + DELIMITER + PASSWORD_KEY)) {
+			for (Object key : users.keySet()) {
+				if (key instanceof String && ((String) key).contains(DELIMITER + username + DELIMITER + PASSWORD_KEY)) {
 					users.remove(key);
 					break;
 				}
@@ -448,8 +451,8 @@ public class SecureUserStore {
 			}
 			
 			String passwordPropertyName = constructPropertyName(username, PASSWORD_KEY);
-			for (String key : users.stringPropertyNames()) {
-				if (key.contains(passwordPropertyName)) {
+			for (Object key : users.keySet()) {
+				if ((key instanceof String) && ((String) key).contains(passwordPropertyName)) {
 					users.remove(key);
 					break;
 				}
@@ -594,8 +597,8 @@ public class SecureUserStore {
 	}
 	
 	private static boolean existsUser(String username, Properties users) {
-		for (String user : users.stringPropertyNames()) {
-			if (user.contains(DELIMITER + username + DELIMITER)) {
+		for (Object user : users.keySet()) {
+			if (user instanceof String && ((String) user).contains(DELIMITER + username + DELIMITER)) {
 				 return true;
 			}
 		}

@@ -127,7 +127,9 @@ public abstract class Scanner {
 
 	public String[] getEscapes() {
         if (escapes != null) {
-            return Arrays.copyOf(escapes, escapes.length);
+        	String[] copy = new String[escapes.length];
+        	System.arraycopy(escapes, 0, copy, 0, escapes.length);
+        	return copy;
         } else {
             return null;
         }
@@ -135,7 +137,8 @@ public abstract class Scanner {
 
 	public void setEscapes(String[] escapes) {
         if (escapes != null) {
-            this.escapes = Arrays.copyOf(escapes, escapes.length);
+            this.escapes = new String[escapes.length];
+        	System.arraycopy(escapes, 0, this.escapes, 0, escapes.length);
         } else {
             this.escapes = null;
         }
