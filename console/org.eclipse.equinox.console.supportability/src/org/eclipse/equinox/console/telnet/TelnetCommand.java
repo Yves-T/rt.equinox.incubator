@@ -18,6 +18,12 @@ import java.util.Hashtable;
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.Descriptor;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * This class implements a command for starting/stopping a simple telnet server.
@@ -31,14 +37,35 @@ public class TelnetCommand {
     private final BundleContext context;
     private String host = null;
     private int port;
-    private TelnetServer telnetServer;
+    private TelnetServer telnetServer = null;
+    private ServiceRegistration<?> configuratorRegistration;
+    private static final String HOST = "host";
+    private static final String PORT = "port";
+    private static final String USE_CONFIG_ADMIN_PROP = "osgi.console.useConfigAdmin";
+    private static final String TELNET_PID = "osgi.console.telnet";
+    private static final String CONSOLE_PROP = "osgi.console";
 
     public TelnetCommand(CommandProcessor processor, BundleContext context)
     {
         this.processor = processor;
         this.context = context;
-        String telnetPort = null;
-        String consolePropValue = context.getProperty("osgi.console");
+        if ("true".equals(System.getProperty(USE_CONFIG_ADMIN_PROP))) {
+        	Dictionary telnetProperties = new Hashtable();
+        	telnetProperties.put(Constants.SERVICE_PID, TELNET_PID);
+        	try {
+        		configuratorRegistration = context.registerService(ManagedService.class.getName(), new TelnetConfigurator(), telnetProperties);
+        	} catch (NoClassDefFoundError e) {
+        		System.out.println("Configuration Admin not available!");
+        		return;
+        	}
+        } else {
+        	parseHostAndPort();
+        }
+    }
+    
+    private void parseHostAndPort() {
+    	String telnetPort = null;
+        String consolePropValue = context.getProperty(CONSOLE_PROP);
         if(consolePropValue != null) {
         	int index = consolePropValue.lastIndexOf(":");
         	if (index > -1) {
@@ -52,7 +79,7 @@ public class TelnetCommand {
 			} catch (NumberFormatException e) {
 				// do nothing
 			}
-        } 
+        }
     }
     
     public synchronized void start() {
@@ -162,5 +189,30 @@ public class TelnetCommand {
     	help.append("\t");
     	help.append("show help");
     	System.out.println(help.toString());          
+    }
+    
+    class TelnetConfigurator implements ManagedService {
+    	private Dictionary properties;
+		public synchronized void updated(Dictionary props) throws ConfigurationException {
+			if (props != null) {
+				this.properties = props;
+				properties.put(Constants.SERVICE_PID, TELNET_PID);
+			} else {
+				return;
+			}
+			
+			defaultPort = Integer.parseInt(((String)properties.get(PORT)));
+			defaultHost = (String)properties.get(HOST);
+			configuratorRegistration.setProperties(properties);
+			if (telnetServer == null) {
+				try {
+					telnet(new String[]{"start"});
+				} catch (Exception e) {
+					System.out.println("Cannot start telnet: " + e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		}
+    	
     }
 }

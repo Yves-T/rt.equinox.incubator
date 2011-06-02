@@ -22,6 +22,10 @@ import org.apache.felix.service.command.Descriptor;
 import org.eclipse.equinox.console.storage.DigestUtil;
 import org.eclipse.equinox.console.storage.SecureUserStore;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 
 /**
  * This class implements a command for starting/stopping a simple ssh server.
@@ -35,17 +39,37 @@ public class SshCommand {
     private int port;
     private SshServ sshServ;
     private BundleContext context;
+    private ServiceRegistration<?> configuratorRegistration;
     
     private static final String DEFAULT_USER = "equinox";
     private static final String DEFAULT_PASSWORD = "equinox";
     private static final String DEFAULT_USER_STORE_PROPERTY = "osgi.console.ssh.useDefaultSecureStorage";
+    private static final String HOST = "host";
+    private static final String PORT = "port";
+    private static final String USE_CONFIG_ADMIN_PROP = "osgi.console.useConfigAdmin";
+    private static final String SSH_PID = "osgi.console.ssh";
     
     public SshCommand(CommandProcessor processor, BundleContext context) {
         this.processor = processor;
         this.context = context;
         
-        String sshPort = null;
-        String consolePropValue = context.getProperty("osgi.console.ssh");
+        if ("true".equals(System.getProperty(USE_CONFIG_ADMIN_PROP))) {
+        	Dictionary sshProperties = new Hashtable();
+        	sshProperties.put(Constants.SERVICE_PID, SSH_PID);
+        	try {
+        		configuratorRegistration = context.registerService(ManagedService.class.getName(), new SshConfigurator(), sshProperties);
+        	} catch (NoClassDefFoundError e) {
+        		System.out.println("Configuration Admin not available!");
+        		return;
+        	}
+        } else {
+        	parseHostAndPort();
+        }
+    }
+    
+    private void parseHostAndPort() {
+    	String sshPort = null;
+        String consolePropValue = context.getProperty(SSH_PID);
         if(consolePropValue != null) {
         	int index = consolePropValue.lastIndexOf(":");
         	if (index > -1) {
@@ -59,7 +83,7 @@ public class SshCommand {
 			} catch (NumberFormatException e) {
 				// do nothing
 			}
-        } 
+        }
     }
     
     public synchronized void start() {
@@ -226,5 +250,30 @@ public class SshCommand {
     	help.append("\t");
     	help.append("show help");
     	System.out.println(help.toString());          
+    }
+    
+    class SshConfigurator implements ManagedService {
+    	private Dictionary properties;
+		public synchronized void updated(Dictionary props) throws ConfigurationException {
+			if (props != null) {
+				this.properties = props;
+				properties.put(Constants.SERVICE_PID, SSH_PID);
+			} else {
+				return;
+			}
+			
+			defaultPort = Integer.parseInt(((String)properties.get(PORT)));
+			defaultHost = (String)properties.get(HOST);
+			configuratorRegistration.setProperties(properties);
+			if (sshServ == null) {
+				try {
+					ssh(new String[]{"start"});
+				} catch (Exception e) {
+					System.out.println("Cannot start ssh: " + e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		}
+    	
     }
 }
