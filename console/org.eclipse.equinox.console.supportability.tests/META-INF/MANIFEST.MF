@@ -22,4 +22,5 @@ Import-Package: org.apache.felix.service.command;status=provisional;version="0.8
  org.eclipse.equinox.console.supportability,
  org.eclipse.equinox.console.telnet,
  org.eclipse.osgi.framework.console,
- org.osgi.framework
+ org.osgi.framework,
+ org.osgi.service.cm
