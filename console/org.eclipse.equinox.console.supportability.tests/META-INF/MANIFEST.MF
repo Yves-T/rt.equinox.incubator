@@ -15,6 +15,7 @@ Import-Package: org.apache.felix.service.command;status=provisional;version="0.8
  org.eclipse.equinox.console.commands,
  org.eclipse.equinox.console.common,
  org.eclipse.equinox.console.common.terminal,
+ org.eclipse.equinox.console.completion.common,
  org.eclipse.equinox.console.completion,
  org.eclipse.equinox.console.jaas,
  org.eclipse.equinox.console.ssh,

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.felix.service.command.CommandSession;
-import org.eclipse.equinox.console.common.Completer;
+import org.eclipse.equinox.console.completion.common.Completer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

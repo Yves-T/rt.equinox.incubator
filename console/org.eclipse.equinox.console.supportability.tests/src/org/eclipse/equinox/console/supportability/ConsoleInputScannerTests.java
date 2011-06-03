@@ -16,9 +16,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
 import org.apache.felix.service.command.CommandSession;
-import org.eclipse.osgi.framework.console.CommandProvider;
-import org.eclipse.equinox.console.Activator;
-import org.eclipse.equinox.console.common.Completer;
 import org.eclipse.equinox.console.common.ConsoleInputStream;
 import org.eclipse.equinox.console.common.ConsoleOutputStream;
 import org.eclipse.equinox.console.common.KEYS;
@@ -28,6 +25,7 @@ import org.eclipse.equinox.console.common.terminal.TerminalTypeMappings;
 import org.eclipse.equinox.console.common.terminal.VT100TerminalTypeMappings;
 import org.eclipse.equinox.console.common.terminal.VT220TerminalTypeMappings;
 import org.eclipse.equinox.console.common.terminal.VT320TerminalTypeMappings;
+import org.eclipse.equinox.console.completion.common.Completer;
 import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
