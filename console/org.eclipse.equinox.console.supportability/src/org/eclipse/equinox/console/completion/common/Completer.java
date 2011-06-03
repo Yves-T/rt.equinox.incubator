@@ -9,7 +9,7 @@
  *     Lazar Kirchev, SAP AG - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.equinox.console.common;
+package org.eclipse.equinox.console.completion.common;
 
 import java.util.Map;
 

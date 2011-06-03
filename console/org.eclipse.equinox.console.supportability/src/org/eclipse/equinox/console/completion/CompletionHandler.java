@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.felix.service.command.CommandSession;
-import org.eclipse.equinox.console.common.Completer;
+import org.eclipse.equinox.console.completion.common.Completer;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;

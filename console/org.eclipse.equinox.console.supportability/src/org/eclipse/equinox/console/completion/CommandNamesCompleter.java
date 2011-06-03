@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.felix.service.command.CommandSession;
-import org.eclipse.equinox.console.common.Completer;
+import org.eclipse.equinox.console.completion.common.Completer;
 
 /**
  * This class provides completion for command names. 

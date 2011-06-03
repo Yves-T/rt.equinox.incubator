@@ -17,7 +17,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.equinox.console.common.Completer;
+import org.eclipse.equinox.console.completion.common.Completer;
 
 /**
  * This class implements completion of file names. It provides completion both for 
