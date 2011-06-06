@@ -69,6 +69,7 @@ public class CompletionHandler {
 		return candidates;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void lookupCustomCompleters (){
 		ServiceReference<Completer>[] completersRefs = null;
 		try {

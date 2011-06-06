@@ -14,7 +14,6 @@ package org.eclipse.equinox.console.common;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 

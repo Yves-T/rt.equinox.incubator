@@ -54,7 +54,7 @@ public class SshCommand {
         this.context = context;
         
         if ("true".equals(System.getProperty(USE_CONFIG_ADMIN_PROP))) {
-        	Dictionary sshProperties = new Hashtable();
+        	Dictionary<String, String> sshProperties = new Hashtable<String, String>();
         	sshProperties.put(Constants.SERVICE_PID, SSH_PID);
         	try {
         		configuratorRegistration = context.registerService(ManagedService.class.getName(), new SshConfigurator(), sshProperties);
@@ -253,7 +253,9 @@ public class SshCommand {
     }
     
     class SshConfigurator implements ManagedService {
-    	private Dictionary properties;
+    	@SuppressWarnings("rawtypes")
+		private Dictionary properties;
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		public synchronized void updated(Dictionary props) throws ConfigurationException {
 			if (props != null) {
 				this.properties = props;

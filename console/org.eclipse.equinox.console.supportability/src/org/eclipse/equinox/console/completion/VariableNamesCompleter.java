@@ -31,6 +31,7 @@ public class VariableNamesCompleter implements Completer {
 	
 	public Map<String, Integer> getCandidates(String buffer, int cursor) {
 		// CommandSession.get(null) returns the names of all registered varialbes
+		@SuppressWarnings("unchecked")
 		Set<String> variableNames = (Set<String>) session.get(null);
 		StringsCompleter completer = new StringsCompleter(variableNames, false);
 		return completer.getCandidates(buffer, cursor);

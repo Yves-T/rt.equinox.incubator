@@ -20,14 +20,12 @@ import java.util.Set;
 
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
-import org.apache.felix.service.command.Parameter;
 import org.eclipse.equinox.console.command.adapter.CustomCommandInterpreter;
 import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.osgi.framework.console.CommandProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
@@ -38,7 +36,6 @@ public class HelpCommand {
 	private BundleContext context;
 	private Set<CommandProvider> legacyCommandProviders;
 	private ServiceTracker<CommandProvider, Set<CommandProvider>> commandProvidersTracker;
-	private ServiceRegistration<?> registration;
 	
     public class CommandProviderCustomizer implements ServiceTrackerCustomizer<CommandProvider, Set<CommandProvider>> {
     	private BundleContext context;

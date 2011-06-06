@@ -34,6 +34,7 @@ public class CommandNamesCompleter implements Completer {
 	
 	public Map<String, Integer> getCandidates(String buffer, int cursor) {
 		// CommandSession.get(".commands") returns the names of all registered commands
+		@SuppressWarnings("unchecked")
 		Set<String> commandNames = (Set<String>) session.get(COMMANDS);
 		
 		// command names are stored in the session in lower case

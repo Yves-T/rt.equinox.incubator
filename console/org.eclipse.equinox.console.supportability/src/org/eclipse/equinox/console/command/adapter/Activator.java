@@ -23,9 +23,7 @@ import java.util.List;
 
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
-import org.apache.felix.service.command.Converter;
 import org.eclipse.equinox.console.commands.EquinoxCommandProvider;
-import org.eclipse.equinox.console.commands.EquinoxCommandsConverter;
 import org.eclipse.equinox.console.commands.HelpCommand;
 import org.eclipse.equinox.console.ssh.SshCommand;
 import org.eclipse.equinox.console.telnet.TelnetCommand;
@@ -240,7 +238,7 @@ public class Activator implements BundleActivator {
 		return (PlatformAdmin) getServiceFromTracker(platformAdminTracker, PlatformAdmin.class.getName());
 	}
 	
-	private static Object getServiceFromTracker(ServiceTracker tracker, String serviceClass) {
+	private static Object getServiceFromTracker(ServiceTracker<?, ?> tracker, String serviceClass) {
 		if (tracker == null)
 			throw new IllegalStateException("Missing service: " + serviceClass);
 		Object result = tracker.getService();

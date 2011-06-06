@@ -20,10 +20,8 @@ import org.apache.felix.service.command.Descriptor;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * This class implements a command for starting/stopping a simple telnet server.
@@ -50,7 +48,7 @@ public class TelnetCommand {
         this.processor = processor;
         this.context = context;
         if ("true".equals(System.getProperty(USE_CONFIG_ADMIN_PROP))) {
-        	Dictionary telnetProperties = new Hashtable();
+        	Dictionary<String, String> telnetProperties = new Hashtable<String, String>();
         	telnetProperties.put(Constants.SERVICE_PID, TELNET_PID);
         	try {
         		configuratorRegistration = context.registerService(ManagedService.class.getName(), new TelnetConfigurator(), telnetProperties);
@@ -192,7 +190,9 @@ public class TelnetCommand {
     }
     
     class TelnetConfigurator implements ManagedService {
-    	private Dictionary properties;
+    	@SuppressWarnings("rawtypes")
+		private Dictionary properties;
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		public synchronized void updated(Dictionary props) throws ConfigurationException {
 			if (props != null) {
 				this.properties = props;
