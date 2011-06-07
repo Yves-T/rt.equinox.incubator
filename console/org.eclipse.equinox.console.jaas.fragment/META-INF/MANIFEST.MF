@@ -4,5 +4,5 @@ Bundle-Name: SSHD Fragment
 Bundle-SymbolicName: org.eclipse.equinox.console.jaas.fragment
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: org.eclipse.equinox.console.jaas
+DynamicImport-Package: org.eclipse.equinox.console.jaas
 Fragment-Host: sshd-core
