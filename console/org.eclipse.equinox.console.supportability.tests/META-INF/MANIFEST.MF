@@ -3,25 +3,10 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Console supportability tests
 Bundle-SymbolicName: org.eclipse.equinox.console.supportability.tests
 Bundle-Version: 1.0.0.qualifier
-Require-Bundle: org.junit4;bundle-version="4.8.1",
- org.easymock;bundle-version="3.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: org.apache.felix.service.command;status=provisional;version="0.8.0",
- org.apache.sshd,
+Import-Package: junit.framework;version="4.8.1",
  org.apache.sshd.client.future,
- org.apache.sshd.server,
- org.eclipse.equinox.console.command.adapter,
- org.eclipse.equinox.console.commands,
- org.eclipse.equinox.console.common,
- org.eclipse.equinox.console.common.terminal,
- org.eclipse.equinox.console.completion.common,
- org.eclipse.equinox.console.completion,
- org.eclipse.equinox.console.jaas,
- org.eclipse.equinox.console.ssh,
- org.eclipse.equinox.console.storage,
- org.eclipse.equinox.console.supportability,
- org.eclipse.equinox.console.telnet,
- org.eclipse.osgi.framework.console,
- org.osgi.framework,
- org.osgi.service.cm
+ org.easymock;version="2.4.0",
+ org.junit;version="4.8.1"
+Fragment-Host: org.eclipse.equinox.console.supportability

@@ -21,6 +21,7 @@ import org.apache.sshd.client.future.ConnectFuture;
 import org.apache.sshd.client.future.DefaultConnectFuture;
 import org.apache.sshd.server.Environment;
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.eclipse.equinox.console.common.ConsoleInputStream;
 import org.eclipse.equinox.console.storage.DigestUtil;
 import org.eclipse.equinox.console.storage.SecureUserStore;
@@ -89,15 +90,20 @@ public class SshCommandWithConfigAdminTests {
         registration.setProperties((Dictionary)EasyMock.anyObject());
         EasyMock.expectLastCall();
         EasyMock.replay(registration);
-        
-		BundleContext context = EasyMock.createMock(BundleContext.class);
+        final BundleContext mockContext = new MockBundleContext(registration);
+
+        BundleContext context = EasyMock.createMock(BundleContext.class);
 		EasyMock.expect(context.getProperty(DEFAULT_USER_STORAGE)).andReturn(TRUE).anyTimes();
-		EasyMock.expect(
-        		context.registerService(
+        EasyMock.expect(
+        		(ServiceRegistration) context.registerService(
         				(String)EasyMock.anyObject(), 
         				(ManagedService)EasyMock.anyObject(), 
         				(Dictionary<String, ?>)EasyMock.anyObject())
-        	).andDelegateTo(new MockBundleContext(registration));
+        	).andAnswer((IAnswer<ServiceRegistration<?>>) new IAnswer<ServiceRegistration<?>>() {
+        		public ServiceRegistration<?> answer() {
+        			return mockContext.registerService((String) EasyMock.getCurrentArguments()[0], (ManagedService) EasyMock.getCurrentArguments()[1], (Dictionary<String, ?>) EasyMock.getCurrentArguments()[2]);
+        		}
+			});
         EasyMock.expect(
         		context.registerService(
         				(String)EasyMock.anyObject(), 

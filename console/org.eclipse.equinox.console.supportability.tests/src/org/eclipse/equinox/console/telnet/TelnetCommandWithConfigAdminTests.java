@@ -12,6 +12,7 @@ import java.util.Hashtable;
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.eclipse.equinox.console.common.ConsoleInputStream;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
@@ -54,16 +55,22 @@ public class TelnetCommandWithConfigAdminTests {
         
         ServiceRegistration<?> registration = EasyMock.createMock(ServiceRegistration.class);
         registration.setProperties((Dictionary)EasyMock.anyObject());
+
         EasyMock.expectLastCall();
         EasyMock.replay(registration);
-        
+
+        final BundleContext mockContext = new MockBundleContext(registration);
         BundleContext context = EasyMock.createMock(BundleContext.class);
         EasyMock.expect(
-        		context.registerService(
+        		(ServiceRegistration) context.registerService(
         				(String)EasyMock.anyObject(), 
         				(ManagedService)EasyMock.anyObject(), 
         				(Dictionary<String, ?>)EasyMock.anyObject())
-        	).andDelegateTo(new MockBundleContext(registration));
+        	).andAnswer((IAnswer<ServiceRegistration<?>>) new IAnswer<ServiceRegistration<?>>() {
+        		public ServiceRegistration<?> answer() {
+        			return mockContext.registerService((String) EasyMock.getCurrentArguments()[0], (ManagedService) EasyMock.getCurrentArguments()[1], (Dictionary<String, ?>) EasyMock.getCurrentArguments()[2]);
+        		}
+			});
         EasyMock.expect(
         		context.registerService(
         				(String)EasyMock.anyObject(), 
