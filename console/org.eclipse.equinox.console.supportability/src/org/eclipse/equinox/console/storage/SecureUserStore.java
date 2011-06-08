@@ -332,11 +332,17 @@ public class SecureUserStore {
 				throw new IllegalArgumentException("The user does not exist!");
 			}
 			
-			for (Object key : users.keySet()) {
-				if ((key instanceof String) && ((String) key).contains(DELIMITER + username + DELIMITER)) {
-						users.remove(key);
-				}
-			}
+//			Set<Object> keys = users.keySet();
+//			for (Object key : keys) {
+//				if ((key instanceof String) && ((String) key).contains(DELIMITER + username + DELIMITER)) {
+//						users.remove(key);
+//				}
+//			}
+			String rolesProperty = constructPropertyName(username, ROLES_KEY);
+			String passwordProperty = constructPropertyName(username, PASSWORD_KEY);
+			
+			users.remove(rolesProperty);
+			users.remove(passwordProperty);
 			
 			out = new FileOutputStream(userFileLoc);
 			try {
