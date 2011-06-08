@@ -85,11 +85,10 @@ public class SshCommandWithConfigAdminTests {
 		EasyMock.expect(processor.createSession((ConsoleInputStream)EasyMock.anyObject(), (PrintStream)EasyMock.anyObject(), (PrintStream)EasyMock.anyObject())).andReturn(session);
 		EasyMock.replay(processor);
 
-		ServiceRegistration<?> registration = EasyMock.createMock(ServiceRegistration.class);
+		final ServiceRegistration<?> registration = EasyMock.createMock(ServiceRegistration.class);
         registration.setProperties((Dictionary)EasyMock.anyObject());
         EasyMock.expectLastCall();
         EasyMock.replay(registration);
-        final BundleContext mockContext = new MockBundleContext(registration);
 
         BundleContext context = EasyMock.createMock(BundleContext.class);
 		EasyMock.expect(context.getProperty(DEFAULT_USER_STORAGE)).andReturn(TRUE).anyTimes();
@@ -100,7 +99,8 @@ public class SshCommandWithConfigAdminTests {
         				(Dictionary<String, ?>)EasyMock.anyObject())
         	).andAnswer((IAnswer<ServiceRegistration<?>>) new IAnswer<ServiceRegistration<?>>() {
         		public ServiceRegistration<?> answer() {
-        			return mockContext.registerService((String) EasyMock.getCurrentArguments()[0], (ManagedService) EasyMock.getCurrentArguments()[1], (Dictionary<String, ?>) EasyMock.getCurrentArguments()[2]);
+        			configurator = (ManagedService) EasyMock.getCurrentArguments()[1];
+        			return registration;
         		}
 			});
         EasyMock.expect(
@@ -210,176 +210,4 @@ public class SshCommandWithConfigAdminTests {
     	}
 	}
 	
-	class MockBundleContext implements BundleContext {
-
-		private ServiceRegistration<?> registration;
-		
-		public MockBundleContext(ServiceRegistration<?> mockRegistration) {
-			this.registration = mockRegistration;
-		}
-		
-		@Override
-		public String getProperty(String key) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Bundle getBundle() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Bundle installBundle(String location, InputStream input)
-				throws BundleException {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Bundle installBundle(String location) throws BundleException {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Bundle getBundle(long id) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Bundle[] getBundles() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public void addServiceListener(ServiceListener listener, String filter)
-				throws InvalidSyntaxException {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void addServiceListener(ServiceListener listener) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void removeServiceListener(ServiceListener listener) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void addBundleListener(BundleListener listener) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void removeBundleListener(BundleListener listener) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void addFrameworkListener(FrameworkListener listener) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void removeFrameworkListener(FrameworkListener listener) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public ServiceRegistration<?> registerService(String[] clazzes,
-				Object service, Dictionary<String, ?> properties) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public ServiceRegistration<?> registerService(String clazz,
-				Object service, Dictionary<String, ?> properties) {
-			configurator = (ManagedService) service;
-			return registration;
-		}
-
-		@Override
-		public <S> ServiceRegistration<S> registerService(Class<S> clazz,
-				S service, Dictionary<String, ?> properties) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public ServiceReference<?>[] getServiceReferences(String clazz,
-				String filter) throws InvalidSyntaxException {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public ServiceReference<?>[] getAllServiceReferences(String clazz,
-				String filter) throws InvalidSyntaxException {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public ServiceReference<?> getServiceReference(String clazz) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public <S> ServiceReference<S> getServiceReference(Class<S> clazz) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public <S> Collection<ServiceReference<S>> getServiceReferences(
-				Class<S> clazz, String filter) throws InvalidSyntaxException {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public <S> S getService(ServiceReference<S> reference) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public boolean ungetService(ServiceReference<?> reference) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public File getDataFile(String filename) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Filter createFilter(String filter) throws InvalidSyntaxException {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Bundle getBundle(String location) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	}
 }
