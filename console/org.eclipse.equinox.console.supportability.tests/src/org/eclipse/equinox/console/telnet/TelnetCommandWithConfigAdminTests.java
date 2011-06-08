@@ -12,7 +12,10 @@ import java.util.Hashtable;
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.eclipse.equinox.console.common.ConsoleInputStream;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -36,10 +39,13 @@ public class TelnetCommandWithConfigAdminTests {
 	private static final String USE_CONFIG_ADMIN_PROP = "osgi.console.useConfigAdmin";
 	private ManagedService configurator;
 	
+	@Before
+	public void init() {
+		System.setProperty(USE_CONFIG_ADMIN_PROP, "true");
+	}
 	
 	@Test
 	public void testTelnetCommandWithConfigAdmin() throws Exception {
-		System.setProperty(USE_CONFIG_ADMIN_PROP, "true");
 		
 		CommandSession session = EasyMock.createMock(CommandSession.class);
     	session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
@@ -54,16 +60,22 @@ public class TelnetCommandWithConfigAdminTests {
         
         ServiceRegistration<?> registration = EasyMock.createMock(ServiceRegistration.class);
         registration.setProperties((Dictionary)EasyMock.anyObject());
+
         EasyMock.expectLastCall();
         EasyMock.replay(registration);
-        
+
+        final BundleContext mockContext = new MockBundleContext(registration);
         BundleContext context = EasyMock.createMock(BundleContext.class);
         EasyMock.expect(
-        		context.registerService(
+        		(ServiceRegistration) context.registerService(
         				(String)EasyMock.anyObject(), 
         				(ManagedService)EasyMock.anyObject(), 
         				(Dictionary<String, ?>)EasyMock.anyObject())
-        	).andDelegateTo(new MockBundleContext(registration));
+        	).andAnswer((IAnswer<ServiceRegistration<?>>) new IAnswer<ServiceRegistration<?>>() {
+        		public ServiceRegistration<?> answer() {
+        			return mockContext.registerService((String) EasyMock.getCurrentArguments()[0], (ManagedService) EasyMock.getCurrentArguments()[1], (Dictionary<String, ?>) EasyMock.getCurrentArguments()[2]);
+        		}
+			});
         EasyMock.expect(
         		context.registerService(
         				(String)EasyMock.anyObject(), 
@@ -97,6 +109,11 @@ public class TelnetCommandWithConfigAdminTests {
             }
             command.telnet(new String[] {STOP_COMMAND});
         }
+	}
+	
+	@After
+	public void cleanUp() {
+		System.setProperty(USE_CONFIG_ADMIN_PROP, "");
 	}
 	
 	class MockBundleContext implements BundleContext {

@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: BundleSupplement Plug-in (Incubation)
-Bundle-SymbolicName: org.eclipse.equinox.weaving.tests.bundles.bundleSupplement
-Bundle-Version: 1.0.0
-Bundle-Localization: plugin
-Export-Package: org.eclipse.osgi.aspectj.tests.bundles.bundleSupplement
-Eclipse-SupplementBundle: someInvalidBundle,
- org.eclipse.equinox.weaving.tests

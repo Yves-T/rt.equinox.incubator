@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.equinox.p2.di.engine">
-   <implementation class="engine.component.EngineComponent"/>
-   <reference bind="setRegistry" cardinality="0..n" interface="org.eclipse.core.runtime.IExtensionRegistry" name="IExtensionRegistry" unbind="unsetRegistry"/>
-   <service>
-      <provide interface="agent.IAgentServiceFactory"/>
-   </service>
-   <property name="p2.agent.servicename" type="String" value="engine.Engine"/>
-</scr:component>

@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: ImportSupplement Plug-in (Incubation)
-Bundle-SymbolicName: org.eclipse.equinox.weaving.tests.bundles.importSupplement
-Bundle-Version: 1.0.0
-Bundle-Localization: plugin
-Export-Package: org.eclipse.osgi.aspectj.tests.bundles.importSupplement
-Eclipse-SupplementImporter: org.eclipse.osgi.aspectj.tests.bundles.spareBundle,
- org.eclipse.osgi.aspectj.tests.bundles.spareBundle.second
