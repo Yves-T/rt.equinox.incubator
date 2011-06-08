@@ -67,12 +67,11 @@ public class SshCommandWithConfigAdminTests {
 		clean();
 		initStore();
         initJaasConfigFile();
+        System.setProperty(USE_CONFIG_ADMIN_PROP, "true");
 	}
 	
 	@Test
 	public void testSshCommandWithConfigAdmin() throws Exception {
-		
-		System.setProperty(USE_CONFIG_ADMIN_PROP, "true");
 		
 		CommandSession session = EasyMock.createMock(CommandSession.class);
 		session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
@@ -183,6 +182,8 @@ public class SshCommandWithConfigAdminTests {
     	if (jaasConfFile.exists()) {
     		jaasConfFile.delete();
     	}
+    	
+    	System.setProperty(USE_CONFIG_ADMIN_PROP, "");
 	}
 	
 	private void initStore() throws Exception {

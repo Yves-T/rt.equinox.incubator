@@ -14,6 +14,8 @@ import org.apache.felix.service.command.CommandSession;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.eclipse.equinox.console.common.ConsoleInputStream;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -37,10 +39,13 @@ public class TelnetCommandWithConfigAdminTests {
 	private static final String USE_CONFIG_ADMIN_PROP = "osgi.console.useConfigAdmin";
 	private ManagedService configurator;
 	
+	@Before
+	public void init() {
+		System.setProperty(USE_CONFIG_ADMIN_PROP, "true");
+	}
 	
 	@Test
 	public void testTelnetCommandWithConfigAdmin() throws Exception {
-		System.setProperty(USE_CONFIG_ADMIN_PROP, "true");
 		
 		CommandSession session = EasyMock.createMock(CommandSession.class);
     	session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
@@ -104,6 +109,11 @@ public class TelnetCommandWithConfigAdminTests {
             }
             command.telnet(new String[] {STOP_COMMAND});
         }
+	}
+	
+	@After
+	public void cleanUp() {
+		System.setProperty(USE_CONFIG_ADMIN_PROP, "");
 	}
 	
 	class MockBundleContext implements BundleContext {
