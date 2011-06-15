@@ -46,14 +46,14 @@ public class TelnetConnectionTests {
 
             CommandSession session = EasyMock.createMock(CommandSession.class);
             session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
-            EasyMock.expectLastCall().times(3);
+            EasyMock.expectLastCall().times(4);
+            EasyMock.expect(session.execute((String)EasyMock.anyObject())).andReturn(null);
             session.close();
     		EasyMock.expectLastCall();
             EasyMock.replay(session);
             
             CommandProcessor processor = EasyMock.createMock(CommandProcessor.class);
-            PrintStream out = new PrintStream(new TelnetOutputStream(socketServer.getOutputStream()));
-            EasyMock.expect(processor.createSession(new ConsoleInputStream(), out, out)).andReturn(session);
+            EasyMock.expect(processor.createSession((ConsoleInputStream) EasyMock.anyObject(), (PrintStream) EasyMock.anyObject(), (PrintStream) EasyMock.anyObject())).andReturn(session);
             EasyMock.replay(processor);
             
             connection = new TelnetConnection(socketServer, processor, null);
@@ -73,6 +73,9 @@ public class TelnetConnectionTests {
             // here IAC is expected, since when the output stream in TelnetConsoleSession is created, several telnet
             // commands are written to it, each of them starting with IAC
             Assert.assertTrue("Client receive telnet responses from the server unexpected value [" + in + "] instead of " + IAC + ".", in == IAC);
+            connection.telnetNegotiationFinished();
+            Thread.sleep(5000);
+            EasyMock.verify(session, processor);
         } finally {
         	if (socketClient != null) {
         		socketClient.close();

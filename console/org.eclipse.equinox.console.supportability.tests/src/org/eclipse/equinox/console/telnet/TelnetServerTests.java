@@ -18,8 +18,6 @@ import org.eclipse.equinox.console.common.ConsoleInputStream;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.osgi.framework.BundleContext;
-
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.ConnectException;
@@ -39,7 +37,8 @@ public class TelnetServerTests {
 
     	CommandSession session = EasyMock.createMock(CommandSession.class);
     	session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
-        EasyMock.expectLastCall().times(3);
+        EasyMock.expectLastCall().times(4);
+        EasyMock.expect(session.execute((String)EasyMock.anyObject())).andReturn(new Object());
         session.close();
 		EasyMock.expectLastCall();
         EasyMock.replay(session);
@@ -64,7 +63,7 @@ public class TelnetServerTests {
             } catch (InterruptedException ie) {
                 // do nothing
             }
-            return;
+            verify();
         } catch(ConnectException e) {
         	Assert.fail("Telnet port not open");
         } finally {
@@ -79,7 +78,10 @@ public class TelnetServerTests {
     public void testTelnetServerWithoutHost() throws Exception {
     	CommandSession session = EasyMock.createMock(CommandSession.class);
     	session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
-        EasyMock.expectLastCall().times(3);
+        EasyMock.expectLastCall().times(4);
+        EasyMock.expect(session.execute((String)EasyMock.anyObject())).andReturn(new Object());
+        session.close();
+		EasyMock.expectLastCall();
         EasyMock.replay(session);
         
         CommandProcessor processor = EasyMock.createMock(CommandProcessor.class);

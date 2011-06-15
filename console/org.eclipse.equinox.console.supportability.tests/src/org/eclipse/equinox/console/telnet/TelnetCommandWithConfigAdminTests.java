@@ -46,10 +46,10 @@ public class TelnetCommandWithConfigAdminTests {
 	
 	@Test
 	public void testTelnetCommandWithConfigAdmin() throws Exception {
-		
 		CommandSession session = EasyMock.createMock(CommandSession.class);
     	session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
-        EasyMock.expectLastCall().times(3);
+        EasyMock.expectLastCall().times(4);
+        EasyMock.expect(session.execute((String)EasyMock.anyObject())).andReturn(new Object());
         session.close();
 		EasyMock.expectLastCall();
         EasyMock.replay(session);
@@ -57,7 +57,7 @@ public class TelnetCommandWithConfigAdminTests {
         CommandProcessor processor = EasyMock.createMock(CommandProcessor.class);
         EasyMock.expect(processor.createSession((ConsoleInputStream)EasyMock.anyObject(), (PrintStream)EasyMock.anyObject(), (PrintStream)EasyMock.anyObject())).andReturn(session);
         EasyMock.replay(processor);
-        
+
         final ServiceRegistration<?> registration = EasyMock.createMock(ServiceRegistration.class);
         registration.setProperties((Dictionary)EasyMock.anyObject());
 
@@ -84,11 +84,12 @@ public class TelnetCommandWithConfigAdminTests {
         EasyMock.replay(context);
         
         TelnetCommand command = new TelnetCommand(processor, context);
+        command.start();
         Dictionary props = new Hashtable();
 		props.put("port", TELNET_PORT);
 		props.put("host", HOST);
 		configurator.updated(props);
-        
+		
         Socket socketClient = null;
         try {
             socketClient = new Socket(HOST, Integer.parseInt(TELNET_PORT));
@@ -109,6 +110,7 @@ public class TelnetCommandWithConfigAdminTests {
             }
             command.telnet(new String[] {STOP_COMMAND});
         }
+        EasyMock.verify(context);
 	}
 	
 	@After

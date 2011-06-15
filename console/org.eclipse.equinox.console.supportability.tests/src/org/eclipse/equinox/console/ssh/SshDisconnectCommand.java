@@ -1,21 +1,16 @@
-/*******************************************************************************
- * Copyright (c) 2011 SAP AG
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors:
- *     Lazar Kirchev, SAP AG - initial API and implementation
- *******************************************************************************/
-
 package org.eclipse.equinox.console.ssh;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringBufferInputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +24,8 @@ import org.apache.sshd.client.future.ConnectFuture;
 import org.apache.sshd.client.future.DefaultConnectFuture;
 import org.apache.sshd.server.Environment;
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
+import org.eclipse.equinox.console.commands.DisconnectCommand;
 import org.eclipse.equinox.console.common.ConsoleInputStream;
 import org.eclipse.equinox.console.storage.DigestUtil;
 import org.eclipse.equinox.console.storage.SecureUserStore;
@@ -38,8 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 
-
-public class SshCommandTests {
+public class SshDisconnectCommand {
 	private static final int TEST_CONTENT = 100;
 	private static final String USER_STORE_FILE_NAME = "org.eclipse.equinox.console.jaas.file";
 	private static final String JAAS_CONFIG_FILE_NAME = "jaas.config";
@@ -58,6 +54,8 @@ public class SshCommandTests {
 	private static final String HOST = "localhost";
 	private static final int SSH_PORT = 2222;
 	private static final long WAIT_TIME = 5000;
+	private SshShell sshShell;
+	private InputStream in;
 
 	@Before
 	public void init() throws Exception {
@@ -68,10 +66,25 @@ public class SshCommandTests {
 	
 	@Test
 	public void testSshCommand() throws Exception {
-		CommandSession session = EasyMock.createMock(CommandSession.class);
+		final CommandSession session = EasyMock.createMock(CommandSession.class);
 		session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
-		EasyMock.expectLastCall().times(4);
+		EasyMock.expectLastCall();
+		session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
+		EasyMock.expectLastCall();
+		session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
+		EasyMock.expectLastCall();
+		session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
+		EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+
+			@Override
+			public Object answer() throws Throwable {
+				sshShell = (SshShell)EasyMock.getCurrentArguments()[1];
+				return null;
+			}
+			
+		});
 		EasyMock.expect(session.execute(GOGO_SHELL_COMMAND)).andReturn(null);
+		EasyMock.expect(session.get("CLOSEABLE")).andReturn(sshShell);
 		session.close();
 		EasyMock.expectLastCall();
 		EasyMock.replay(session);
@@ -117,18 +130,47 @@ public class SshCommandTests {
 				System.exit(-1);
 			}
 			ClientChannel channel = sshSession.createChannel("shell");
-			channel.setIn(new StringBufferInputStream(TEST_CONTENT + "\n"));
-			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-			channel.setOut(byteOut);
-			channel.setErr(byteOut);
-			channel.open();
-			try {
+			
+			PipedOutputStream outputStream = new PipedOutputStream();
+			PipedInputStream inputStream = new PipedInputStream(outputStream);
+			
+			final DisconnectCommand disconnectCommand = new DisconnectCommand(context);
+			in = System.in;
+            System.setIn(inputStream);
+            
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            channel.setIn(new StringBufferInputStream(TEST_CONTENT + "\n"));
+            channel.setOut(byteOut);
+            channel.setErr(byteOut);
+            channel.open();
+            
+            
+            new Thread() {
+            	public void run() {
+            		disconnectCommand.disconnect(session);
+            	}
+            }.start();
+            
+            outputStream.write(new byte[]{'y'});
+            outputStream.write('\n');
+            outputStream.flush();
+            
+            Thread.sleep(WAIT_TIME);
+            
+            try {
 				Thread.sleep(WAIT_TIME);
 			} catch (InterruptedException ie) {
 				// do nothing
 			}
-			byte[] output = byteOut.toByteArray();
-			Assert.assertEquals("Output not as expected",Integer.toString(TEST_CONTENT), new String(output).trim());
+			
+            try {
+				outputStream.write(TEST_CONTENT);
+				outputStream.write('\n');
+				outputStream.flush();
+				Assert.fail("Connection not closed");
+			} catch (Exception e) {
+				// we should be here
+			}
 			sshSession.close(true);
 		} finally {
 			client.stop();
@@ -155,6 +197,8 @@ public class SshCommandTests {
     	if (jaasConfFile.exists()) {
     		jaasConfFile.delete();
     	}
+    	
+    	System.setIn(in);
 	}
 	
 	private void initStore() throws Exception {

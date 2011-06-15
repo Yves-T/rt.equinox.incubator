@@ -28,7 +28,6 @@ public class TelnetCommandTests {
 	
 	private static final int TEST_CONTENT = 100;
 	private static final String TELNET_PORT_PROP_NAME = "osgi.console";
-	private static final String START_COMMAND = "start";
 	private static final String STOP_COMMAND = "stop";
 	private static final String HOST = "localhost";
 	private static final int TELNET_PORT = 2223;
@@ -38,7 +37,8 @@ public class TelnetCommandTests {
 	public void testTelnetCommand() throws Exception {
 		CommandSession session = EasyMock.createMock(CommandSession.class);
     	session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
-        EasyMock.expectLastCall().times(3);
+        EasyMock.expectLastCall().times(4);
+        EasyMock.expect(session.execute((String)EasyMock.anyObject())).andReturn(new Object());
         session.close();
 		EasyMock.expectLastCall();
         EasyMock.replay(session);
@@ -53,7 +53,7 @@ public class TelnetCommandTests {
         EasyMock.replay(context);
         
         TelnetCommand command = new TelnetCommand(processor, context);
-        command.telnet(new String[] {START_COMMAND});
+        command.start();
         
         Socket socketClient = null;
         try {
@@ -75,5 +75,6 @@ public class TelnetCommandTests {
             }
             command.telnet(new String[] {STOP_COMMAND});
         }
+        EasyMock.verify(context);
 	}
 }
