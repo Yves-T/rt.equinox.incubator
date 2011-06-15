@@ -90,13 +90,15 @@ public class HelpCommand {
 	 * message for the particular command is displayed (if such is defined).
 	 * 
 	 * This method can accept an additional argument -legacy. If this option is specified, the names of all 
-	 * legacy equinox commands are displayed, and then the Gogo help command is called to display the other
-	 * commands' names. If -legacy is not specified, then only the Gogo help command is called.
+	 * legacy equinox commands are displayed. If -legacy is not specified, then only the Gogo help command is called.
 	 * 
 	 * If -legacy is displayed along with a command name, then the legacy commands are searched
 	 * for a command with this name, and the help message for this command is displayed, if provided. If the 
 	 * CommandProvider, which provides this command, does not provide help for individual commands, then
 	 * the help for all commands in the CommandProvider is displayed. 
+	 * 
+	 * This method can accept an additional argument -all. If this option is specified, then both the names of the 
+	 * legacy equinox commands and the Gogo commands are displayed.
 	 * 
 	 * @param session
 	 * @param args
@@ -104,12 +106,15 @@ public class HelpCommand {
 	 */
 	public void help(final CommandSession session, String... args) throws Exception {
 		boolean isLegacy = false;
+		boolean isAll = false;
 		String command = null;
 		
 		if (args.length > 0) {
 			for (String arg : args) {
 				if (arg.equals("-legacy")) {
 					isLegacy = true;
+				} else if(arg.equals("-all")) {
+					isAll = true;
 				} else {
 					command = arg;
 				}
@@ -142,17 +147,33 @@ public class HelpCommand {
 			return;
 		}
 		
+		if (isLegacy == false && command != null) {
+			session.execute("help " + command);
+			return;
+		}
+		
 		if (isLegacy == true) {
-			for (CommandProvider provider : legacyCommandProviders) {
-				Method[] methods = provider.getClass().getMethods();
-				for (Method method : methods) {
-					if (method.getName().startsWith("_")) {
-						System.out.println("equinox:" + method.getName().substring(1));
-					}
-				}
-			}
+			printLegacyCommands();
+			return;
 		} 
 		
+		if (isAll == true) {
+			printLegacyCommands();
+			session.execute("help");
+			return;
+		}
+						
 		session.execute("help");
+	}
+	
+	private void printLegacyCommands() {
+		for (CommandProvider provider : legacyCommandProviders) {
+			Method[] methods = provider.getClass().getMethods();
+			for (Method method : methods) {
+				if (method.getName().startsWith("_")) {
+					System.out.println("equinox:" + method.getName().substring(1));
+				}
+			}
+		}
 	}
 }

@@ -26,6 +26,7 @@ import org.apache.felix.service.command.CommandSession;
 import org.eclipse.equinox.console.commands.DisconnectCommand;
 import org.eclipse.equinox.console.commands.EquinoxCommandProvider;
 import org.eclipse.equinox.console.commands.HelpCommand;
+import org.eclipse.equinox.console.commands.ManCommand;
 import org.eclipse.equinox.console.ssh.SshCommand;
 import org.eclipse.equinox.console.telnet.TelnetCommand;
 import org.eclipse.osgi.framework.console.CommandInterpreter;
@@ -217,6 +218,9 @@ public class Activator implements BundleActivator {
 		
 		HelpCommand helpCommand = new HelpCommand(context); 
 		helpCommand.start();
+		
+		ManCommand manCommand = new ManCommand(context);
+		manCommand.start();
 		
 		DisconnectCommand disconnectCommand = new DisconnectCommand(context);
 		disconnectCommand.start();
