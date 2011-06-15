@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
+import org.eclipse.equinox.console.commands.DisconnectCommand;
 import org.eclipse.equinox.console.commands.EquinoxCommandProvider;
 import org.eclipse.equinox.console.commands.HelpCommand;
 import org.eclipse.equinox.console.ssh.SshCommand;
@@ -216,6 +217,9 @@ public class Activator implements BundleActivator {
 		
 		HelpCommand helpCommand = new HelpCommand(context); 
 		helpCommand.start();
+		
+		DisconnectCommand disconnectCommand = new DisconnectCommand(context);
+		disconnectCommand.start();
 	}
 	
 	public StartLevel getStartLevel() {

@@ -24,6 +24,7 @@ import org.apache.felix.service.command.CommandSession;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
+import java.io.Closeable;
 import org.eclipse.equinox.console.common.ConsoleInputStream;
 import org.eclipse.equinox.console.common.ConsoleOutputStream;
 import org.eclipse.equinox.console.common.KEYS;
@@ -43,7 +44,7 @@ import org.osgi.framework.BundleContext;
  * from the ssh server, and starting a CommandSession to execute commands from the ssh.
  *
  */
-public class SshShell implements Command {
+public class SshShell implements Command, Closeable {
 	
 	private CommandProcessor processor;
 	private BundleContext context;
@@ -63,6 +64,7 @@ public class SshShell implements Command {
     private static final String USER_STORAGE_PROPERTY_NAME = "osgi.console.ssh.useDefaultSecureStorage";
     private static final String DEFAULT_USER = "equinox";
     private static final String TERMINAL_PROPERTY = "TERM";
+    private static final String CLOSEABLE = "CLOSEABLE";
 	private static final int ADD_USER_COUNTER_LIMIT = 2;
 	
 	public SshShell(CommandProcessor processor, BundleContext context) {
@@ -131,6 +133,8 @@ public class SshShell implements Command {
         session.put(PROMPT, OSGI_PROMPT);
         session.put(INPUT_SCANNER, consoleInputHandler.getScanner());
         session.put(SSH_INPUT_SCANNER, inputHandler.getScanner());
+        // Store this closeable object in the session, so that the disconnect command can close it
+        session.put(CLOSEABLE, this);
         ((ConsoleInputScanner)consoleInputHandler.getScanner()).setSession(session);
         
         thread = new Thread() {
@@ -179,6 +183,10 @@ public class SshShell implements Command {
 	public void onExit() {
 		thread.interrupt();
 		callback.onExit(0);
+	}
+
+	public void close() {
+		onExit();
 	}
 
 }

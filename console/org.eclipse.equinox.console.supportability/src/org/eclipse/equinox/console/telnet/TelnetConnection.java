@@ -16,6 +16,7 @@ import java.io.PrintStream;
 import java.net.Socket;
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
+import java.io.Closeable;
 import org.eclipse.equinox.console.common.ConsoleInputStream;
 import org.eclipse.equinox.console.supportability.ConsoleInputHandler;
 import org.eclipse.equinox.console.supportability.ConsoleInputScanner;
@@ -26,7 +27,7 @@ import org.osgi.framework.BundleContext;
  * from the socket, and starting a CommandSession to execute commands from the telnet.
  *
  */
-public class TelnetConnection extends Thread {
+public class TelnetConnection extends Thread implements Closeable {
 	
 	private Socket socket;
 	private CommandProcessor processor;
@@ -39,6 +40,7 @@ public class TelnetConnection extends Thread {
     private static final String OSGI_PROMPT = "osgi> ";
     private static final String INPUT_SCANNER = "INPUT_SCANNER";
     private static final String SSH_INPUT_SCANNER = "SSH_INPUT_SCANNER";
+    private static final String CLOSEABLE = "CLOSEABLE";
 	
 	public TelnetConnection (Socket socket, CommandProcessor processor, BundleContext context) {
 		this.socket = socket;
@@ -84,6 +86,8 @@ public class TelnetConnection extends Thread {
 	        session.put(PROMPT, OSGI_PROMPT);
 	        session.put(INPUT_SCANNER, consoleInputHandler.getScanner());
 	        session.put(SSH_INPUT_SCANNER, telnetInputHandler.getScanner());
+	        // Store this closeable object in the session, so that the disconnect command can close it
+	        session.put(CLOSEABLE, this);
 	        ((ConsoleInputScanner)consoleInputHandler.getScanner()).setSession(session);
 	        
 			try {
@@ -99,6 +103,15 @@ public class TelnetConnection extends Thread {
 	            	// do nothing
 	            }
 	        }
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void close() {
+		try {
+			this.interrupt();
+			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
