@@ -53,6 +53,8 @@ public class Activator implements BundleActivator {
 	private ServiceTracker<PermissionAdmin, ?> permissionAdminTracker;
 	private ServiceTracker<PackageAdmin, ?> packageAdminTracker;
 	private ServiceTracker<PlatformAdmin, ?> platformAdminTracker;
+	private static List<TelnetCommand> telnetConnections = new ArrayList<TelnetCommand>();
+	private static List<SshCommand> sshConnections = new ArrayList<SshCommand>();
 	
 	private ServiceTracker<CommandProcessor, ServiceTracker<ConsoleSession, CommandSession>> commandProcessorTracker;
 	// Tracker for Equinox CommandProviders
@@ -75,10 +77,12 @@ public class Activator implements BundleActivator {
 			if (processor == null)
 				return null;
 			
-			TelnetCommand telnet = new TelnetCommand(processor, context);
-			telnet.start();
+			TelnetCommand telnetCommand = new TelnetCommand(processor, context);
+			telnetCommand.start();
+			telnetConnections.add(telnetCommand);
 			SshCommand sshCommand = new SshCommand(processor, context);
 			sshCommand.start();
+			sshConnections.add(sshCommand);
 			
 			ServiceTracker<ConsoleSession, CommandSession> tracker = new ServiceTracker<ConsoleSession, CommandSession>(context, ConsoleSession.class, new SessionCustomizer(context, processor));
 			tracker.open();
@@ -290,6 +294,14 @@ public class Activator implements BundleActivator {
 		commandProcessorTracker.close();
 		if (equinoxCmdProvider != null) {
 			equinoxCmdProvider.stop();
+		}
+		
+		for (TelnetCommand telnetCommand : telnetConnections) {
+			telnetCommand.telnet(new String[]{"stop"});
+		}
+		
+		for (SshCommand sshCommand : sshConnections) {
+			sshCommand.ssh(new String[]{"stop"});
 		}
 	}
 }
