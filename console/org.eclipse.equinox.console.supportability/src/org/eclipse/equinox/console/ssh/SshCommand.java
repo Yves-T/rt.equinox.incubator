@@ -53,7 +53,7 @@ public class SshCommand {
         this.processor = processor;
         this.context = context;
         
-        if ("true".equals(System.getProperty(USE_CONFIG_ADMIN_PROP))) {
+        if ("true".equals(context.getProperty(USE_CONFIG_ADMIN_PROP))) {
         	Dictionary<String, String> sshProperties = new Hashtable<String, String>();
         	sshProperties.put(Constants.SERVICE_PID, SSH_PID);
         	try {
