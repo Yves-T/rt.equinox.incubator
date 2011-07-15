@@ -45,7 +45,7 @@ public class DisconnectCommand {
 		}
 		
 		if (reply != null) {
-			if (reply.toLowerCase().startsWith(DISCONNECT_CONFIRMATION_Y)) {
+			if (reply.toLowerCase().startsWith(DISCONNECT_CONFIRMATION_Y) || reply.length() == 0) {
 				Closeable closable = (Closeable)session.get(CLOSEABLE);
 				if (closable != null) {
 					try {
