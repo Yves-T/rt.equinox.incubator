@@ -37,11 +37,15 @@ public class TelnetCommand {
     private int port;
     private TelnetServer telnetServer = null;
     private ServiceRegistration<?> configuratorRegistration;
+    private boolean isEnabled = false;
+    
     private static final String HOST = "host";
     private static final String PORT = "port";
     private static final String USE_CONFIG_ADMIN_PROP = "osgi.console.useConfigAdmin";
     private static final String TELNET_PID = "osgi.console.telnet";
     private static final String CONSOLE_PROP = "osgi.console";
+    private static final String ENABLED = "enabled";
+    private final Object lock = new Object();
 
     public TelnetCommand(CommandProcessor processor, BundleContext context)
     {
@@ -51,7 +55,9 @@ public class TelnetCommand {
         	Dictionary<String, String> telnetProperties = new Hashtable<String, String>();
         	telnetProperties.put(Constants.SERVICE_PID, TELNET_PID);
         	try {
-        		configuratorRegistration = context.registerService(ManagedService.class.getName(), new TelnetConfigurator(), telnetProperties);
+        		synchronized (lock) {
+        			configuratorRegistration = context.registerService(ManagedService.class.getName(), new TelnetConfigurator(), telnetProperties);
+        		}
         	} catch (NoClassDefFoundError e) {
         		System.out.println("Configuration Admin not available!");
         		return;
@@ -70,6 +76,7 @@ public class TelnetCommand {
         		defaultHost = consolePropValue.substring(0, index);
         	}
         	telnetPort = consolePropValue.substring(index + 1);
+        	isEnabled = true;
         }
         if (telnetPort != null && !"".equals(telnetPort)) {
         	try {
@@ -203,8 +210,15 @@ public class TelnetCommand {
 			
 			defaultPort = Integer.parseInt(((String)properties.get(PORT)));
 			defaultHost = (String)properties.get(HOST);
-			configuratorRegistration.setProperties(properties);
-			if (telnetServer == null) {
+			if (properties.get(ENABLED) == null) {
+				isEnabled = false;
+			} else {
+				isEnabled = Boolean.parseBoolean((String)properties.get(ENABLED));
+			}
+			synchronized (lock) {
+				configuratorRegistration.setProperties(properties);
+			}
+			if (telnetServer == null && isEnabled == true) {
 				try {
 					telnet(new String[]{"start"});
 				} catch (Exception e) {

@@ -40,6 +40,8 @@ public class SshCommand {
     private SshServ sshServ;
     private BundleContext context;
     private ServiceRegistration<?> configuratorRegistration;
+    private boolean isEnabled = false;
+    private final Object lock = new Object();
     
     private static final String DEFAULT_USER = "equinox";
     private static final String DEFAULT_PASSWORD = "equinox";
@@ -48,6 +50,7 @@ public class SshCommand {
     private static final String PORT = "port";
     private static final String USE_CONFIG_ADMIN_PROP = "osgi.console.useConfigAdmin";
     private static final String SSH_PID = "osgi.console.ssh";
+    private static final String ENABLED = "enabled";
     
     public SshCommand(CommandProcessor processor, BundleContext context) {
         this.processor = processor;
@@ -57,7 +60,9 @@ public class SshCommand {
         	Dictionary<String, String> sshProperties = new Hashtable<String, String>();
         	sshProperties.put(Constants.SERVICE_PID, SSH_PID);
         	try {
-        		configuratorRegistration = context.registerService(ManagedService.class.getName(), new SshConfigurator(), sshProperties);
+        		synchronized (lock) {
+        			configuratorRegistration = context.registerService(ManagedService.class.getName(), new SshConfigurator(), sshProperties);
+        		}
         	} catch (NoClassDefFoundError e) {
         		System.out.println("Configuration Admin not available!");
         		return;
@@ -76,6 +81,7 @@ public class SshCommand {
         		defaultHost = consolePropValue.substring(0, index);
         	}
         	sshPort = consolePropValue.substring(index + 1);
+        	isEnabled = true;
         }
         if (sshPort != null && !"".equals(sshPort)) {
         	try {
@@ -266,8 +272,15 @@ public class SshCommand {
 			
 			defaultPort = Integer.parseInt(((String)properties.get(PORT)));
 			defaultHost = (String)properties.get(HOST);
-			configuratorRegistration.setProperties(properties);
-			if (sshServ == null) {
+			if (properties.get(ENABLED) == null) {
+				isEnabled = false;
+			} else {
+				isEnabled = Boolean.parseBoolean((String)properties.get(ENABLED));
+			}
+			synchronized (lock) {
+				configuratorRegistration.setProperties(properties);
+			}
+			if (sshServ == null && isEnabled == true) {
 				try {
 					ssh(new String[]{"start"});
 				} catch (Exception e) {

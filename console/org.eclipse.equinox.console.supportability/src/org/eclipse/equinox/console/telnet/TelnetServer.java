@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.felix.service.command.CommandProcessor;
 import org.osgi.framework.BundleContext;
@@ -30,6 +32,7 @@ public class TelnetServer extends Thread {
     private boolean isRunning = true;
     private CommandProcessor processor;
     private BundleContext context;
+    private List<TelnetConnection> telnetConnections = new ArrayList<TelnetConnection>();
     
     public TelnetServer(BundleContext context, CommandProcessor processor, String host, int port) throws IOException {
     	this.context = context;
@@ -49,6 +52,7 @@ public class TelnetServer extends Thread {
             {
                 final Socket socket = server.accept();
                 TelnetConnection telnetConnection = new TelnetConnection(socket, processor, context);
+                telnetConnections.add(telnetConnection);
                 telnetConnection.start();
             }
         } catch (IOException e) {
@@ -72,10 +76,15 @@ public class TelnetServer extends Thread {
 		try {
             if (server != null) {
                 server.close();
-            }
+            }    
         } catch (IOException e){
         	// do nothing
         }
+        
+        for(TelnetConnection telnetConnection : telnetConnections) {
+        	telnetConnection.close();
+        }
+        
 		this.interrupt();
 	}
 }
