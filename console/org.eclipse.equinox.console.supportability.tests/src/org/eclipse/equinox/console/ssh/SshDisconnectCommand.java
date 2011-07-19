@@ -41,10 +41,12 @@ public class SshDisconnectCommand {
 	private static final String JAAS_CONFIG_FILE_NAME = "jaas.config";
 	private static final String JAAS_CONFIG_PROPERTY_NAME = "java.security.auth.login.config";
 	private static final String DEFAULT_USER_STORAGE = "osgi.console.ssh.useDefaultSecureStorage";
+	private static final String USE_CONFIG_ADMIN_PROP = "osgi.console.useConfigAdmin";
 	private static final String SSH_PORT_PROP_NAME = "osgi.console.ssh";
 	private static final String STORE_FILE_NAME = SshCommandTests.class.getName() + "_store";
 	private static final String GOGO_SHELL_COMMAND = "gosh --login --noshutdown";
 	private static final String TRUE = "true";
+	private static final String FALSE = "false";
 	private static final String USERNAME = "username";
 	private static final String PASSWORD = "password";
 	private static final String START_COMMAND = "start";
@@ -94,6 +96,7 @@ public class SshDisconnectCommand {
 		EasyMock.replay(processor);
 
 		BundleContext context = EasyMock.createMock(BundleContext.class);
+		EasyMock.expect(context.getProperty(USE_CONFIG_ADMIN_PROP)).andReturn(FALSE);
 		EasyMock.expect(context.getProperty(DEFAULT_USER_STORAGE)).andReturn(TRUE).anyTimes();
 		EasyMock.expect(context.getProperty(SSH_PORT_PROP_NAME)).andReturn(Integer.toString(SSH_PORT));
 		EasyMock.expect(context.registerService((String)EasyMock.anyObject(), EasyMock.anyObject(), (Dictionary<String, ?>)EasyMock.anyObject())).andReturn(null);

@@ -19,6 +19,7 @@ import org.apache.sshd.ClientSession;
 import org.apache.sshd.SshClient;
 import org.apache.sshd.client.future.ConnectFuture;
 import org.apache.sshd.client.future.DefaultConnectFuture;
+import org.apache.sshd.common.RuntimeSshException;
 import org.apache.sshd.server.Environment;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -51,6 +52,7 @@ public class SshCommandWithConfigAdminTests {
 	private static final String STORE_FILE_NAME = SshCommandTests.class.getName() + "_store";
 	private static final String GOGO_SHELL_COMMAND = "gosh --login --noshutdown";
 	private static final String TRUE = "true";
+	private static final String FALSE = "false";
 	private static final String USERNAME = "username";
 	private static final String PASSWORD = "password";
 	private static final String STOP_COMMAND = "stop";
@@ -67,7 +69,6 @@ public class SshCommandWithConfigAdminTests {
 		clean();
 		initStore();
         initJaasConfigFile();
-        System.setProperty(USE_CONFIG_ADMIN_PROP, "true");
 	}
 	
 	@Test
@@ -91,6 +92,7 @@ public class SshCommandWithConfigAdminTests {
         EasyMock.replay(registration);
 
         BundleContext context = EasyMock.createMock(BundleContext.class);
+        EasyMock.expect(context.getProperty(USE_CONFIG_ADMIN_PROP)).andReturn(TRUE);
 		EasyMock.expect(context.getProperty(DEFAULT_USER_STORAGE)).andReturn(TRUE).anyTimes();
         EasyMock.expect(
         		(ServiceRegistration) context.registerService(
@@ -120,6 +122,7 @@ public class SshCommandWithConfigAdminTests {
 		Dictionary props = new Hashtable();
 		props.put("port", SSH_PORT);
 		props.put("host", HOST);
+		props.put("enabled", TRUE);
 		configurator.updated(props);
 
 		SshClient client = SshClient.setUpDefaultClient();
@@ -165,6 +168,100 @@ public class SshCommandWithConfigAdminTests {
 		return;
 	}
 	
+	@Test
+	public void testSshCommandWithConfigAdminDisabledSsh() throws Exception {
+		testDisabled(false);
+	}
+	
+	@Test
+	public void testSshCommandWithConfigAdminDisabledSshByDefault() throws Exception {
+		testDisabled(true);
+	}
+	
+	private void testDisabled(boolean isDefault) throws Exception {
+		CommandSession session = EasyMock.createMock(CommandSession.class);
+		session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
+		EasyMock.expectLastCall().times(4);
+		EasyMock.expect(session.execute(GOGO_SHELL_COMMAND)).andReturn(null);
+		session.close();
+		EasyMock.expectLastCall();
+		EasyMock.replay(session);
+
+		CommandProcessor processor = EasyMock.createMock(CommandProcessor.class);
+		EasyMock.expect(processor.createSession((ConsoleInputStream)EasyMock.anyObject(), (PrintStream)EasyMock.anyObject(), (PrintStream)EasyMock.anyObject())).andReturn(session);
+		EasyMock.replay(processor);
+
+		final ServiceRegistration<?> registration = EasyMock.createMock(ServiceRegistration.class);
+        registration.setProperties((Dictionary)EasyMock.anyObject());
+        EasyMock.expectLastCall();
+        EasyMock.replay(registration);
+
+        BundleContext context = EasyMock.createMock(BundleContext.class);
+        EasyMock.expect(context.getProperty(USE_CONFIG_ADMIN_PROP)).andReturn(TRUE);
+		EasyMock.expect(context.getProperty(DEFAULT_USER_STORAGE)).andReturn(TRUE).anyTimes();
+        EasyMock.expect(
+        		(ServiceRegistration) context.registerService(
+        				(String)EasyMock.anyObject(), 
+        				(ManagedService)EasyMock.anyObject(), 
+        				(Dictionary<String, ?>)EasyMock.anyObject())
+        	).andAnswer((IAnswer<ServiceRegistration<?>>) new IAnswer<ServiceRegistration<?>>() {
+        		public ServiceRegistration<?> answer() {
+        			configurator = (ManagedService) EasyMock.getCurrentArguments()[1];
+        			return registration;
+        		}
+			});
+        EasyMock.expect(
+        		context.registerService(
+        				(String)EasyMock.anyObject(), 
+        				(SshCommand)EasyMock.anyObject(), 
+        				(Dictionary<String, ?>)EasyMock.anyObject())).andReturn(null);
+		EasyMock.replay(context);
+
+		Map<String, String> environment = new HashMap<String, String>();
+		environment.put(TERM_PROPERTY, XTERM);
+		Environment env = EasyMock.createMock(Environment.class);
+		EasyMock.expect(env.getEnv()).andReturn(environment);
+		EasyMock.replay(env);
+
+		SshCommand command = new SshCommand(processor, context);
+		Dictionary props = new Hashtable();
+		props.put("port", SSH_PORT);
+		props.put("host", HOST);
+		if (isDefault == false) {
+			props.put("enabled", FALSE);
+		}
+		configurator.updated(props);
+
+		SshClient client = SshClient.setUpDefaultClient();
+		client.start();
+		try {
+			ConnectFuture connectFuture = client.connect(HOST, Integer.valueOf(SSH_PORT));
+			DefaultConnectFuture defaultConnectFuture = (DefaultConnectFuture) connectFuture;
+
+			try {
+				Thread.sleep(WAIT_TIME);
+			} catch (InterruptedException ie) {
+				// do nothing
+			}
+			ClientSession sshSession;
+			try {
+				sshSession = defaultConnectFuture.getSession();
+				Assert.fail("It should not be possible to connect to " + HOST + ":" + SSH_PORT);
+			} catch (RuntimeSshException e) {
+				//this is expected
+			}
+		} finally {
+			client.stop();
+		}
+
+		try {
+			command.ssh(new String[] {STOP_COMMAND});
+		} catch (IllegalStateException e) {
+			// this is expected
+		}
+		return;
+	}
+	
 	@After
 	public void cleanUp() {
 		clean();
@@ -182,8 +279,6 @@ public class SshCommandWithConfigAdminTests {
     	if (jaasConfFile.exists()) {
     		jaasConfFile.delete();
     	}
-    	
-    	System.setProperty(USE_CONFIG_ADMIN_PROP, "");
 	}
 	
 	private void initStore() throws Exception {
