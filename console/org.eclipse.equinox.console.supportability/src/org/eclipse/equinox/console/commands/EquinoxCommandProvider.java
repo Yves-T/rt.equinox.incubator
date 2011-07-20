@@ -293,15 +293,6 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 		}
 	}
 
-	private static boolean matchCommand(String command, String input, int minLength) {
-		if (minLength <= 0)
-			minLength = command.length();
-		int length = input.length();
-		if (minLength > length)
-			length = minLength;
-		return (command.regionMatches(0, input, 0, length));
-	}
-
 	/**
 	 *  Handle the update command's abbreviation.  Invoke update()
 	 *
@@ -608,6 +599,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	 *
 	 *  @param bundle bundle for which to display package details
 	 */
+	@SuppressWarnings("deprecation")
 	@Descriptor(ConsoleMsg.CONSOLE_HELP_PACKAGES_COMMAND_DESCRIPTION)
 	public void packages(@Descriptor(ConsoleMsg.CONSOLE_HELP_PACKAGES_BUNDLE_ARGUMENT_DESCRIPTION)Bundle... bundle) throws Exception {
 		if(activator.getPackageAdmin() != null) {
@@ -628,6 +620,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	 *
 	 *  @param packageName package for which to display details
 	 **/
+	@SuppressWarnings("deprecation")
 	@Descriptor(ConsoleMsg.CONSOLE_HELP_PACKAGES_COMMAND_DESCRIPTION)
 	public void packages(@Descriptor(ConsoleMsg.CONSOLE_HELP_PACKAGES_PACKAGE_ARGUMENT_DESCRIPTION)String packageName) throws Exception {
 		if(activator.getPackageAdmin() != null) {
@@ -638,6 +631,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void getPackages(ExportedPackage[] packages) throws Exception {
 		if (packages == null) {
 			System.out.println(ConsoleMsg.CONSOLE_NO_EXPORTED_PACKAGES_MESSAGE);
@@ -774,6 +768,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	 *
 	 *  @param bundles bundle(s) to display details for
 	 */
+	@SuppressWarnings({ "deprecation", "restriction" })
 	@Descriptor(ConsoleMsg.CONSOLE_HELP_BUNDLE_COMMAND_DESCRIPTION)
 	public void bundle(@Descriptor(ConsoleMsg.CONSOLE_HELP_IDLOCATION_ARGUMENT_DESCRIPTION)Bundle[] bundles) throws Exception {
 		if (bundles.length == 0) {
@@ -1189,6 +1184,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	 *
 	 *  @param bundles bundle(s) to be refreshed
 	 */
+	@SuppressWarnings("deprecation")
 	@Descriptor(ConsoleMsg.CONSOLE_HELP_REFRESH_COMMAND_DESCRIPTION)
 	public void refresh(@Descriptor(ConsoleMsg.CONSOLE_HELP_REFRESH_COMMAND_ARGUMENT_DESCRIPTION) Bundle... bundles) throws Exception {
 		PackageAdmin packageAdmin = activator.getPackageAdmin();
@@ -1255,6 +1251,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	 *
 	 * @param bundles bundle(s) whose headers to display
 	 */
+	@SuppressWarnings("restriction")
 	@Descriptor(ConsoleMsg.CONSOLE_HELP_HEADERS_COMMAND_DESCRIPTION)
 	public List<Dictionary<String, String>> headers(@Descriptor(ConsoleMsg.CONSOLE_HELP_HEADERS_COMMAND_ARGUMENT_DESCRIPTION) Bundle... bundles) throws Exception {
 		ArrayList<Dictionary<String, String>> headers = new ArrayList<Dictionary<String,String>>();
@@ -1311,7 +1308,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 			System.out.println(ConsoleMsg.CONSOLE_NO_PARAMETERS_SPECIFIED_TITLE);
 			props();
 		} else {
-			ServiceReference envInfoRef = context.getServiceReference(EnvironmentInfo.class.getName());
+			ServiceReference<EnvironmentInfo> envInfoRef = context.getServiceReference(EnvironmentInfo.class);
 			if (envInfoRef != null) {
 				// EnvironmentInfo is used because FrameworkProperties cannot be directly accessed outside of the system bundle
 				EnvironmentInfo envInfo = context.getService(envInfoRef);
@@ -1340,6 +1337,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	 *
 	 * @param arguments
 	 */
+	@SuppressWarnings("deprecation")
 	@Descriptor(ConsoleMsg.CONSOLE_HELP_SS_COMMAND_DESCRIPTION)
 	public void ss(@Descriptor(ConsoleMsg.CONSOLE_HELP_STATUS_ARGUMENT_DESCRIPTION) String... arguments) throws Exception {
 		if (context.getBundle(0).getState() == Bundle.ACTIVE) {
@@ -1440,6 +1438,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	 * in the embedded system.
 	 *
 	 */
+	@SuppressWarnings("restriction")
 	@Descriptor(ConsoleMsg.CONSOLE_THREADS_COMMAND_DESCRIPTION)
 	public void threads() throws Exception {
 
@@ -1483,6 +1482,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	 *
 	 * @param bundle bundle to display startlevel for; if no bundle is specified, the framework startlevel is displayed
 	 */
+	@SuppressWarnings("deprecation")
 	@Descriptor(ConsoleMsg.CONSOLE_HELP_SL_COMMAND_DESCRIPTION)
 	public void sl(@Descriptor(ConsoleMsg.CONSOLE_HELP_SL_COMMAND_ARGUMENT_DESCRIPTION) Bundle... bundle) throws Exception {
 		StartLevel startLevel = activator.getStartLevel();
@@ -1503,6 +1503,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	 *
 	 * @param newSL new value for the framewrok start level
 	 */
+	@SuppressWarnings("deprecation")
 	@Descriptor(ConsoleMsg.CONSOLE_HELP_SETFWSL_COMMAND_DESCRIPTION)
 	public void setfwsl(@Descriptor(ConsoleMsg.CONSOLE_HELP_SETFWSL_COMMAND_ARGUMENT_DESCRIPTION) int newSL) throws Exception {
 		StartLevel startLevel = activator.getStartLevel();
@@ -1522,6 +1523,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	 * @param newSL new value for bundle start level
 	 * @param bundles bundles whose start value will be changed
 	 */
+	@SuppressWarnings("deprecation")
 	@Descriptor(ConsoleMsg.CONSOLE_HELP_SETBSL_COMMAND_DESCRIPTION)
 	public void setbsl(
 			@Descriptor(ConsoleMsg.CONSOLE_HELP_SETFWSL_COMMAND_ARGUMENT_DESCRIPTION)int newSL, 
@@ -1548,6 +1550,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	 *
 	 * @param newInitialSL new value for initial start level
 	 */
+	@SuppressWarnings("deprecation")
 	@Descriptor(ConsoleMsg.CONSOLE_HELP_SETIBSL_COMMAND_DESCRIPTION)
 	public void setibsl(@Descriptor(ConsoleMsg.CONSOLE_HELP_SETFWSL_COMMAND_ARGUMENT_DESCRIPTION) int newInitialSL) throws Exception {
 		StartLevel startLevel = activator.getStartLevel();
@@ -1576,6 +1579,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	 * 
 	 * @param symbolicName
 	 */
+	@SuppressWarnings("deprecation")
 	@Descriptor(ConsoleMsg.CONSOLE_HELP_REQUIRED_BUNDLES_COMMAND_DESCRIPTION)
 	public void classSpaces(@Descriptor(ConsoleMsg.CONSOLE_HELP_REQUIRED_BUNDLES_COMMAND_ARGUMENT_DESCRIPTION) String... symbolicName) {
 		PackageAdmin packageAdmin = activator.getPackageAdmin();
@@ -1633,6 +1637,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	/**
 	 * Handles the profilelog command. 
 	 */
+	@SuppressWarnings("restriction")
 	@Descriptor(ConsoleMsg.CONSOLE_HELP_PROFILELOG_COMMAND_DESCRIPTION)
 	public void profilelog() throws Exception {
 		System.out.println(Profile.getProfileLog());

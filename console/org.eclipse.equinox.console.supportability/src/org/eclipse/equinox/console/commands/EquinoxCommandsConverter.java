@@ -39,17 +39,19 @@ public class EquinoxCommandsConverter implements Converter {
 				if("*".equals((String) in)) {
 					return context.getBundles();
 				}
-			} else if (in instanceof List) {
-				try {
-					List<String> args = (List<String>) in;
-					ArrayList<Bundle> bundles = new ArrayList<Bundle>();
-					for(String arg : args) {
-						long id = Long.parseLong(arg);
-						bundles.add(context.getBundle(id));
+			} else if (in instanceof List<?>) {
+				List<?> args = (List<?>) in;
+				if (checkStringElements(args)) {
+					try {
+						ArrayList<Bundle> bundles = new ArrayList<Bundle>();
+						for (Object arg : args) {
+							long id = Long.parseLong((String)arg);
+							bundles.add(context.getBundle(id));
+						}
+						return bundles.toArray(new Bundle[0]);
+					} catch (Exception e) {
+						return null;
 					}
-					return bundles.toArray(new Bundle[0]);
-				} catch (Exception e) {
-					return null;
 				}
 			}
 		}
@@ -106,6 +108,16 @@ public class EquinoxCommandsConverter implements Converter {
 		
 		return null;
 	}
+	
+	private boolean checkStringElements(List<?> list) {
+		for (Object element : list) {
+			if (!(element instanceof String)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
 
 	public CharSequence format(Object target, int level, Converter escape) throws Exception {
 		if (target instanceof Dictionary<?, ?>) {
@@ -114,12 +126,12 @@ public class EquinoxCommandsConverter implements Converter {
 		}
 		
 		if (target instanceof List<?>) {
-			if (((List<?>)target).get(0) instanceof Dictionary<?, ?>) {
+			List<?> list = (List<?>) target;
+			if (checkDictionaryElements(list)) {
 				StringBuilder builder = new StringBuilder();
-				List<Dictionary<?, ?>> list = (List<Dictionary<?, ?>>) target;
-				for(Dictionary<?, ?> dic : list) {
+				for(Object dic : list) {
 					builder.append("Bundle headers:\r\n");
-					builder.append(printDictionary(dic));
+					builder.append(printDictionary((Dictionary<?, ?>)dic));
 					builder.append("\r\n");
 					builder.append("\r\n");
 				}
@@ -130,6 +142,17 @@ public class EquinoxCommandsConverter implements Converter {
 		return null;
 	}
 	
+	private boolean checkDictionaryElements(List<?> list) {
+		for (Object element : list) {
+			if (!(element instanceof Dictionary<?, ?>)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	@SuppressWarnings("restriction")
 	private String printDictionary(Dictionary<?, ?> dic) {
 		int count = dic.size();
 		String[] keys = new String[count];
