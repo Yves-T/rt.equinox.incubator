@@ -297,11 +297,19 @@ public class Activator implements BundleActivator {
 		}
 		
 		for (TelnetCommand telnetCommand : telnetConnections) {
-			telnetCommand.telnet(new String[]{"stop"});
+			try {
+				telnetCommand.telnet(new String[]{"stop"});
+			} catch (Exception e) {
+				// expected if the telnet server is not started
+			}
 		}
 		
 		for (SshCommand sshCommand : sshConnections) {
-			sshCommand.ssh(new String[]{"stop"});
+			try {
+				sshCommand.ssh(new String[]{"stop"});
+			} catch (Exception e) {
+				// expected if the ssh server is not started
+			}
 		}
 	}
 }
