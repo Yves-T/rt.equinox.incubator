@@ -77,21 +77,21 @@ public class TelnetCommand {
         	}
         	telnetPort = consolePropValue.substring(index + 1);
         	isEnabled = true;
-        }
+        } 
         if (telnetPort != null && !"".equals(telnetPort)) {
         	try {
         		defaultPort = Integer.parseInt(telnetPort);
 			} catch (NumberFormatException e) {
 				// do nothing
 			}
-        }
+        } 
     }
     
     public synchronized void start() {
     	Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put("osgi.command.scope", "equinox");
 		properties.put("osgi.command.function", new String[] {"telnet"});
-		if (port > 0 || defaultPort > 0) {
+		if ((port > 0 || defaultPort > 0) && isEnabled == true) {
 			try{
 				telnet(new String[]{"start"});
 			} catch (Exception e) {

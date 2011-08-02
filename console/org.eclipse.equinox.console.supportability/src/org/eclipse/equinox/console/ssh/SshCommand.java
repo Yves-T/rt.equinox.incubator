@@ -82,7 +82,7 @@ public class SshCommand {
         	}
         	sshPort = consolePropValue.substring(index + 1);
         	isEnabled = true;
-        }
+        } 
         if (sshPort != null && !"".equals(sshPort)) {
         	try {
         		defaultPort = Integer.parseInt(sshPort);
@@ -96,7 +96,7 @@ public class SshCommand {
     	Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put("osgi.command.scope", "equinox");
 		properties.put("osgi.command.function", new String[] {"ssh"});
-		if (port > 0 || defaultPort > 0) {
+		if ((port > 0 || defaultPort > 0) && isEnabled == true) {
 			try{
 				ssh(new String[]{"start"});
 			} catch (Exception e) {
