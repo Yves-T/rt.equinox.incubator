@@ -75,6 +75,7 @@ public class SshCommandWithConfigAdminTests {
 	public void testSshCommandWithConfigAdmin() throws Exception {
 		
 		CommandSession session = EasyMock.createMock(CommandSession.class);
+		EasyMock.makeThreadSafe(session, true);
 		session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
 		EasyMock.expectLastCall().times(4);
 		EasyMock.expect(session.execute(GOGO_SHELL_COMMAND)).andReturn(null);
@@ -92,6 +93,7 @@ public class SshCommandWithConfigAdminTests {
         EasyMock.replay(registration);
 
         BundleContext context = EasyMock.createMock(BundleContext.class);
+        EasyMock.makeThreadSafe(context, true);
         EasyMock.expect(context.getProperty(USE_CONFIG_ADMIN_PROP)).andReturn(TRUE);
 		EasyMock.expect(context.getProperty(DEFAULT_USER_STORAGE)).andReturn(TRUE).anyTimes();
         EasyMock.expect(

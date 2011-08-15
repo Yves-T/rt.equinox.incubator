@@ -265,7 +265,7 @@ public class Activator implements BundleActivator {
 		Method[] methods = c.getDeclaredMethods();
 		for (Method method : methods) {
 			if (method.getName().startsWith("_")
-					&& method.getModifiers() == Modifier.PUBLIC) {
+					&& method.getModifiers() == Modifier.PUBLIC && !method.getName().equals("_help")) {
 				Type[] types = method.getGenericParameterTypes();
 				if (types.length == 1
 						&& types[0].equals(CommandInterpreter.class)) {

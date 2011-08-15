@@ -70,6 +70,7 @@ public class SshShellTests {
             socketServer = servSocket.accept();
 
             CommandSession session = EasyMock.createMock(CommandSession.class);
+            EasyMock.makeThreadSafe(session, true);
             session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
             EasyMock.expectLastCall().times(4);
             EasyMock.expect(session.execute(GOGO_SHELL_COMMAND)).andReturn(null);
@@ -82,6 +83,7 @@ public class SshShellTests {
             EasyMock.replay(processor);
             
             BundleContext context = EasyMock.createMock(BundleContext.class);
+            EasyMock.makeThreadSafe(context, true);
             EasyMock.expect(context.getProperty(DEFAULT_USER_STORAGE)).andReturn(TRUE);
             EasyMock.replay(context);
             
