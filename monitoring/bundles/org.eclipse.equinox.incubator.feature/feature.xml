@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.equinox.incubator.feature"
       label="%featureName"
-      version="1.0.0.qualifier"
+      version="1.1.0.qualifier"
       provider-name="%providerName"
       image="eclipse_update_120.jpg"
       license-feature="org.eclipse.license"
@@ -27,7 +27,7 @@
    <includes
          id="org.eclipse.equinox.jmx.client.feature"
          version="0.0.0"/>
-  
+
    <includes
          id="org.eclipse.equinox.jmx.server.feature"
          version="0.0.0"/>
@@ -38,7 +38,7 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-         
+
    <plugin
          id="org.eclipse.equinox.initializer.source"
          download-size="0"
@@ -52,20 +52,20 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-         
+
    <plugin
          id="org.eclipse.equinox.console.supportability.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         unpack="false"/>     
-         
+         unpack="false"/>
+
    <plugin
          id="org.eclipse.equinox.console.jaas.fragment"
          download-size="0"
          install-size="0"
          version="0.0.0"
          fragment="true"
-         unpack="false"/>     
-   
+         unpack="false"/>
+
 </feature>
