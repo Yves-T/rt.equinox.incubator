@@ -148,7 +148,7 @@ public class HelpCommand {
 		}
 		
 		if (isLegacy == false && command != null) {
-			session.execute("help " + command);
+			session.execute("felix:help " + command);
 			return;
 		}
 		
@@ -159,11 +159,11 @@ public class HelpCommand {
 		
 		if (isAll == true) {
 			printLegacyCommands();
-			session.execute("help");
+			session.execute("felix:help");
 			return;
 		}
 						
-		session.execute("help");
+		session.execute("felix:help");
 	}
 	
 	private void printLegacyCommands() {
