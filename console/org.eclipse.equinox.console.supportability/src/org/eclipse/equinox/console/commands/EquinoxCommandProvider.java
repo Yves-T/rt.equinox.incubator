@@ -14,8 +14,8 @@ package org.eclipse.equinox.console.commands;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URL;
-import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -31,9 +31,6 @@ import org.apache.felix.service.command.Converter;
 import org.apache.felix.service.command.Descriptor;
 import org.apache.felix.service.command.Parameter;
 import org.eclipse.equinox.console.command.adapter.Activator;
-import org.eclipse.osgi.framework.internal.core.AbstractBundle;
-import org.eclipse.osgi.framework.internal.core.Util;
-import org.eclipse.osgi.internal.profile.Profile;
 import org.eclipse.osgi.service.environment.EnvironmentInfo;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.DisabledInfo;
@@ -768,7 +765,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	 *
 	 *  @param bundles bundle(s) to display details for
 	 */
-	@SuppressWarnings({ "deprecation", "restriction" })
+	@SuppressWarnings({ "deprecation" })
 	@Descriptor(ConsoleMsg.CONSOLE_HELP_BUNDLE_COMMAND_DESCRIPTION)
 	public void bundle(@Descriptor(ConsoleMsg.CONSOLE_HELP_IDLOCATION_ARGUMENT_DESCRIPTION)Bundle[] bundles) throws Exception {
 		if (bundles.length == 0) {
@@ -1027,13 +1024,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 				} else {
 					System.out.print("  "); //$NON-NLS-1$
 					System.out.println(ConsoleMsg.CONSOLE_NO_EXPORTED_PACKAGES_NO_PLATFORM_ADMIN_MESSAGE);
-				}
-				
-				SecurityManager sm = System.getSecurityManager();
-				if (sm != null) {
-					ProtectionDomain domain = ((AbstractBundle)bundle).getProtectionDomain();
-					System.out.println(domain);
-				}
+				}		
 		}
 	}
 
@@ -1251,7 +1242,6 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	 *
 	 * @param bundles bundle(s) whose headers to display
 	 */
-	@SuppressWarnings("restriction")
 	@Descriptor(ConsoleMsg.CONSOLE_HELP_HEADERS_COMMAND_DESCRIPTION)
 	public List<Dictionary<String, String>> headers(@Descriptor(ConsoleMsg.CONSOLE_HELP_HEADERS_COMMAND_ARGUMENT_DESCRIPTION) Bundle... bundles) throws Exception {
 		ArrayList<Dictionary<String, String>> headers = new ArrayList<Dictionary<String,String>>();
@@ -1263,7 +1253,7 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 		
 		
 		for (Bundle bundle : bundles) {
-			headers.add(((AbstractBundle)bundle).getHeaders());
+			headers.add(bundle.getHeaders());
 		}
 		return headers;
 	}
@@ -1438,7 +1428,6 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	 * in the embedded system.
 	 *
 	 */
-	@SuppressWarnings("restriction")
 	@Descriptor(ConsoleMsg.CONSOLE_THREADS_COMMAND_DESCRIPTION)
 	public void threads() throws Exception {
 
@@ -1637,10 +1626,11 @@ public class EquinoxCommandProvider implements SynchronousBundleListener {
 	/**
 	 * Handles the profilelog command. 
 	 */
-	@SuppressWarnings("restriction")
 	@Descriptor(ConsoleMsg.CONSOLE_HELP_PROFILELOG_COMMAND_DESCRIPTION)
 	public void profilelog() throws Exception {
-		System.out.println(Profile.getProfileLog());
+		Class<?> profileClass = BundleContext.class.getClassLoader().loadClass("org.eclipse.osgi.internal.profile.Profile");
+		Method getProfileLog = profileClass.getMethod("getProfileLog", (Class<?>[]) null);
+		System.out.println(getProfileLog.invoke(null, (Object[]) null));
 	}
 
 	/**

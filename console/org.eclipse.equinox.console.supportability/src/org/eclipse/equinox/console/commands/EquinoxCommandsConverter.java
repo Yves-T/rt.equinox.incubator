@@ -18,7 +18,6 @@ import java.util.Enumeration;
 import java.util.List;
 
 import org.apache.felix.service.command.Converter;
-import org.eclipse.osgi.framework.internal.core.Util;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
@@ -152,7 +151,6 @@ public class EquinoxCommandsConverter implements Converter {
 		return true;
 	}
 	
-	@SuppressWarnings("restriction")
 	private String printDictionary(Dictionary<?, ?> dic) {
 		int count = dic.size();
 		String[] keys = new String[count];
