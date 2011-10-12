@@ -125,6 +125,7 @@ public class Activator implements BundleActivator {
 			new Thread(new Runnable(){
 				public void run() {
                     try {
+                    	gogoSession.put("SCOPE", "equinox:*");
                     	gogoSession.put("prompt", "osgi> ");
                         gogoSession.execute("gosh --login --noshutdown");
                     }

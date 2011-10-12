@@ -41,7 +41,7 @@ public class TelnetDisconnectionTest {
             final CommandSession session = EasyMock.createMock(CommandSession.class);
             EasyMock.makeThreadSafe(session, true);
             session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
-            EasyMock.expectLastCall().times(4);
+            EasyMock.expectLastCall().times(3);
             EasyMock.expect(session.get("CLOSEABLE")).andReturn(connection);
             EasyMock.expect(session.execute((String)EasyMock.anyObject())).andReturn(null);
             session.close();

@@ -38,8 +38,8 @@ public class TelnetConnection extends Thread implements Closeable {
     private static final long NEGOTIATION_TIMEOUT = 60000;
     private static final String PROMPT = "prompt";
     private static final String OSGI_PROMPT = "osgi> ";
-    private static final String INPUT_SCANNER = "INPUT_SCANNER";
-    private static final String SSH_INPUT_SCANNER = "SSH_INPUT_SCANNER";
+    private static final String SCOPE = "SCOPE";
+    private static final String EQUINOX_SCOPE = "equinox:*";
     private static final String CLOSEABLE = "CLOSEABLE";
 	
 	public TelnetConnection (Socket socket, CommandProcessor processor, BundleContext context) {
@@ -83,9 +83,8 @@ public class TelnetConnection extends Thread implements Closeable {
 	        consoleInputHandler.start();
 	        
 	        session = processor.createSession(inp, output, output);
+	        session.put(SCOPE, EQUINOX_SCOPE);
 	        session.put(PROMPT, OSGI_PROMPT);
-	        session.put(INPUT_SCANNER, consoleInputHandler.getScanner());
-	        session.put(SSH_INPUT_SCANNER, telnetInputHandler.getScanner());
 	        // Store this closeable object in the session, so that the disconnect command can close it
 	        session.put(CLOSEABLE, this);
 	        ((ConsoleInputScanner)consoleInputHandler.getScanner()).setSession(session);

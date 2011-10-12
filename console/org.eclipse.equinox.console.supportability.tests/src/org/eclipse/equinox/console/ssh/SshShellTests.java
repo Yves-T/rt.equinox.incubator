@@ -72,7 +72,7 @@ public class SshShellTests {
             CommandSession session = EasyMock.createMock(CommandSession.class);
             EasyMock.makeThreadSafe(session, true);
             session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
-            EasyMock.expectLastCall().times(4);
+            EasyMock.expectLastCall().times(5);
             EasyMock.expect(session.execute(GOGO_SHELL_COMMAND)).andReturn(null);
             session.close();
             EasyMock.expectLastCall();
