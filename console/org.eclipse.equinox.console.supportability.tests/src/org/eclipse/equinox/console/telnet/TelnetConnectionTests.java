@@ -46,7 +46,7 @@ public class TelnetConnectionTests {
 
             CommandSession session = EasyMock.createMock(CommandSession.class);
             session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
-            EasyMock.expectLastCall().times(4);
+            EasyMock.expectLastCall().times(3);
             EasyMock.expect(session.execute((String)EasyMock.anyObject())).andReturn(null);
             session.close();
     		EasyMock.expectLastCall();

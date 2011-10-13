@@ -23,6 +23,7 @@ import org.apache.felix.service.command.CommandSession;
 import org.eclipse.equinox.console.command.adapter.CustomCommandInterpreter;
 import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.osgi.framework.console.CommandProvider;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
@@ -105,23 +106,13 @@ public class HelpCommand {
 	 * @throws Exception
 	 */
 	public void help(final CommandSession session, String... args) throws Exception {
-		boolean isLegacy = false;
-		boolean isAll = false;
 		String command = null;
 		
 		if (args.length > 0) {
-			for (String arg : args) {
-				if (arg.equals("-legacy")) {
-					isLegacy = true;
-				} else if(arg.equals("-all")) {
-					isAll = true;
-				} else {
-					command = arg;
-				}
-			}
+			command = args[0];
 		}
 		
-		if (isLegacy == true && command != null) {
+		if (command != null) {
 			for (CommandProvider provider : legacyCommandProviders) {
 				Method[] methods = provider.getClass().getMethods();
 				for (Method method : methods) {
@@ -144,36 +135,52 @@ public class HelpCommand {
 					}
 				}
 			}
+			
+			try {
+				session.execute("felix:help " + command);
+			} catch (IllegalArgumentException e) {
+				handleCommandNotFound();
+			}
+			
 			return;
 		}
-		
-		if (isLegacy == false && command != null) {
-			session.execute("help " + command);
-			return;
+
+		printLegacyCommands();
+		try {
+			session.execute("felix:help");
+		} catch (IllegalArgumentException e) {
+			handleCommandNotFound();
 		}
-		
-		if (isLegacy == true) {
-			printLegacyCommands();
-			return;
-		} 
-		
-		if (isAll == true) {
-			printLegacyCommands();
-			session.execute("help");
-			return;
-		}
-						
-		session.execute("help");
+
 	}
 	
 	private void printLegacyCommands() {
 		for (CommandProvider provider : legacyCommandProviders) {
 			Method[] methods = provider.getClass().getMethods();
 			for (Method method : methods) {
-				if (method.getName().startsWith("_")) {
+				if (method.getName().startsWith("_") && !method.getName().equals("_help")) {
 					System.out.println("equinox:" + method.getName().substring(1));
 				}
 			}
+		}
+	}
+	
+	private boolean checkStarted(String symbolicName) {
+		Bundle[] bundles = context.getBundles();
+		for (Bundle bundle : bundles) {
+			if (bundle.getSymbolicName().equals(symbolicName) && bundle.getState() == Bundle.ACTIVE) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	private void handleCommandNotFound() {
+		if (checkStarted("org.apache.felix.gogo.command")) {
+			System.out.println("Cannot find felix:help command");
+		} else {
+			System.out.println("Cannot find felix:help command; bundle org.apache.felix.gogo.command is not started");
 		}
 	}
 }

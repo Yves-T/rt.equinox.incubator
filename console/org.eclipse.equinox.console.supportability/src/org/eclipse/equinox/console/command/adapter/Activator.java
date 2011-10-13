@@ -32,8 +32,10 @@ import org.eclipse.equinox.console.telnet.TelnetCommand;
 import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.osgi.framework.console.CommandProvider;
 import org.eclipse.osgi.framework.console.ConsoleSession;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.condpermadmin.ConditionalPermissionAdmin;
@@ -51,7 +53,7 @@ public class Activator implements BundleActivator {
 	private ServiceTracker<StartLevel, ?> startLevelManagerTracker;
 	private ServiceTracker<ConditionalPermissionAdmin, ?> condPermAdminTracker;
 	private ServiceTracker<PermissionAdmin, ?> permissionAdminTracker;
-	private ServiceTracker<PackageAdmin, ?> packageAdminTracker;
+	private ServiceTracker<PackageAdmin, PackageAdmin> packageAdminTracker;
 	private ServiceTracker<PlatformAdmin, ?> platformAdminTracker;
 	private static List<TelnetCommand> telnetConnections = new ArrayList<TelnetCommand>();
 	private static List<SshCommand> sshConnections = new ArrayList<SshCommand>();
@@ -123,6 +125,7 @@ public class Activator implements BundleActivator {
 			new Thread(new Runnable(){
 				public void run() {
                     try {
+                    	gogoSession.put("SCOPE", "equinox:*");
                     	gogoSession.put("prompt", "osgi> ");
                         gogoSession.execute("gosh --login --noshutdown");
                     }
@@ -211,7 +214,7 @@ public class Activator implements BundleActivator {
 		startLevelManagerTracker = new ServiceTracker<StartLevel, Object>(context, StartLevel.class.getName(), null);
 		startLevelManagerTracker.open();
 
-		packageAdminTracker = new ServiceTracker<PackageAdmin, Object>(context, PackageAdmin.class.getName(), null);
+		packageAdminTracker = new ServiceTracker<PackageAdmin, PackageAdmin>(context, PackageAdmin.class, null);
 		packageAdminTracker.open();
 
 		platformAdminTracker = new ServiceTracker<PlatformAdmin, Object>(context, PlatformAdmin.class.getName(), null);
@@ -228,8 +231,25 @@ public class Activator implements BundleActivator {
 		
 		DisconnectCommand disconnectCommand = new DisconnectCommand(context);
 		disconnectCommand.start();
+
+		startBundle("org.apache.felix.gogo.runtime", true);
+		startBundle("org.apache.felix.gogo.shell", true);
+		startBundle("org.apache.felix.gogo.command", false);
 	}
-	
+
+	private void startBundle(String bsn, boolean required) throws BundleException {
+		PackageAdmin pa = packageAdminTracker.getService();
+		if (pa != null) {
+			@SuppressWarnings("deprecation")
+			Bundle[] shells = pa.getBundles(bsn, null);
+			if (shells != null && shells.length > 0) {
+				shells[0].start(Bundle.START_TRANSIENT);
+			} else if (required) {
+				throw new BundleException("Missing required bundle: " + bsn);
+			}
+		}
+	}
+
 	public StartLevel getStartLevel() {
 		return (StartLevel) getServiceFromTracker(startLevelManagerTracker, StartLevel.class.getName());
 	}

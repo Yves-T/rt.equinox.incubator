@@ -59,6 +59,8 @@ public class SshShell implements Command, Closeable {
 	private Map<String, KEYS> currentEscapesToKey;
 	private static final String PROMPT = "prompt";
     private static final String OSGI_PROMPT = "osgi> ";
+    private static final String SCOPE = "SCOPE";
+    private static final String EQUINOX_SCOPE = "equinox:*";
     private static final String INPUT_SCANNER = "INPUT_SCANNER";
     private static final String SSH_INPUT_SCANNER = "SSH_INPUT_SCANNER";
     private static final String USER_STORAGE_PROPERTY_NAME = "osgi.console.ssh.useDefaultSecureStorage";
@@ -130,6 +132,7 @@ public class SshShell implements Command, Closeable {
 		final PrintStream output = new PrintStream(outp);
 		
         session = processor.createSession(inp, output, output);
+        session.put(SCOPE, EQUINOX_SCOPE);
         session.put(PROMPT, OSGI_PROMPT);
         session.put(INPUT_SCANNER, consoleInputHandler.getScanner());
         session.put(SSH_INPUT_SCANNER, inputHandler.getScanner());
