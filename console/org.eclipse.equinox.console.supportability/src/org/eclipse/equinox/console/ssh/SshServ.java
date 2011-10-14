@@ -12,6 +12,7 @@
 package org.eclipse.equinox.console.ssh;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.sshd.SshServer;
@@ -34,10 +35,10 @@ public class SshServ extends Thread {
 	private static final String SSH_KEYSTORE_PROP_DEFAULT = "hostkey.ser";
 	private static final String EQUINOX_CONSOLE_DOMAIN = "equinox_console";
 	
-    public SshServ(CommandProcessor processor, BundleContext context, String host, int port) {
+    public SshServ(List<CommandProcessor> processors, BundleContext context, String host, int port) {
     	this.host = host;
     	this.port = port;
-    	shellFactory = new SshShellFactory(processor, context);
+    	shellFactory = new SshShellFactory(processors, context);
     }
     
     public void run() throws RuntimeException {
@@ -67,6 +68,14 @@ public class SshServ extends Thread {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+    }
+    
+    public synchronized void addCommandProcessor(CommandProcessor processor) {
+    	shellFactory.addCommandProcessor(processor);
+    }
+    
+    public synchronized void removeCommandProcessor(CommandProcessor processor) {
+    	shellFactory.removeCommandProcessor(processor);
     }
     
     private PasswordAuthenticator createJaasPasswordAuthenticator() {

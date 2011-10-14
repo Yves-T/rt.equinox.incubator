@@ -17,7 +17,9 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.felix.service.command.CommandProcessor;
@@ -93,7 +95,9 @@ public class SshShellTests {
             EasyMock.expect(env.getEnv()).andReturn(environment);
             EasyMock.replay(env);
             
-            shell = new SshShell(processor, context);
+            List<CommandProcessor> processors = new ArrayList<CommandProcessor>();
+            processors.add(processor);
+            shell = new SshShell(processors, context);
             shell.setInputStream(socketServer.getInputStream());
             shell.setOutputStream(socketServer.getOutputStream());
             shell.start(env);

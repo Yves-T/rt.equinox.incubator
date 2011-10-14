@@ -12,6 +12,7 @@
 package org.eclipse.equinox.console.ssh;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.felix.service.command.CommandProcessor;
@@ -25,19 +26,33 @@ import org.osgi.framework.BundleContext;
  */
 public class SshShellFactory implements Factory<Command> {
 	
-	private CommandProcessor processor;
+	private List<CommandProcessor> processors;
 	private BundleContext context;
 	private Set<SshShell> shells = new HashSet<SshShell>();
 	
-	public SshShellFactory(CommandProcessor processor, BundleContext context) {
-		this.processor = processor;
+	public SshShellFactory(List<CommandProcessor> processors, BundleContext context) {
+		this.processors = processors;
 		this.context = context;
 	}
 	
-	public Command create() {
-		SshShell shell = new SshShell(processor, context);
+	public synchronized Command create() {
+		SshShell shell = new SshShell(processors, context);
 		shells.add(shell);
 		return shell;
+	}
+	
+	public synchronized void addCommandProcessor (CommandProcessor processor) {
+		processors.add(processor);
+		for (SshShell shell : shells) {
+			shell.addCommandProcessor(processor);
+		}
+	}
+	
+	public synchronized void removeCommandProcessor (CommandProcessor processor) {
+		processors.remove(processor);
+		for (SshShell shell : shells) {
+			shell.removeCommandProcessor(processor);
+		}
 	}
 	
 	public void exit() {

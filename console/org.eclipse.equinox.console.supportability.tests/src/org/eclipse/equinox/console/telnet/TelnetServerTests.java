@@ -22,6 +22,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.easymock.EasyMock.*;
 
@@ -47,7 +49,9 @@ public class TelnetServerTests {
         EasyMock.expect(processor.createSession((ConsoleInputStream)EasyMock.anyObject(), (PrintStream)EasyMock.anyObject(), (PrintStream)EasyMock.anyObject())).andReturn(session);
         EasyMock.replay(processor);
         
-        TelnetServer telnetServer = new TelnetServer(null, processor, HOST, PORT);
+        List<CommandProcessor> processors = new ArrayList<CommandProcessor>();
+        processors.add(processor);
+        TelnetServer telnetServer = new TelnetServer(null, processors, HOST, PORT);
         telnetServer.start();
         Socket socketClient = null;
 
@@ -88,7 +92,9 @@ public class TelnetServerTests {
         EasyMock.expect(processor.createSession((ConsoleInputStream)EasyMock.anyObject(), (PrintStream)EasyMock.anyObject(), (PrintStream)EasyMock.anyObject())).andReturn(session);
         EasyMock.replay(processor);
         
-        TelnetServer telnetServer = new TelnetServer(null, processor, null, PORT);
+        List<CommandProcessor> processors = new ArrayList<CommandProcessor>();
+        processors.add(processor);
+        TelnetServer telnetServer = new TelnetServer(null, processors, null, PORT);
         telnetServer.start();
         Socket socketClient = null;
 
