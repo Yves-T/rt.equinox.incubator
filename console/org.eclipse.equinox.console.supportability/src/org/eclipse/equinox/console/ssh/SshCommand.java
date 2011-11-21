@@ -14,8 +14,10 @@ package org.eclipse.equinox.console.ssh;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.Descriptor;
@@ -34,7 +36,7 @@ import org.osgi.service.cm.ManagedService;
 public class SshCommand {
 	private String defaultHost = null;
 	private int defaultPort;
-    private final CommandProcessor processor;
+    private List<CommandProcessor> processors = new ArrayList<CommandProcessor>();
     private String host = null;
     private int port;
     private SshServ sshServ;
@@ -53,7 +55,7 @@ public class SshCommand {
     private static final String ENABLED = "enabled";
     
     public SshCommand(CommandProcessor processor, BundleContext context) {
-        this.processor = processor;
+        processors.add(processor);
         this.context = context;
         
         if ("true".equals(context.getProperty(USE_CONFIG_ADMIN_PROP))) {
@@ -160,7 +162,7 @@ public class SshCommand {
             checkPortAvailable(port);
             
             try {
-				sshServ = new SshServ(processor, context, host, port);
+				sshServ = new SshServ(processors, context, host, port);
 			} catch (NoClassDefFoundError e) {
 				// ssh server bundles are optional and may not be available
 				System.out.println("SSH bundles not available! If you want to use SSH, please install Apache sshd-core, Apache mina-core, slf4j-api and a slf4j logger implementation bundles");
@@ -192,12 +194,27 @@ public class SshCommand {
 			}    
         } else if ("stop".equals(command)) {
             if (sshServ == null) {
-                throw new IllegalStateException("ssh is not running.");
+                System.out.println("ssh is not running.");
+                return;
             }
             
             sshServ.stopSshServer();
             sshServ = null;
         } 
+    }
+    
+    public synchronized void addCommandProcessor(CommandProcessor processor) {
+    	processors.add(processor);
+    	if (sshServ != null) {
+    		sshServ.addCommandProcessor(processor);
+    	}
+    }
+    
+    public synchronized void removeCommandProcessor(CommandProcessor processor) {
+    	processors.remove(processor);
+    	if (sshServ != null) {
+    		sshServ.removeCommandProcessor(processor);
+    	}
     }
     
     private void checkPortAvailable(int port) throws Exception {

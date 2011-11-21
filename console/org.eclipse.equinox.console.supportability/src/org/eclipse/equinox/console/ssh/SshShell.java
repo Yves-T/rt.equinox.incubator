@@ -15,18 +15,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.felix.service.command.CommandProcessor;
-import org.apache.felix.service.command.CommandSession;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
-import java.io.Closeable;
-import org.eclipse.equinox.console.common.ConsoleInputStream;
-import org.eclipse.equinox.console.common.ConsoleOutputStream;
 import org.eclipse.equinox.console.common.KEYS;
 import org.eclipse.equinox.console.common.terminal.ANSITerminalTypeMappings;
 import org.eclipse.equinox.console.common.terminal.SCOTerminalTypeMappings;
@@ -34,43 +30,30 @@ import org.eclipse.equinox.console.common.terminal.TerminalTypeMappings;
 import org.eclipse.equinox.console.common.terminal.VT100TerminalTypeMappings;
 import org.eclipse.equinox.console.common.terminal.VT220TerminalTypeMappings;
 import org.eclipse.equinox.console.common.terminal.VT320TerminalTypeMappings;
-import org.eclipse.equinox.console.storage.SecureUserStore;
-import org.eclipse.equinox.console.supportability.ConsoleInputHandler;
-import org.eclipse.equinox.console.supportability.ConsoleInputScanner;
 import org.osgi.framework.BundleContext;
 
 /**
- * This class manages a ssh connection. It is responsible for wrapping the original io streams
- * from the ssh server, and starting a CommandSession to execute commands from the ssh.
+ * This class manages a ssh connection. It is responsible for starting a sessions to execute commands 
+ * from the ssh. If there are multiple CommandProcessors, a session is started for each of them.
  *
  */
-public class SshShell implements Command, Closeable {
+public class SshShell implements Command {
 	
-	private CommandProcessor processor;
+	private List<CommandProcessor> processors;
 	private BundleContext context;
 	private InputStream in;
 	private OutputStream out;
 	private ExitCallback callback;
-	private Thread thread;
+	private Map<CommandProcessor, SshSession> commandProcessorToConsoleThreadMap = new HashMap<CommandProcessor, SshSession>();
 	
 	private final Map<String, TerminalTypeMappings> supportedEscapeSequences;
 	private static final String DEFAULT_TTYPE = File.separatorChar == '/' ? "XTERM" : "ANSI";
 	private TerminalTypeMappings currentMappings;
 	private Map<String, KEYS> currentEscapesToKey;
-	private static final String PROMPT = "prompt";
-    private static final String OSGI_PROMPT = "osgi> ";
-    private static final String SCOPE = "SCOPE";
-    private static final String EQUINOX_SCOPE = "equinox:*";
-    private static final String INPUT_SCANNER = "INPUT_SCANNER";
-    private static final String SSH_INPUT_SCANNER = "SSH_INPUT_SCANNER";
-    private static final String USER_STORAGE_PROPERTY_NAME = "osgi.console.ssh.useDefaultSecureStorage";
-    private static final String DEFAULT_USER = "equinox";
     private static final String TERMINAL_PROPERTY = "TERM";
-    private static final String CLOSEABLE = "CLOSEABLE";
-	private static final int ADD_USER_COUNTER_LIMIT = 2;
 	
-	public SshShell(CommandProcessor processor, BundleContext context) {
-		this.processor = processor;
+	public SshShell(List<CommandProcessor> processors, BundleContext context) {
+		this.processors = processors;
 		this.context = context;
 		supportedEscapeSequences = new HashMap<String, TerminalTypeMappings> ();
         supportedEscapeSequences.put("ANSI", new ANSITerminalTypeMappings());
@@ -102,7 +85,7 @@ public class SshShell implements Command, Closeable {
 		this.callback = callback;
 	}
 
-	public void start(Environment env) throws IOException {
+	public synchronized void start(Environment env) throws IOException {
 		String term = env.getEnv().get(TERMINAL_PROPERTY);
 		TerminalTypeMappings mapping = supportedEscapeSequences.get(term.toUpperCase());
 		if(mapping != null) {
@@ -110,73 +93,25 @@ public class SshShell implements Command, Closeable {
 			currentEscapesToKey = mapping.getEscapesToKey();
 		}
 		
-		ConsoleInputStream input = new ConsoleInputStream();
-		ConsoleOutputStream outp = new ConsoleOutputStream(out);
-		SshInputHandler inputHandler = new SshInputHandler(in, input, outp);
-		inputHandler.getScanner().setBackspace(currentMappings.getBackspace());
-		inputHandler.getScanner().setDel(currentMappings.getDel());
-		inputHandler.getScanner().setCurrentEscapesToKey(currentEscapesToKey);
-		inputHandler.getScanner().setEscapes(currentMappings.getEscapes());
-		inputHandler.start();
-		
-		ConsoleInputStream inp = new ConsoleInputStream();
-        ConsoleInputHandler consoleInputHandler = new ConsoleInputHandler(input, inp, outp);
-        consoleInputHandler.getScanner().setBackspace(currentMappings.getBackspace());
-        consoleInputHandler.getScanner().setDel(currentMappings.getDel());
-        consoleInputHandler.getScanner().setCurrentEscapesToKey(currentEscapesToKey);
-        consoleInputHandler.getScanner().setEscapes(currentMappings.getEscapes());
-        ((ConsoleInputScanner)consoleInputHandler.getScanner()).setContext(context);
-        consoleInputHandler.start();
-        
-        final CommandSession session;
-		final PrintStream output = new PrintStream(outp);
-		
-        session = processor.createSession(inp, output, output);
-        session.put(SCOPE, EQUINOX_SCOPE);
-        session.put(PROMPT, OSGI_PROMPT);
-        session.put(INPUT_SCANNER, consoleInputHandler.getScanner());
-        session.put(SSH_INPUT_SCANNER, inputHandler.getScanner());
-        // Store this closeable object in the session, so that the disconnect command can close it
-        session.put(CLOSEABLE, this);
-        ((ConsoleInputScanner)consoleInputHandler.getScanner()).setSession(session);
-        
-        thread = new Thread() {
-        	public void run() {
-        		try {
-        			if ("true".equals(context.getProperty(USER_STORAGE_PROPERTY_NAME))) {
-        				String[] names = SecureUserStore.getUserNames();
-        				for (String name : names) {
-        					// if the default user is the only user, request creation of a new user and delete the default
-        					if (DEFAULT_USER.equals(name)) {
-        						if (names.length == 1) {
-        							session.getConsole().println("Currently the default user is the only one; since it will be deleted after first login, create a new user:");
-        							boolean isUserAdded =false;
-        							int count = 0;
-        							while (!isUserAdded && count < ADD_USER_COUNTER_LIMIT ){
-        								isUserAdded = ((Boolean) session.execute("addUser")).booleanValue();
-        								count++;
-        							}
-        							if (!isUserAdded) {
-        								break;
-        							}
-        						}
-        						if (SecureUserStore.existsUser(name)) {
-        							SecureUserStore.deleteUser(name);
-        						}
-        						break;
-        					}
-        				}
-        			}
-					session.execute("gosh --login --noshutdown");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    session.close();
-                }
-        	}
-        };
-        
-        thread.start();
+		for (CommandProcessor processor : processors) {
+			createNewSession(processor);
+		}
+	}
+	
+	public synchronized void addCommandProcessor(CommandProcessor processor) {
+		createNewSession(processor);
+	}
+	
+	public synchronized void removeCommandProcessor(CommandProcessor processor) {
+		Thread consoleSession = commandProcessorToConsoleThreadMap.get(processor);
+		if (consoleSession != null) {
+			consoleSession.interrupt();
+		}
+	}
+	
+	private void createNewSession(CommandProcessor processor) {
+		SshSession consoleSession = startNewConsoleSession(processor);
+		commandProcessorToConsoleThreadMap.put(processor, consoleSession);
 	}
 
 	public void destroy() {
@@ -184,12 +119,36 @@ public class SshShell implements Command, Closeable {
 	}
 	
 	public void onExit() {
-		thread.interrupt();
+		if (commandProcessorToConsoleThreadMap.values() != null) {
+			for (Thread consoleSession : commandProcessorToConsoleThreadMap.values()) {
+				consoleSession.interrupt();
+			}
+		}
 		callback.onExit(0);
 	}
-
-	public void close() {
-		onExit();
+	
+	public void removeSession(SshSession session) {
+		CommandProcessor processorToRemove = null;
+		for (CommandProcessor processor : commandProcessorToConsoleThreadMap.keySet()) {
+			if (session.equals(commandProcessorToConsoleThreadMap.get(processor))) {
+				processorToRemove = processor;
+				break;
+			}
+		}
+		
+		if (processorToRemove != null) {
+			commandProcessorToConsoleThreadMap.remove(processorToRemove);
+		}
+		
+		if (commandProcessorToConsoleThreadMap.size() == 0) {
+			onExit();
+		}
+	}
+	
+	private SshSession startNewConsoleSession(CommandProcessor processor) {
+		SshSession consoleSession = new SshSession(processor, context, this, in, out, currentMappings, currentEscapesToKey);
+        consoleSession.start();
+        return consoleSession;
 	}
 
 }

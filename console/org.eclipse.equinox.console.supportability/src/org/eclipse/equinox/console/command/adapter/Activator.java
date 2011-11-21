@@ -55,6 +55,11 @@ public class Activator implements BundleActivator {
 	private ServiceTracker<PermissionAdmin, ?> permissionAdminTracker;
 	private ServiceTracker<PackageAdmin, PackageAdmin> packageAdminTracker;
 	private ServiceTracker<PlatformAdmin, ?> platformAdminTracker;
+	private static boolean isFirstProcessor = true;
+	private static TelnetCommand telnetConnection = null;
+	private static SshCommand sshConnection = null;
+	private static Object telnetLock = new Object();
+	private static Object sshLock = new Object(); 
 	private static List<TelnetCommand> telnetConnections = new ArrayList<TelnetCommand>();
 	private static List<SshCommand> sshConnections = new ArrayList<SshCommand>();
 	
@@ -79,12 +84,16 @@ public class Activator implements BundleActivator {
 			if (processor == null)
 				return null;
 			
-			TelnetCommand telnetCommand = new TelnetCommand(processor, context);
-			telnetCommand.start();
-			telnetConnections.add(telnetCommand);
-			SshCommand sshCommand = new SshCommand(processor, context);
-			sshCommand.start();
-			sshConnections.add(sshCommand);
+			if (isFirstProcessor) {
+				isFirstProcessor = false;
+				telnetConnection = new TelnetCommand(processor, context);
+				telnetConnection.start();
+				sshConnection = new SshCommand(processor, context);
+				sshConnection.start();
+			} else {
+				telnetConnection.addCommandProcessor(processor);
+				sshConnection.addCommandProcessor(processor);
+			}
 			
 			ServiceTracker<ConsoleSession, CommandSession> tracker = new ServiceTracker<ConsoleSession, CommandSession>(context, ConsoleSession.class, new SessionCustomizer(context, processor));
 			tracker.open();
@@ -101,6 +110,9 @@ public class Activator implements BundleActivator {
 			ServiceReference<CommandProcessor> reference,
 			ServiceTracker<ConsoleSession, CommandSession> tracker) {
 			tracker.close();
+			CommandProcessor processor = context.getService(reference);
+			telnetConnection.removeCommandProcessor(processor);
+			sshConnection.removeCommandProcessor(processor);
 		}	
 	}
 
@@ -315,21 +327,18 @@ public class Activator implements BundleActivator {
 		if (equinoxCmdProvider != null) {
 			equinoxCmdProvider.stop();
 		}
-		
-		for (TelnetCommand telnetCommand : telnetConnections) {
-			try {
-				telnetCommand.telnet(new String[]{"stop"});
-			} catch (Exception e) {
-				// expected if the telnet server is not started
-			}
+
+		try {
+			telnetConnection.telnet(new String[]{"stop"});
+		} catch (Exception e) {
+			// expected if the telnet server is not started
 		}
-		
-		for (SshCommand sshCommand : sshConnections) {
-			try {
-				sshCommand.ssh(new String[]{"stop"});
-			} catch (Exception e) {
-				// expected if the ssh server is not started
-			}
+
+		try {
+			sshConnection.ssh(new String[]{"stop"});
+		} catch (Exception e) {
+			// expected if the ssh server is not started
 		}
+
 	}
 }

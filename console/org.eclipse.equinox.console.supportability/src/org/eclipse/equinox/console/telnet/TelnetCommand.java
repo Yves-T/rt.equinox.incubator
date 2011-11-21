@@ -12,8 +12,10 @@
 package org.eclipse.equinox.console.telnet;
 
 import java.net.BindException;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.Descriptor;
@@ -31,7 +33,7 @@ public class TelnetCommand {
 	
 	private String defaultHost = null;
     private int defaultPort;
-    private final CommandProcessor processor;
+    private List<CommandProcessor> processors = new ArrayList<CommandProcessor>();
     private final BundleContext context;
     private String host = null;
     private int port;
@@ -49,7 +51,7 @@ public class TelnetCommand {
 
     public TelnetCommand(CommandProcessor processor, BundleContext context)
     {
-        this.processor = processor;
+        processors.add(processor);
         this.context = context;
         if ("true".equals(context.getProperty(USE_CONFIG_ADMIN_PROP))) {
         	Dictionary<String, String> telnetProperties = new Hashtable<String, String>();
@@ -154,7 +156,7 @@ public class TelnetCommand {
             }
             
             try {
-				telnetServer = new TelnetServer(context, processor, host, port);
+				telnetServer = new TelnetServer(context, processors, host, port);
 			} catch (BindException e) {
 				throw new Exception("Port " + port + " already in use");
 			}
@@ -163,12 +165,27 @@ public class TelnetCommand {
             telnetServer.start();    
         } else if ("stop".equals(command)) {
             if (telnetServer == null) {
-                throw new IllegalStateException("telnet is not running.");
+                System.out.println("telnet is not running.");
+                return;
             }
             
             telnetServer.stopTelnetServer();
             telnetServer = null;
         } 
+    }
+    
+    public synchronized void addCommandProcessor(CommandProcessor processor) {
+    	processors.add(processor);
+    	if (telnetServer != null) {
+    		telnetServer.addCommandProcessor(processor);
+    	}
+    }
+    
+    public synchronized void removeCommandProcessor(CommandProcessor processor) {
+    	processors.remove(processor);
+    	if (telnetServer != null) {
+    		telnetServer.removeCommandProcessor(processor);
+    	}
     }
     
     private void printHelp() {

@@ -35,7 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 
-public class SshDisconnectCommand {
+public class SshDisconnectCommandTests {
 	private static final int TEST_CONTENT = 100;
 	private static final String USER_STORE_FILE_NAME = "org.eclipse.equinox.console.jaas.file";
 	private static final String JAAS_CONFIG_FILE_NAME = "jaas.config";
@@ -56,7 +56,7 @@ public class SshDisconnectCommand {
 	private static final String HOST = "localhost";
 	private static final int SSH_PORT = 2222;
 	private static final long WAIT_TIME = 5000;
-	private SshShell sshShell;
+	private SshSession sshSession;
 	private InputStream in;
 
 	@Before
@@ -77,19 +77,21 @@ public class SshDisconnectCommand {
 		session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
 		EasyMock.expectLastCall();
 		session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
+		EasyMock.expectLastCall();
+		session.put((String)EasyMock.anyObject(), EasyMock.anyObject());
 		EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
 
 			@Override
 			public Object answer() throws Throwable {
-				sshShell = (SshShell)EasyMock.getCurrentArguments()[1];
+				sshSession = (SshSession)EasyMock.getCurrentArguments()[1];
 				return null;
 			}
 			
 		});
 		EasyMock.expect(session.execute(GOGO_SHELL_COMMAND)).andReturn(null);
-		EasyMock.expect(session.get("CLOSEABLE")).andReturn(sshShell);
+		EasyMock.expect(session.get("CLOSEABLE")).andReturn(sshSession);
 		session.close();
-		EasyMock.expectLastCall();
+		EasyMock.expectLastCall().atLeastOnce();
 		EasyMock.replay(session);
 
 		CommandProcessor processor = EasyMock.createMock(CommandProcessor.class);
