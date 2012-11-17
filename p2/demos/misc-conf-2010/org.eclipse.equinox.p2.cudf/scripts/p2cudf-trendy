@@ -1,2 +1,0 @@
-#!/bin/bash
-./p2cudf $1 trendy $2
